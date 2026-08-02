@@ -1,0 +1,69 @@
+.formulaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+}
+
+@media (max-width: 800px) {
+  .formulaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.sectionHead h2 {
+  margin-top: 14px;
+}
+
+.serviceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .serviceGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .serviceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.note {
+  margin-top: 40px;
+  padding: 24px 28px;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-blue-soft);
+  border: 1px solid rgba(63, 99, 255, 0.3);
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.ctaBanner {
+  border-radius: var(--radius-lg);
+  padding: clamp(40px, 6vw, 64px);
+  text-align: center;
+  background: linear-gradient(135deg, #1a0f2e, #2c1030 45%, #2c1414 100%);
+  border: 1px solid var(--color-border-strong);
+}
+
+.ctaBanner p {
+  margin-top: 12px;
+}
+
+.ctaActions {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}

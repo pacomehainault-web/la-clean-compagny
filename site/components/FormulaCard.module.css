@@ -1,0 +1,101 @@
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-strong);
+}
+
+.featured {
+  border-image: linear-gradient(120deg, #8b3bf0, #e23fa0, #ef4444) 1;
+  background: linear-gradient(180deg, rgba(139, 59, 240, 0.08), var(--color-surface) 40%);
+}
+
+.ribbon {
+  position: absolute;
+  top: -1px;
+  right: 28px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 0 0 10px 10px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tagline {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.priceFrom {
+  font-size: 0.82rem;
+  color: var(--color-text-faint);
+}
+
+.price {
+  font-family: var(--font-heading), serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.duration {
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.description {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.includes {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.includes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--color-text);
+}
+
+.includes svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--color-brand-blue);
+}
+
+.actions {
+  margin-top: auto;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,115 @@
+.storyGrid {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 56px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.storyImage {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-elevated);
+  position: sticky;
+  top: calc(var(--header-height) + 24px);
+}
+
+.storyImage img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.prose p {
+  color: var(--color-text-muted);
+  font-size: 1.02rem;
+  line-height: 1.8;
+  margin-bottom: 22px;
+}
+
+.prose h2 {
+  margin-top: 36px;
+  margin-bottom: 16px;
+  font-size: 1.7rem;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.quote {
+  margin: 32px 0;
+  padding: 24px 28px;
+  border-left: 3px solid var(--color-brand-blue);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-family: var(--font-heading), serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--color-text);
+}
+
+.signature {
+  margin-top: 8px;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--color-text-faint);
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.valueCard {
+  padding: 26px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.valueCard svg {
+  color: var(--color-brand-blue);
+  margin-bottom: 14px;
+}
+
+.valueCard h3 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.valueCard p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.sectionHead h2 {
+  margin-top: 14px;
+}

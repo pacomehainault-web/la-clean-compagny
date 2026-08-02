@@ -1,0 +1,146 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  background: rgba(8, 8, 10, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid transparent;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.headerScrolled {
+  background: rgba(8, 8, 10, 0.86);
+  border-bottom-color: var(--color-border);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.brand img {
+  height: 46px;
+  width: auto;
+}
+
+.nav {
+  display: none;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav a {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color 0.2s var(--ease);
+  white-space: nowrap;
+}
+
+.nav a:hover {
+  color: var(--color-text);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+}
+
+.phone {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.phone:hover {
+  color: var(--color-text);
+}
+
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+@media (min-width: 1000px) {
+  .nav {
+    display: flex;
+  }
+  .phone {
+    display: inline-flex;
+  }
+  .menuBtn {
+    display: none;
+  }
+}
+
+/* Mobile overlay */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(6, 6, 8, 0.98);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--header-height) + 20px) 24px 32px;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.overlay a {
+  font-family: var(--font-heading), serif;
+  font-size: 1.7rem;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.overlayFooter {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.overlayContact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+@media (min-width: 1000px) {
+  .overlay {
+    display: none;
+  }
+}

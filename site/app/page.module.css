@@ -1,0 +1,336 @@
+.hero {
+  position: relative;
+  padding-block: clamp(56px, 8vw, 96px) clamp(48px, 6vw, 80px);
+  overflow: hidden;
+}
+
+.heroGlow {
+  position: absolute;
+  top: -280px;
+  right: -220px;
+  width: 640px;
+  height: 640px;
+  background: radial-gradient(circle, rgba(139, 59, 240, 0.28), transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.heroContent h1 {
+  margin-top: 18px;
+}
+
+.heroLead {
+  margin-top: 22px;
+  max-width: 52ch;
+}
+
+.heroActions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.trustRow {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.trustItem svg {
+  color: var(--color-brand-blue);
+  flex: none;
+}
+
+.heroVisual {
+  position: relative;
+}
+
+.heroImageFrame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-elevated);
+  aspect-ratio: 4 / 5;
+}
+
+.heroImageFrame img {
+  object-fit: cover;
+}
+
+.heroBadgeFloat {
+  position: absolute;
+  bottom: -18px;
+  left: -18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-elevated);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .heroBadgeFloat {
+    left: 12px;
+  }
+}
+
+.heroBadgeStars {
+  color: #f5b800;
+  display: flex;
+  gap: 2px;
+}
+
+.heroBadgeLabel {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.statsBar {
+  padding-block: 36px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 48px;
+}
+
+.sectionHead h2 {
+  margin-top: 14px;
+}
+
+.sectionHeadRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.formulaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+}
+
+@media (max-width: 800px) {
+  .formulaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.complementaryNote {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+}
+
+.vehicleGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .vehicleGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .vehicleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.vehicleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 26px 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  text-align: center;
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.vehicleCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-strong);
+}
+
+.vehicleCard svg {
+  color: var(--color-text);
+  width: 52px;
+  height: auto;
+}
+
+.vehicleCard span {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.sliderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .sliderGrid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.storyImage {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-elevated);
+}
+
+.storyImage img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.storyQuote {
+  margin-top: 20px;
+  padding-left: 18px;
+  border-left: 2px solid var(--color-brand-blue);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.reviewsFooter {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.zoneGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .zoneGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 48px;
+}
+
+@media (max-width: 900px) {
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ctaBanner {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  padding: clamp(48px, 7vw, 80px);
+  text-align: center;
+  background: linear-gradient(135deg, #1a0f2e, #2c1030 45%, #2c1414 100%);
+  border: 1px solid var(--color-border-strong);
+}
+
+.ctaBannerInner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.ctaBannerInner p {
+  margin-top: 16px;
+}
+
+.ctaBannerActions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}

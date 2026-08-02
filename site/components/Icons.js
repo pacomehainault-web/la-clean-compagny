@@ -1,0 +1,306 @@
+function VehicleBase({ children, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 120 60"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      {children}
+    </svg>
+  )
+}
+
+export function IconCitadine(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M14,46 L14,34 C14,26 20,20 28,19 L34,13 C38,9.5 44,7.5 50,7.5 L64,7.5 C69,7.5 73,10 75,15 L79,20 C89,21 98,26 104,34 L104,46 Z" />
+      <line x1="14" y1="46" x2="104" y2="46" />
+      <circle cx="32" cy="46" r="7.5" fill="currentColor" stroke="none" />
+      <circle cx="90" cy="46" r="7.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconBerline(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M8,46 L8,36 C8,30 12,26 18,25 L28,15 C32,11 38,9 44,9 L60,9 C65,9 69,11.5 72,16 L78,24 L96,26 C103,27 110,31 111,37 L111,46 Z" />
+      <line x1="8" y1="46" x2="111" y2="46" />
+      <line x1="18" y1="25" x2="78" y2="24" />
+      <circle cx="28" cy="46" r="7.5" fill="currentColor" stroke="none" />
+      <circle cx="94" cy="46" r="7.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconSUV(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M13,46 L13,28 L23,15 L96,15 C104,15 111,21 111,29 L111,46 Z" />
+      <line x1="13" y1="46" x2="111" y2="46" />
+      <line x1="23" y1="15" x2="23" y2="46" />
+      <circle cx="32" cy="46" r="8.5" fill="currentColor" stroke="none" />
+      <circle cx="92" cy="46" r="8.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconMonospace(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M12,46 L12,22 C12,14 18,9.5 26,9.5 L96,9.5 C104,9.5 111,14 111,22 L111,46 Z" />
+      <line x1="12" y1="46" x2="111" y2="46" />
+      <line x1="70" y1="9.5" x2="70" y2="46" />
+      <circle cx="31" cy="46" r="7.5" fill="currentColor" stroke="none" />
+      <circle cx="94" cy="46" r="7.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconUtilitaire(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M8,46 L8,24 C8,15.5 15,11 23,11 L99,11 C107,11 113,16.5 113,25 L113,46 Z" />
+      <rect x="15" y="18" width="15" height="12" rx="1.5" />
+      <line x1="8" y1="46" x2="113" y2="46" />
+      <line x1="36" y1="11" x2="36" y2="46" />
+      <circle cx="26" cy="46" r="7.5" fill="currentColor" stroke="none" />
+      <circle cx="97" cy="46" r="7.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export const VEHICLE_ICONS = {
+  citadine: IconCitadine,
+  berline: IconBerline,
+  suv: IconSUV,
+  monospace: IconMonospace,
+  utilitaire: IconUtilitaire,
+}
+
+function UiBase({ children, size = 22, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      {children}
+    </svg>
+  )
+}
+
+export function IconCheck(props) {
+  return (
+    <UiBase {...props}>
+      <polyline points="20 6 9 17 4 12" />
+    </UiBase>
+  )
+}
+
+export function IconChevronDown(props) {
+  return (
+    <UiBase {...props}>
+      <polyline points="6 9 12 15 18 9" />
+    </UiBase>
+  )
+}
+
+export function IconChevronRight(props) {
+  return (
+    <UiBase {...props}>
+      <polyline points="9 6 15 12 9 18" />
+    </UiBase>
+  )
+}
+
+export function IconArrowRight(props) {
+  return (
+    <UiBase {...props}>
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <polyline points="13 5 20 12 13 19" />
+    </UiBase>
+  )
+}
+
+export function IconMenu(props) {
+  return (
+    <UiBase {...props}>
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </UiBase>
+  )
+}
+
+export function IconClose(props) {
+  return (
+    <UiBase {...props}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </UiBase>
+  )
+}
+
+export function IconPhone(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 2 6a2 2 0 0 1 2-2Z" />
+    </UiBase>
+  )
+}
+
+export function IconMapPin(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </UiBase>
+  )
+}
+
+export function IconClock(props) {
+  return (
+    <UiBase {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <polyline points="12 7 12 12 15.5 14" />
+    </UiBase>
+  )
+}
+
+export function IconShield(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3Z" />
+      <polyline points="9 12 11.5 14.5 15.5 9.5" />
+    </UiBase>
+  )
+}
+
+export function IconDroplet(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12Z" />
+    </UiBase>
+  )
+}
+
+export function IconSparkle(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
+      <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z" />
+    </UiBase>
+  )
+}
+
+export function IconStar(props) {
+  return (
+    <UiBase fill="currentColor" stroke="none" {...props}>
+      <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.6 6.1 20.6l1.3-6.6-4.9-4.6 6.6-.8L12 2.5Z" />
+    </UiBase>
+  )
+}
+
+export function IconLeaf(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M5 20c9 0 14-5 14-14V4h-2C8 4 5 11 5 19v1Z" />
+      <line x1="5" y1="20" x2="14" y2="11" />
+    </UiBase>
+  )
+}
+
+export function IconEye(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </UiBase>
+  )
+}
+
+export function IconTarget(props) {
+  return (
+    <UiBase {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="0.6" fill="currentColor" />
+    </UiBase>
+  )
+}
+
+export function IconGift(props) {
+  return (
+    <UiBase {...props}>
+      <rect x="3" y="9" width="18" height="12" rx="1.5" />
+      <line x1="3" y1="14" x2="21" y2="14" />
+      <line x1="12" y1="9" x2="12" y2="21" />
+      <path d="M12 9C12 6 9.5 4 7.5 4S4 5.5 4 7.5 6 9 12 9Z" />
+      <path d="M12 9c0-3 2.5-5 4.5-5S20 5.5 20 7.5 18 9 12 9Z" />
+    </UiBase>
+  )
+}
+
+export function IconMail(props) {
+  return (
+    <UiBase {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <polyline points="3 7 12 13 21 7" />
+    </UiBase>
+  )
+}
+
+export function IconWhatsapp(props) {
+  return (
+    <UiBase fill="currentColor" stroke="none" {...props}>
+      <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.9 12.1l-.3.5.7 2.6-2.7-.7-.5.3A8 8 0 1 1 12 4Zm-3.1 4.1c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.9 4.5 4 2.2.9 2.7.7 3.2.7.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3-.2-.1-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.5-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.6-1.6-.9-2.1-.2-.5-.4-.5-.6-.5Z" />
+    </UiBase>
+  )
+}
+
+export function IconInstagram(props) {
+  return (
+    <UiBase {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+    </UiBase>
+  )
+}
+
+export function IconTiktok(props) {
+  return (
+    <UiBase fill="currentColor" stroke="none" {...props}>
+      <path d="M14 3c.4 2 2 3.5 4 3.8V10c-1.4 0-2.8-.4-4-1.2v6.3a5.6 5.6 0 1 1-5.6-5.6c.3 0 .5 0 .8.1v3.1a2.5 2.5 0 1 0 1.8 2.4V3h3Z" />
+    </UiBase>
+  )
+}
+
+export function IconFacebook(props) {
+  return (
+    <UiBase fill="currentColor" stroke="none" {...props}>
+      <path d="M13.5 21v-7.2h2.4l.4-2.8h-2.8V9.2c0-.8.2-1.4 1.4-1.4h1.5V5.3c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.1H8v2.8h2.5V21h3Z" />
+    </UiBase>
+  )
+}
+
+export function IconLinkedin(props) {
+  return (
+    <UiBase fill="currentColor" stroke="none" {...props}>
+      <path d="M6.9 8.6H3.9V20h3V8.6ZM5.4 4a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6ZM20.1 20h-3v-6c0-1.4-.5-2.4-1.8-2.4-1 0-1.6.7-1.9 1.3-.1.2-.1.6-.1.9v6.2h-3s.1-10.4 0-11.4h3v1.6c.4-.6 1.1-1.5 2.8-1.5 2.1 0 3.6 1.4 3.6 4.3V20Z" />
+    </UiBase>
+  )
+}

@@ -1,0 +1,28 @@
+.hero {
+  padding-block: clamp(48px, 7vw, 80px) clamp(36px, 5vw, 56px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hero h1 {
+  margin-top: 14px;
+  max-width: 20ch;
+}
+
+.lead {
+  margin-top: 18px;
+  max-width: 60ch;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--color-text-faint);
+  margin-bottom: 18px;
+}
+
+.breadcrumb a:hover {
+  color: var(--color-text-muted);
+}

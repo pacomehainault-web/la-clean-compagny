@@ -1,0 +1,305 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import styles from './page.module.css'
+import StatsRow from '@/components/StatsRow'
+import FormulaCard from '@/components/FormulaCard'
+import BeforeAfterSlider from '@/components/BeforeAfterSlider'
+import ReviewsGrid from '@/components/ReviewsGrid'
+import FAQAccordion from '@/components/FAQAccordion'
+import GoogleMapEmbed from '@/components/GoogleMapEmbed'
+import { VEHICLE_ICONS, IconStar, IconMapPin, IconShield, IconArrowRight, IconCheck } from '@/components/Icons'
+import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
+import { VEHICLE_TYPES } from '@/lib/data/vehicles'
+import { REVIEWS } from '@/lib/data/reviews'
+import { FAQ_ITEMS } from '@/lib/data/faq'
+import { CITIES } from '@/lib/data/cities'
+import { CONTACT, SITE, telLink } from '@/lib/constants'
+import { buildMetadata } from '@/lib/seo'
+
+export const metadata = buildMetadata({
+  title: 'Detailing automobile haut de gamme à Angers',
+  description:
+    "La Clean Compagny redonne à chaque véhicule l'éclat qu'il mérite : nettoyage intérieur/extérieur, polissage, traitement céramique, rénovation optiques. Intervention à Angers et dans un rayon de 30 km.",
+  path: '/',
+})
+
+const HOME_SLIDERS = [
+  { before: '/images/avant-apres/paire-1-avant.jpg', after: '/images/avant-apres/paire-1-apres.jpg', alt: 'Nettoyage intérieur — véhicule' },
+  { before: '/images/avant-apres/paire-2-avant.jpg', after: '/images/avant-apres/paire-2-apres.jpg', alt: 'Rénovation esthétique — véhicule' },
+  { before: '/images/avant-apres/paire-3-avant.jpg', after: '/images/avant-apres/paire-3-apres.jpg', alt: 'Detailing complet — véhicule' },
+]
+
+export default function HomePage() {
+  return (
+    <>
+      <section className={styles.hero}>
+        <div className={styles.heroGlow} aria-hidden="true" />
+        <div className="container">
+          <div className={styles.heroGrid}>
+            <div className={styles.heroContent}>
+              <span className="eyebrow">Detailing automobile haut de gamme — Angers</span>
+              <h1>
+                Chaque véhicule, <span className="text-gradient">même exigence.</span>
+              </h1>
+              <p className={`lead ${styles.heroLead}`}>
+                De la citadine du quotidien à la voiture de collection, nous redonnons à votre
+                véhicule l&apos;éclat et le soin qu&apos;il mérite. Un travail minutieux, réalisé
+                directement chez vous ou sur votre lieu de travail, dans un rayon de{' '}
+                {CONTACT.radiusKm} km autour d&apos;Angers.
+              </p>
+              <div className={styles.heroActions}>
+                <Link href="/devis" className="btn btn-cta">
+                  Voir les tarifs et réserver
+                  <IconArrowRight size={18} />
+                </Link>
+                <Link href="/prestations" className="btn btn-outline">
+                  Découvrir nos prestations
+                </Link>
+              </div>
+              <div className={styles.trustRow}>
+                <span className={styles.trustItem}>
+                  <IconShield size={16} /> Micro-entreprise déclarée — SIREN {SITE.siren}
+                </span>
+                <span className={styles.trustItem}>
+                  <IconMapPin size={16} /> Intervention à domicile, {CONTACT.radiusKm} km autour d&apos;Angers
+                </span>
+                <span className={styles.trustItem}>
+                  <IconCheck size={16} /> Véhicules du quotidien, utilitaires &amp; prestige
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.heroVisual}>
+              <div className={styles.heroImageFrame}>
+                <Image
+                  src="/images/exterieur/lamborghini-huracan-detailing-angers.jpg"
+                  alt="Lamborghini Huracán préparée par La Clean Compagny à Angers"
+                  fill
+                  sizes="(max-width: 900px) 90vw, 420px"
+                  priority
+                />
+              </div>
+              <div className={styles.heroBadgeFloat}>
+                <div className={styles.heroBadgeStars} aria-hidden="true">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <IconStar key={i} size={16} />
+                  ))}
+                </div>
+                <div>
+                  <strong>5.0 / 5</strong>
+                  <div className={styles.heroBadgeLabel}>Avis Google</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className={styles.statsBar}>
+        <div className="container">
+          <StatsRow
+            stats={[
+              { value: `Depuis ${SITE.foundedYear}`, label: 'passionnés par l’automobile' },
+              { value: '5.0 ★', label: 'de moyenne sur Google' },
+              { value: `${CONTACT.radiusKm} km`, label: 'autour d’Angers, à domicile' },
+              { value: '100 %', label: 'sur-mesure, sur devis' },
+            ]}
+          />
+        </div>
+      </div>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHeadRow}>
+            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
+              <span className="eyebrow">Nos formules</span>
+              <h2>Deux formules, un seul niveau d&apos;exigence</h2>
+            </div>
+            <Link href="/prestations" className="btn btn-ghost btn-sm">
+              Toutes les prestations
+              <IconArrowRight size={16} />
+            </Link>
+          </div>
+
+          <div className={styles.formulaGrid}>
+            {FORMULAS.map((formula) => (
+              <FormulaCard formula={formula} key={formula.id} />
+            ))}
+          </div>
+
+          <div className={styles.complementaryNote}>
+            <span>Et aussi, sur devis :</span>
+            <div className={styles.chipRow}>
+              {[...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT].map((s) => (
+                <span className={styles.chip} key={s.id}>
+                  {s.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Pour chaque véhicule</span>
+            <h2>Un savoir-faire adapté à votre gabarit</h2>
+          </div>
+          <div className={styles.vehicleGrid}>
+            {VEHICLE_TYPES.map((v) => {
+              const Icon = VEHICLE_ICONS[v.id]
+              return (
+                <Link href={`/devis?vehicule=${v.id}`} className={styles.vehicleCard} key={v.id}>
+                  <Icon />
+                  <span>{v.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHeadRow}>
+            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
+              <span className="eyebrow">Avant / Après</span>
+              <h2>Le résultat parle de lui-même</h2>
+            </div>
+            <Link href="/galerie" className="btn btn-ghost btn-sm">
+              Voir toute la galerie
+              <IconArrowRight size={16} />
+            </Link>
+          </div>
+          <div className={styles.sliderGrid}>
+            {HOME_SLIDERS.map((s) => (
+              <BeforeAfterSlider key={s.before} {...s} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.storyGrid}>
+            <div className={styles.storyImage}>
+              <Image
+                src="/images/equipe/enzo-soldet-gerant-la-clean-compagny.jpg"
+                alt="Enzo Soldet, gérant et fondateur de La Clean Compagny"
+                fill
+                sizes="(max-width: 900px) 90vw, 380px"
+              />
+            </div>
+            <div>
+              <span className="eyebrow">Notre histoire</span>
+              <h2 style={{ marginTop: 14 }}>Une entreprise née d&apos;une passion, pas d&apos;un plan de carrière</h2>
+              <p className="lead" style={{ marginTop: 18 }}>
+                Ancien électricien, Enzo Soldet a dû tout arrêter après un accident de voiture.
+                De cette épreuve est née La Clean Compagny, en {SITE.foundedYear} : une entreprise
+                fondée du jour au lendemain, portée par la passion de l&apos;automobile et un sens
+                du détail qui ne transige jamais.
+              </p>
+              <p className={styles.storyQuote}>
+                « Chaque véhicule mérite le même soin, qu&apos;il s&apos;agisse d&apos;une citadine
+                de tous les jours ou d&apos;une voiture de collection. »
+              </p>
+              <Link href="/notre-histoire" className="btn btn-outline" style={{ marginTop: 28 }}>
+                Découvrir notre histoire
+                <IconArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Avis clients</span>
+            <h2>Ce que nos clients en disent</h2>
+          </div>
+          <ReviewsGrid reviews={REVIEWS.slice(0, 3)} />
+          <div className={styles.reviewsFooter}>
+            <a href={CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer" className="btn btn-cta btn-sm">
+              Voir tous nos avis Google
+            </a>
+            <Link href="/avis" className="btn btn-ghost btn-sm">
+              Toute la page avis
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.zoneGrid}>
+            <div>
+              <span className="eyebrow">Zone d&apos;intervention</span>
+              <h2 style={{ marginTop: 14 }}>Angers et jusqu&apos;à {CONTACT.radiusKm} km alentour</h2>
+              <p className="lead" style={{ marginTop: 18 }}>
+                Nous nous déplaçons directement chez vous ou sur votre lieu de travail, à Angers
+                et dans les communes environnantes.
+              </p>
+              <div className={styles.chipRow} style={{ marginTop: 24 }}>
+                {CITIES.slice(0, 8).map((c) => (
+                  <Link href={`/zone-intervention/${c.slug}`} className={styles.chip} key={c.slug}>
+                    {c.name}
+                  </Link>
+                ))}
+              </div>
+              <Link href="/zone-intervention" className="btn btn-outline" style={{ marginTop: 28 }}>
+                Toute la zone d&apos;intervention
+                <IconArrowRight size={16} />
+              </Link>
+            </div>
+            <GoogleMapEmbed height={360} />
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.faqGrid}>
+            <div>
+              <span className="eyebrow">Questions fréquentes</span>
+              <h2 style={{ marginTop: 14 }}>Tout ce qu&apos;il faut savoir</h2>
+              <p className="lead" style={{ marginTop: 18 }}>
+                Une question sur nos prestations, nos délais ou nos tarifs ?
+              </p>
+              <Link href="/faq" className="btn btn-ghost btn-sm" style={{ marginTop: 20 }}>
+                Toutes les questions
+                <IconArrowRight size={16} />
+              </Link>
+            </div>
+            <FAQAccordion items={FAQ_ITEMS.slice(0, 4)} />
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.ctaBanner}>
+            <div className={styles.ctaBannerInner}>
+              <span className="eyebrow">Prêt à commencer ?</span>
+              <h2>Offrez à votre véhicule le traitement qu&apos;il mérite</h2>
+              <p className="lead">
+                Choisissez votre véhicule, votre prestation, et recevez votre devis en quelques
+                minutes.
+              </p>
+              <div className={styles.ctaBannerActions}>
+                <Link href="/devis" className="btn btn-cta">
+                  Voir les tarifs et réserver
+                  <IconArrowRight size={18} />
+                </Link>
+                <a href={telLink()} className="btn btn-outline">
+                  {CONTACT.phoneDisplay}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}

@@ -1,0 +1,29 @@
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+  }
+}
+
+.stat {
+  text-align: center;
+}
+
+.value {
+  font-family: var(--font-heading), serif;
+  font-size: clamp(1.8rem, 2.2vw, 2.6rem);
+  font-weight: 700;
+}
+
+.label {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.03em;
+}
