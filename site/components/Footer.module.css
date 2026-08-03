@@ -1,7 +1,7 @@
 .footer {
-  background: #050506;
-  border-top: 1px solid var(--color-border);
-  padding-block: 64px 32px;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  padding-block: 72px 32px;
 }
 
 .grid {
@@ -23,14 +23,13 @@
 }
 
 .brandCol img {
-  height: 52px;
+  height: 46px;
   width: auto;
-  margin-bottom: 16px;
-  border-radius: 6px;
+  margin-bottom: 18px;
 }
 
 .tagline {
-  color: var(--color-text-muted);
+  color: var(--color-on-ink-muted);
   font-size: 0.92rem;
   max-width: 30ch;
   margin-bottom: 20px;
@@ -48,15 +47,16 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  background: rgba(238, 236, 231, 0.06);
+  border: 1px solid var(--color-on-ink-border);
+  color: var(--color-on-ink-muted);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
 }
 
 .socials a:hover {
-  color: var(--color-text);
-  border-color: var(--color-border-strong);
+  color: var(--color-bg);
+  border-color: rgba(238, 236, 231, 0.3);
+  background: rgba(238, 236, 231, 0.1);
 }
 
 .colTitle {
@@ -64,7 +64,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-text-faint);
+  color: var(--color-blue-light);
   margin-bottom: 18px;
 }
 
@@ -77,11 +77,11 @@
 .linkList a,
 .linkList span {
   font-size: 0.92rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-ink-muted);
 }
 
 .linkList a:hover {
-  color: var(--color-text);
+  color: var(--color-bg);
 }
 
 .contactItem {
@@ -89,17 +89,17 @@
   align-items: flex-start;
   gap: 10px;
   font-size: 0.92rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-ink-muted);
 }
 
 .contactItem svg {
   flex: none;
   margin-top: 2px;
-  color: var(--color-brand-blue);
+  color: var(--color-blue-light);
 }
 
 .contactItem a:hover {
-  color: var(--color-text);
+  color: var(--color-bg);
 }
 
 .hours {
@@ -107,25 +107,25 @@
   justify-content: space-between;
   gap: 12px;
   font-size: 0.88rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-ink-muted);
 }
 
 .hours strong {
-  color: var(--color-text);
-  font-weight: 500;
+  color: var(--color-bg);
+  font-weight: 600;
 }
 
 .bottom {
   margin-top: 56px;
   padding-top: 24px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-on-ink-border);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   font-size: 0.8rem;
-  color: var(--color-text-faint);
+  color: var(--color-on-ink-muted);
 }
 
 .bottomLinks {
@@ -135,5 +135,5 @@
 }
 
 .bottomLinks a:hover {
-  color: var(--color-text-muted);
+  color: var(--color-bg);
 }

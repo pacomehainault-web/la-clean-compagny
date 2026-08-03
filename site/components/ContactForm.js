@@ -87,7 +87,7 @@ export default function ContactForm() {
 
       {error && <p className={styles.errorText}>{error}</p>}
       {emailStatus === 'sent' && (
-        <p className={styles.errorText} style={{ color: '#8be9a8' }}>
+        <p className={styles.errorText} style={{ color: 'var(--color-success)' }}>
           Votre message a bien été envoyé — merci, nous revenons vers vous rapidement.
         </p>
       )}

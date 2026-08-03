@@ -22,12 +22,12 @@ export default function Footer() {
         <div className={styles.grid}>
           <div className={styles.brandCol}>
             <Image
-              src="/images/logo/logo-source.jpg"
+              src="/images/logo/logo-transparent.png"
               alt="La Clean Compagny"
-              width={140}
+              width={280}
               height={187}
               className={styles.brandLogo}
-              style={{ height: 52, width: 'auto' }}
+              style={{ height: 46, width: 'auto' }}
             />
             <p className={styles.tagline}>
               {SITE.slogan}. Detailing automobile haut de gamme à Angers et dans un rayon de{' '}
@@ -55,6 +55,7 @@ export default function Footer() {
               <Link href="/prestations">Prestations &amp; tarifs</Link>
               <Link href="/devis">Demander un devis</Link>
               <Link href="/galerie">Galerie avant / après</Link>
+              <Link href="/evenements">Événements</Link>
               <Link href="/notre-histoire">Notre histoire</Link>
               <Link href="/zone-intervention">Zone d&apos;intervention</Link>
               <Link href="/conseils">Conseils d&apos;expert</Link>

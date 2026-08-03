@@ -349,7 +349,7 @@
 }
 
 .errorText {
-  color: #ff9b9b;
+  color: var(--color-error);
   font-size: 0.84rem;
   margin-top: 14px;
 }

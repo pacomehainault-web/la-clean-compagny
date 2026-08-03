@@ -42,7 +42,7 @@
   padding: 24px 28px;
   border-radius: var(--radius-md);
   background: var(--color-brand-blue-soft);
-  border: 1px solid rgba(63, 99, 255, 0.3);
+  border: 1px solid rgba(10, 108, 255, 0.22);
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.65;
@@ -52,12 +52,25 @@
   border-radius: var(--radius-lg);
   padding: clamp(40px, 6vw, 64px);
   text-align: center;
-  background: linear-gradient(135deg, #1a0f2e, #2c1030 45%, #2c1414 100%);
-  border: 1px solid var(--color-border-strong);
+  background: linear-gradient(135deg, #062a7a 0%, #0a6cff 55%, #38b6ff 100%);
+  color: #fff;
+}
+
+.ctaBanner .eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ctaBanner .eyebrow::before {
+  background: #fff;
+}
+
+.ctaBanner h2 {
+  color: #fff;
 }
 
 .ctaBanner p {
   margin-top: 12px;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .ctaActions {
@@ -66,4 +79,20 @@
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.ctaActions :global(.btn-outline) {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.ctaActions :global(.btn-outline:hover) {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ctaActions :global(.btn-cta) {
+  background: #fff;
+  color: var(--color-blue-dark);
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.3);
 }

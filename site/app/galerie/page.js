@@ -14,13 +14,17 @@ export const metadata = buildMetadata({
   path: '/galerie',
 })
 
-const SLIDERS = [
-  { before: '/images/avant-apres/paire-1-avant.jpg', after: '/images/avant-apres/paire-1-apres.jpg', alt: 'Nettoyage intérieur complet — véhicule' },
-  { before: '/images/avant-apres/paire-2-avant.jpg', after: '/images/avant-apres/paire-2-apres.jpg', alt: 'Rénovation esthétique — véhicule' },
-  { before: '/images/avant-apres/paire-3-avant.jpg', after: '/images/avant-apres/paire-3-apres.jpg', alt: 'Detailing complet — véhicule' },
-]
+const SLIDERS = Array.from({ length: 13 }, (_, i) => {
+  const n = i + 1
+  return {
+    before: `/images/avant-apres/paire-${n}-avant.jpg`,
+    after: `/images/avant-apres/paire-${n}-apres.jpg`,
+    alt: `Detailing avant / après — véhicule ${n}`,
+  }
+})
 
 const EXTERIOR_PHOTOS = [
+  { src: '/images/exterieur/porsche-911-gt3-polissage-showroom-angers.jpg', alt: 'Porsche 911 GT3 — polissage et brillance', caption: 'Porsche 911 GT3' },
   { src: '/images/exterieur/lamborghini-huracan-detailing-angers.jpg', alt: 'Lamborghini Huracán — detailing extérieur à Angers', caption: 'Lamborghini Huracán' },
   { src: '/images/exterieur/ferrari-california-lavage-prestige-angers.jpg', alt: 'Ferrari California — lavage prestige à Angers', caption: 'Ferrari California' },
   { src: '/images/exterieur/bmw-xm-detailing-exterieur-angers.jpg', alt: 'BMW XM — detailing extérieur à Angers', caption: 'BMW XM' },

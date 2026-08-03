@@ -1,10 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
+import ParallaxImage from '@/components/ParallaxImage'
 import StatsRow from '@/components/StatsRow'
 import FormulaCard from '@/components/FormulaCard'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
-import ReviewsGrid from '@/components/ReviewsGrid'
+import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import { VEHICLE_ICONS, IconStar, IconMapPin, IconShield, IconArrowRight, IconCheck } from '@/components/Icons'
@@ -36,10 +37,12 @@ export default function HomePage() {
         <div className={styles.heroGlow} aria-hidden="true" />
         <div className="container">
           <div className={styles.heroGrid}>
-            <div className={styles.heroContent}>
+            <div className={`${styles.heroContent} reveal`}>
               <span className="eyebrow">Detailing automobile haut de gamme — Angers</span>
               <h1>
-                Chaque véhicule, <span className="text-gradient">même exigence.</span>
+                Chaque véhicule,
+                <br />
+                <span className="text-gradient">même exigence.</span>
               </h1>
               <p className={`lead ${styles.heroLead}`}>
                 De la citadine du quotidien à la voiture de collection, nous redonnons à votre
@@ -71,23 +74,25 @@ export default function HomePage() {
 
             <div className={styles.heroVisual}>
               <div className={styles.heroImageFrame}>
-                <Image
-                  src="/images/exterieur/lamborghini-huracan-detailing-angers.jpg"
-                  alt="Lamborghini Huracán préparée par La Clean Compagny à Angers"
-                  fill
-                  sizes="(max-width: 900px) 90vw, 420px"
+                <ParallaxImage
+                  src="/images/exterieur/ferrari-california-lavage-prestige-angers.jpg"
+                  alt="Ferrari California, l'emblème de La Clean Compagny, en plein soin à Angers"
                   priority
                 />
-              </div>
-              <div className={styles.heroBadgeFloat}>
-                <div className={styles.heroBadgeStars} aria-hidden="true">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <IconStar key={i} size={16} />
-                  ))}
+                <div className={styles.heroImageOverlay} aria-hidden="true" />
+                <div className={styles.heroBadgeFloat}>
+                  <div className={styles.heroBadgeStars} aria-hidden="true">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <IconStar key={i} size={16} />
+                    ))}
+                  </div>
+                  <div>
+                    <strong>5.0 / 5</strong>
+                    <div className={styles.heroBadgeLabel}>Avis Google</div>
+                  </div>
                 </div>
-                <div>
-                  <strong>5.0 / 5</strong>
-                  <div className={styles.heroBadgeLabel}>Avis Google</div>
+                <div className={styles.heroImageCaption}>
+                  Ferrari California <span>— l&apos;emblème La Clean Compagny</span>
                 </div>
               </div>
             </div>
@@ -110,7 +115,7 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className={styles.sectionHeadRow}>
+          <div className={`${styles.sectionHeadRow} reveal`}>
             <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
               <span className="eyebrow">Nos formules</span>
               <h2>Deux formules, un seul niveau d&apos;exigence</h2>
@@ -121,7 +126,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className={styles.formulaGrid}>
+          <div className={`${styles.formulaGrid} reveal`}>
             {FORMULAS.map((formula) => (
               <FormulaCard formula={formula} key={formula.id} />
             ))}
@@ -142,11 +147,11 @@ export default function HomePage() {
 
       <section className="section section-alt">
         <div className="container">
-          <div className={styles.sectionHead}>
+          <div className={`${styles.sectionHead} reveal`}>
             <span className="eyebrow">Pour chaque véhicule</span>
             <h2>Un savoir-faire adapté à votre gabarit</h2>
           </div>
-          <div className={styles.vehicleGrid}>
+          <div className={`${styles.vehicleGrid} reveal`}>
             {VEHICLE_TYPES.map((v) => {
               const Icon = VEHICLE_ICONS[v.id]
               return (
@@ -162,7 +167,7 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className={styles.sectionHeadRow}>
+          <div className={`${styles.sectionHeadRow} reveal`}>
             <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
               <span className="eyebrow">Avant / Après</span>
               <h2>Le résultat parle de lui-même</h2>
@@ -172,7 +177,7 @@ export default function HomePage() {
               <IconArrowRight size={16} />
             </Link>
           </div>
-          <div className={styles.sliderGrid}>
+          <div className={`${styles.sliderGrid} reveal`}>
             {HOME_SLIDERS.map((s) => (
               <BeforeAfterSlider key={s.before} {...s} />
             ))}
@@ -182,7 +187,7 @@ export default function HomePage() {
 
       <section className="section section-alt">
         <div className="container">
-          <div className={styles.storyGrid}>
+          <div className={`${styles.storyGrid} reveal`}>
             <div className={styles.storyImage}>
               <Image
                 src="/images/equipe/enzo-soldet-gerant-la-clean-compagny.jpg"
@@ -215,11 +220,11 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className={styles.sectionHead}>
+          <div className={`${styles.sectionHead} reveal`}>
             <span className="eyebrow">Avis clients</span>
             <h2>Ce que nos clients en disent</h2>
           </div>
-          <ReviewsGrid reviews={REVIEWS.slice(0, 3)} />
+          <ReviewsCarousel reviews={REVIEWS} />
           <div className={styles.reviewsFooter}>
             <a href={CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer" className="btn btn-cta btn-sm">
               Voir tous nos avis Google
@@ -233,7 +238,7 @@ export default function HomePage() {
 
       <section className="section section-alt">
         <div className="container">
-          <div className={styles.zoneGrid}>
+          <div className={`${styles.zoneGrid} reveal`}>
             <div>
               <span className="eyebrow">Zone d&apos;intervention</span>
               <h2 style={{ marginTop: 14 }}>Angers et jusqu&apos;à {CONTACT.radiusKm} km alentour</h2>
@@ -260,7 +265,7 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className={styles.faqGrid}>
+          <div className={`${styles.faqGrid} reveal`}>
             <div>
               <span className="eyebrow">Questions fréquentes</span>
               <h2 style={{ marginTop: 14 }}>Tout ce qu&apos;il faut savoir</h2>
@@ -279,7 +284,7 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
-          <div className={styles.ctaBanner}>
+          <div className={`${styles.ctaBanner} reveal`}>
             <div className={styles.ctaBannerInner}>
               <span className="eyebrow">Prêt à commencer ?</span>
               <h2>Offrez à votre véhicule le traitement qu&apos;il mérite</h2>

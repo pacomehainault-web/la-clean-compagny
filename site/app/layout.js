@@ -1,4 +1,4 @@
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Inter, Archivo } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -6,6 +6,8 @@ import { WhatsAppFloat, MobileStickyCTA } from '@/components/FloatingCTAs'
 import CookieConsent from '@/components/CookieConsent'
 import Analytics from '@/components/Analytics'
 import JsonLd from '@/components/JsonLd'
+import CustomCursor from '@/components/CustomCursor'
+import ScrollRevealInit from '@/components/ScrollRevealInit'
 import { SITE } from '@/lib/constants'
 import { localBusinessSchema } from '@/lib/schema'
 
@@ -15,11 +17,11 @@ const inter = Inter({
   display: 'swap',
 })
 
-const playfair = Playfair_Display({
+const archivo = Archivo({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  weight: ['600', '700'],
+  weight: ['700', '800', '900'],
 })
 
 export const metadata = {
@@ -44,19 +46,24 @@ export const metadata = {
 }
 
 export const viewport = {
-  themeColor: '#08080a',
+  themeColor: '#eeece7',
   width: 'device-width',
   initialScale: 1,
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" data-scroll-behavior="smooth" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="fr" data-scroll-behavior="smooth" className={`${inter.variable} ${archivo.variable}`}>
       <body>
+        <noscript>
+          <style>{'.reveal { opacity: 1 !important; transform: none !important; }'}</style>
+        </noscript>
         <JsonLd data={localBusinessSchema()} />
         <a href="#main-content" className="skip-link">
           Aller au contenu
         </a>
+        <CustomCursor />
+        <ScrollRevealInit />
         <Header />
         <main id="main-content">{children}</main>
         <Footer />

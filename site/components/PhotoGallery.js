@@ -5,7 +5,7 @@ import Image from 'next/image'
 import styles from './PhotoGallery.module.css'
 import { IconClose, IconChevronRight } from './Icons'
 
-export default function PhotoGallery({ photos }) {
+export default function PhotoGallery({ photos, masonry = false }) {
   const [activeIndex, setActiveIndex] = useState(-1)
   const open = activeIndex >= 0
 
@@ -26,12 +26,13 @@ export default function PhotoGallery({ photos }) {
 
   return (
     <>
-      <div className={styles.grid}>
+      <div className={masonry ? styles.masonry : styles.grid}>
         {photos.map((photo, index) => (
           <button
             type="button"
             key={photo.src}
             className={styles.thumb}
+            style={masonry ? { aspectRatio: photo.aspect || '3 / 4' } : undefined}
             onClick={() => setActiveIndex(index)}
           >
             <Image

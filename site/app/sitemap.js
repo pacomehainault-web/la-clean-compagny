@@ -7,6 +7,7 @@ const STATIC_ROUTES = [
   { path: '/prestations', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/devis', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/galerie', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/evenements', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/notre-histoire', changeFrequency: 'yearly', priority: 0.6 },
   { path: '/zone-intervention', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/conseils', changeFrequency: 'weekly', priority: 0.6 },

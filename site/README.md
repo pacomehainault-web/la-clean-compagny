@@ -4,6 +4,35 @@ Site vitrine + devis en ligne pour **La Clean Compagny**, detailing automobile h
 
 Stack : **Next.js 16** (App Router), React, CSS natif (CSS Modules, pas de Tailwind), sans base de données. Le formulaire de devis/contact envoie un email **directement depuis le site** (voir ci-dessous) ; le bouton WhatsApp ouvre l'application WhatsApp du visiteur avec un message pré-rempli.
 
+## Identité visuelle (v2 — refonte claire)
+
+Le site est passé d'un thème sombre à une esthétique claire et sportive :
+
+- **Fond** : gris Nardo clair (`--color-bg`, `#eeece7`)
+- **Accent** : bleu Riviera/Polaire (`--color-blue`, `#0a6cff`) en dégradé sur les CTA
+- **Texte** : anthracite quasi-noir (`--color-text`, `#15171b`)
+- **Typographie** : Archivo (Black/Bold, très grand corps) pour les titres, Inter pour le texte courant
+- **Footer & bandeaux de contraste** : volontairement en encre foncée (`--color-ink`) pour créer un effet de "bookend" premium, façon Porsche/Apple
+
+Tous ces réglages sont centralisés dans `app/globals.css` (variables CSS en haut du fichier) — modifier une couleur là suffit à la propager sur tout le site.
+
+### Fonctionnalités créatives ajoutées
+
+- **Curseur personnalisé** (`components/CustomCursor.js`) : un point + anneau qui suit la souris et grossit au survol des liens/boutons (désactivé sur mobile/tactile).
+- **Révélations au scroll** (`components/ScrollRevealInit.js`) : les sections apparaissent en fondu/translation au défilement (classe `.reveal` sur n'importe quel élément). Dégradé en douceur si JavaScript est désactivé (voir `<noscript>` dans `app/layout.js`).
+- **Slider avant/après réactif au gyroscope** (`components/BeforeAfterSlider.js`) : sur mobile, un bouton « Incliner le téléphone » active la comparaison avant/après en inclinant l'appareil (API `DeviceOrientationEvent`, avec gestion de la permission iOS).
+
+### Nouvelle page Événements
+
+`app/evenements/` présente la présence de La Clean Compagny sur les rassemblements automobiles (stand, partenaires Kenotek/Motul), avec une galerie de type masonry. Les photos viennent du dossier `Photo enzo /` fourni — si vous avez d'autres photos d'événements à ajouter, déposez-les dans `public/images/evenements/` et complétez le tableau `EVENT_PHOTOS` dans `app/evenements/page.js`.
+
+### Logo
+
+Deux versions du logo sont utilisées, selon le fond :
+
+- `public/images/logo/logo-onlight.png` — tracé recoloré en anthracite, pour les fonds clairs (header, favicon, OG image). Généré à partir de votre fichier « Logo transparent .PNG » d'origine (dont le tracé blanc était invisible sur fond clair).
+- `public/images/logo/logo-transparent.png` — votre fichier d'origine (tracé blanc), utilisé sur fond sombre (menu mobile, footer).
+
 ## Lancer le site en local
 
 ```bash

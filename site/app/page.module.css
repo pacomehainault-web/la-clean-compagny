@@ -1,16 +1,16 @@
 .hero {
   position: relative;
-  padding-block: clamp(56px, 8vw, 96px) clamp(48px, 6vw, 80px);
+  padding-block: clamp(48px, 6vw, 72px) clamp(48px, 6vw, 80px);
   overflow: hidden;
 }
 
 .heroGlow {
   position: absolute;
-  top: -280px;
-  right: -220px;
-  width: 640px;
-  height: 640px;
-  background: radial-gradient(circle, rgba(139, 59, 240, 0.28), transparent 70%);
+  top: -320px;
+  right: -260px;
+  width: 720px;
+  height: 720px;
+  background: radial-gradient(circle, rgba(10, 108, 255, 0.16), transparent 70%);
   filter: blur(10px);
   pointer-events: none;
   z-index: 0;
@@ -20,16 +20,20 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 56px;
-  align-items: center;
+  grid-template-columns: 1fr 0.86fr;
+  gap: 40px;
+  align-items: end;
 }
 
 @media (max-width: 900px) {
   .heroGrid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
+}
+
+.heroContent {
+  padding-bottom: clamp(0px, 4vw, 40px);
 }
 
 .heroContent h1 {
@@ -37,19 +41,19 @@
 }
 
 .heroLead {
-  margin-top: 22px;
-  max-width: 52ch;
+  margin-top: 24px;
+  max-width: 48ch;
 }
 
 .heroActions {
-  margin-top: 34px;
+  margin-top: 36px;
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
 .trustRow {
-  margin-top: 40px;
+  margin-top: 44px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px 22px;
@@ -72,37 +76,73 @@
   position: relative;
 }
 
+@media (min-width: 901px) {
+  .heroVisual {
+    margin-top: -32px;
+    margin-right: -16px;
+  }
+}
+
 .heroImageFrame {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-elevated);
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 5.4;
+  background: var(--color-ink);
+}
+
+@media (min-width: 901px) {
+  .heroImageFrame {
+    aspect-ratio: 4 / 6;
+  }
 }
 
 .heroImageFrame img {
   object-fit: cover;
 }
 
+.heroImageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 22, 26, 0) 45%, rgba(10, 12, 15, 0.55) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.heroImageCaption {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  z-index: 2;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heroImageCaption span {
+  opacity: 0.75;
+  font-weight: 500;
+}
+
 .heroBadgeFloat {
   position: absolute;
-  bottom: -18px;
-  left: -18px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 12px 16px;
   box-shadow: var(--shadow-elevated);
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-@media (max-width: 900px) {
-  .heroBadgeFloat {
-    left: 12px;
-  }
+  gap: 10px;
 }
 
 .heroBadgeStars {
@@ -112,9 +152,9 @@
 }
 
 .heroBadgeLabel {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--color-text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .statsBar {
@@ -312,8 +352,24 @@
   overflow: hidden;
   padding: clamp(48px, 7vw, 80px);
   text-align: center;
-  background: linear-gradient(135deg, #1a0f2e, #2c1030 45%, #2c1414 100%);
-  border: 1px solid var(--color-border-strong);
+  background: linear-gradient(135deg, #062a7a 0%, #0a6cff 55%, #38b6ff 100%);
+  color: #fff;
+}
+
+.ctaBanner .eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ctaBanner .eyebrow::before {
+  background: #fff;
+}
+
+.ctaBanner h2 {
+  color: #fff;
+}
+
+.ctaBanner .lead {
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .ctaBannerInner {
@@ -333,4 +389,26 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 14px;
+}
+
+.ctaBannerActions :global(.btn-outline) {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.ctaBannerActions :global(.btn-outline:hover) {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ctaBannerActions :global(.btn-cta) {
+  background: #fff;
+  color: var(--color-blue-dark);
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.3);
+}
+
+.ctaBannerActions :global(.btn-cta:hover) {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.35);
 }

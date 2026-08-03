@@ -44,7 +44,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lavage-exterieur',
     name: 'Lavage extérieur',
-    basePrice: 35,
+    priceOnRequest: true,
     description:
       'Lavage carrosserie en deux phases, sans risque de micro-rayure, pour une brillance immédiate.',
     category: 'exterieur',
@@ -52,7 +52,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'polissage',
     name: 'Polissage',
-    basePrice: 120,
+    priceOnRequest: true,
     description:
       'Correction de peinture pour effacer hologrammes, micro-rayures et ternissures et redonner sa profondeur à la carrosserie.',
     category: 'exterieur',
@@ -60,7 +60,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lustrage',
     name: 'Lustrage',
-    basePrice: 90,
+    priceOnRequest: true,
     description:
       "Finition brillance sans correction agressive, pour raviver l'éclat de la peinture entre deux polissages.",
     category: 'exterieur',
@@ -68,7 +68,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'decontamination',
     name: 'Décontamination',
-    basePrice: 70,
+    priceOnRequest: true,
     description:
       'Élimination des particules ferreuses, goudrons et résidus incrustés que le lavage seul ne retire pas.',
     category: 'exterieur',
@@ -76,7 +76,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'ceramique',
     name: 'Traitement céramique',
-    basePrice: 249,
+    priceOnRequest: true,
     description:
       'Protection longue durée qui sublime la brillance et facilite l’entretien face aux salissures et UV.',
     category: 'exterieur',
@@ -84,7 +84,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'nettoyage-moteur',
     name: 'Nettoyage moteur',
-    basePrice: 39,
+    priceOnRequest: true,
     description:
       'Dégraissage et nettoyage soigné du compartiment moteur, en toute sécurité pour les composants électroniques.',
     category: 'technique',
@@ -92,7 +92,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'traitement-cuir',
     name: 'Traitement cuir',
-    basePrice: 79,
+    priceOnRequest: true,
     description:
       'Nettoyage, nourrissage et protection du cuir pour préserver sa souplesse et éviter le craquellement.',
     category: 'interieur',

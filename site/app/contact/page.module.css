@@ -30,6 +30,11 @@
   margin-top: 3px;
 }
 
+.infoItem > div {
+  flex: 1;
+  min-width: 0;
+}
+
 .infoTitle {
   font-weight: 700;
   font-size: 0.92rem;

@@ -6,8 +6,14 @@ export default function ServiceCard({ service }) {
       <div className={styles.top}>
         <span className={styles.name}>{service.name}</span>
         <span className={styles.price}>
-          dès
-          <strong>{service.basePrice} €</strong>
+          {service.priceOnRequest ? (
+            <strong>Sur devis</strong>
+          ) : (
+            <>
+              dès
+              <strong>{service.basePrice} €</strong>
+            </>
+          )}
         </span>
       </div>
       <p className={styles.description}>{service.description}</p>

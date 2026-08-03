@@ -1,11 +1,16 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import emailjs from '@emailjs/browser'
 import styles from './QuoteWizard.module.css'
 import { VEHICLE_ICONS, IconCheck, IconArrowRight, IconWhatsapp, IconMail } from './Icons'
 import { VEHICLE_TYPES, getVehicleType } from '@/lib/data/vehicles'
 import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
-import { whatsappLink, mailtoLink, CONTACT } from '@/lib/constants'
+import { whatsappLink, CONTACT } from '@/lib/constants'
+
+const EMAILJS_SERVICE_ID = 'service_ugnog14'
+const EMAILJS_TEMPLATE_ID = 'template_655hkaq'
+const EMAILJS_PUBLIC_KEY = 'SebLXFPtUd5Uj5qLX'
 
 const EXTRA_SERVICES = [...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT]
 
@@ -15,12 +20,15 @@ const STEPS = [
   { id: 3, label: 'Coordonnées' },
 ]
 
+const EMPTY_CONTACT = { name: '', phone: '', email: '', date: '', message: '' }
+
 export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
+  const form = useRef(null)
   const [step, setStep] = useState(1)
   const [vehicleId, setVehicleId] = useState(initialVehicleId || '')
   const [formulaId, setFormulaId] = useState(initialFormulaId || '')
   const [extraIds, setExtraIds] = useState(new Set())
-  const [contact, setContact] = useState({ name: '', phone: '', email: '', date: '', message: '' })
+  const [contact, setContact] = useState(EMPTY_CONTACT)
   const [error, setError] = useState('')
   const [emailStatus, setEmailStatus] = useState('idle') // idle | sending | sent | error
 
@@ -30,9 +38,21 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
   const selectedServices = [formula, ...extras].filter(Boolean)
 
   const multiplier = vehicle?.priceMultiplier || 1
-  const subtotal = selectedServices.reduce((sum, s) => sum + s.basePrice, 0)
+  const pricedServices = selectedServices.filter((s) => !s.priceOnRequest)
+  const hasQuoteOnlyServices = selectedServices.some((s) => s.priceOnRequest)
+  const subtotal = pricedServices.reduce((sum, s) => sum + s.basePrice, 0)
   const estimateLow = Math.round(subtotal * multiplier * 0.92)
   const estimateHigh = Math.round(subtotal * multiplier * 1.18)
+
+  // Champs récapitulatifs envoyés à EmailJS (name="type_vehicule", "formule_habitacle", etc.)
+  const vehicleLabel = vehicle ? vehicle.label : 'Non précisé'
+  const formulaLabel = formula ? formula.name : 'Aucune formule sélectionnée'
+  const extrasLabel = extras.length ? extras.map((s) => s.name).join(', ') : 'Aucune'
+  const estimationLabel = pricedServices.length
+    ? `${estimateLow} € – ${estimateHigh} €${hasQuoteOnlyServices ? ' + prestations sur devis' : ''}`
+    : hasQuoteOnlyServices
+      ? 'Sur devis'
+      : 'Non estimé'
 
   function toggleExtra(id) {
     setExtraIds((prev) => {
@@ -63,16 +83,18 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const message = useMemo(() => {
+  // Récapitulatif complet en un seul champ (name="recapitulatif_complet"),
+  // pratique pour un template EmailJS minimal avec un seul placeholder.
+  const recap = useMemo(() => {
     const lines = [
-      'Bonjour La Clean Compagny,',
+      'Nouvelle demande de devis — La Clean Compagny',
       '',
-      'Je souhaite obtenir un devis pour :',
-      `- Véhicule : ${vehicle ? vehicle.label : 'non précisé'}`,
-      `- Prestations : ${selectedServices.length ? selectedServices.map((s) => s.name).join(', ') : 'non précisées'}`,
-      selectedServices.length ? `- Estimation indicative : ${estimateLow} € – ${estimateHigh} €` : null,
+      `Véhicule : ${vehicleLabel}`,
+      `Formule habitacle : ${formulaLabel}`,
+      `Prestations complémentaires : ${extrasLabel}`,
+      `Estimation indicative : ${estimationLabel}`,
       '',
-      'Mes coordonnées :',
+      'Coordonnées :',
       `Nom : ${contact.name || '—'}`,
       contact.phone ? `Téléphone : ${contact.phone}` : null,
       contact.email ? `Email : ${contact.email}` : null,
@@ -80,7 +102,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
       contact.message ? `Message : ${contact.message}` : null,
     ]
     return lines.filter((l) => l !== null).join('\n')
-  }, [vehicle, selectedServices, estimateLow, estimateHigh, contact])
+  }, [vehicleLabel, formulaLabel, extrasLabel, estimationLabel, contact])
 
   function handleWhatsapp() {
     if (!contact.name || !contact.phone) {
@@ -88,40 +110,48 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
       return
     }
     setError('')
-    window.open(whatsappLink(message), '_blank', 'noopener,noreferrer')
+    window.open(whatsappLink(recap), '_blank', 'noopener,noreferrer')
   }
 
-  async function handleEmailSubmit() {
+  const envoyerEmail = (e) => {
+    e.preventDefault()
+
     if (!contact.name || !contact.phone) {
       setError('Merci de renseigner au moins votre nom et votre téléphone.')
       return
     }
+
     setError('')
     setEmailStatus('sending')
-    try {
-      const res = await fetch('/api/devis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: contact.name, phone: contact.phone, email: contact.email, message }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        if (res.status === 503) {
-          // Envoi serveur non configuré : on bascule sur le client de messagerie local.
-          window.location.href = mailtoLink({ subject: 'Demande de devis — La Clean Compagny', body: message })
-          setEmailStatus('idle')
-          return
-        }
-        throw new Error(data.error || 'Envoi impossible')
+
+    emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form.current, EMAILJS_PUBLIC_KEY).then(
+      (result) => {
+        console.log('Succès !', result.text)
+        setEmailStatus('sent')
+        // On vide le formulaire (composants contrôlés : on remet l'état à zéro plutôt
+        // que d'utiliser form.current.reset(), sans effet sur des champs contrôlés par React).
+        setContact(EMPTY_CONTACT)
+        setVehicleId('')
+        setFormulaId('')
+        setExtraIds(new Set())
+        setStep(1)
+      },
+      (err) => {
+        console.log('Erreur...', err.text)
+        setEmailStatus('error')
       }
-      setEmailStatus('sent')
-    } catch {
-      setEmailStatus('error')
-    }
+    )
   }
 
   return (
-    <div>
+    <form ref={form} onSubmit={envoyerEmail}>
+      {/* Champs cachés — reflètent la sélection des étapes 1 et 2 pour EmailJS */}
+      <input type="hidden" name="type_vehicule" value={vehicleLabel} />
+      <input type="hidden" name="formule_habitacle" value={formulaLabel} />
+      <input type="hidden" name="prestations_complementaires" value={extrasLabel} />
+      <input type="hidden" name="estimation_prix" value={estimationLabel} />
+      <input type="hidden" name="recapitulatif_complet" value={recap} />
+
       <div className={styles.steps}>
         {STEPS.map((s, index) => (
           <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flex: index < STEPS.length - 1 ? 1 : 'none' }}>
@@ -228,7 +258,9 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                       <div className={styles.optionBody}>
                         <div className={styles.optionName}>
                           <span>{s.name}</span>
-                          <span className={styles.optionPrice}>dès {s.basePrice} €</span>
+                          <span className={styles.optionPrice}>
+                            {s.priceOnRequest ? 'Sur devis' : `dès ${s.basePrice} €`}
+                          </span>
                         </div>
                         <p className={styles.optionDesc}>{s.description}</p>
                       </div>
@@ -250,6 +282,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   <label htmlFor="name">Nom &amp; prénom *</label>
                   <input
                     id="name"
+                    name="nom_complet"
                     type="text"
                     value={contact.name}
                     onChange={(e) => setContact({ ...contact, name: e.target.value })}
@@ -261,6 +294,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   <label htmlFor="phone">Téléphone *</label>
                   <input
                     id="phone"
+                    name="telephone"
                     type="tel"
                     value={contact.phone}
                     onChange={(e) => setContact({ ...contact, phone: e.target.value })}
@@ -272,6 +306,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   <label htmlFor="email">Email (optionnel)</label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     value={contact.email}
                     onChange={(e) => setContact({ ...contact, email: e.target.value })}
@@ -282,6 +317,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   <label htmlFor="date">Date souhaitée (optionnel)</label>
                   <input
                     id="date"
+                    name="date_souhaitee"
                     type="date"
                     value={contact.date}
                     onChange={(e) => setContact({ ...contact, date: e.target.value })}
@@ -291,6 +327,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   <label htmlFor="message">Message (optionnel)</label>
                   <textarea
                     id="message"
+                    name="message"
                     rows={4}
                     value={contact.message}
                     onChange={(e) => setContact({ ...contact, message: e.target.value })}
@@ -305,9 +342,8 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
                   Envoyer ma demande par WhatsApp
                 </button>
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-outline btn-block"
-                  onClick={handleEmailSubmit}
                   disabled={emailStatus === 'sending' || emailStatus === 'sent'}
                 >
                   <IconMail size={18} />
@@ -384,16 +420,28 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
           {selectedServices.map((s) => (
             <div className={styles.summaryRow} key={s.id}>
               <span>{s.name}</span>
-              <strong>{s.basePrice} €</strong>
+              <strong>{s.priceOnRequest ? 'Sur devis' : `${s.basePrice} €`}</strong>
             </div>
           ))}
 
-          {selectedServices.length > 0 && (
+          {pricedServices.length > 0 && (
             <div className={styles.summaryTotal}>
               <div className={styles.summaryTotalLabel}>Estimation indicative</div>
               <div className={styles.summaryTotalValue}>
                 {estimateLow} € – {estimateHigh} €
               </div>
+              {hasQuoteOnlyServices && (
+                <div className={styles.summaryTotalLabel} style={{ marginTop: 6 }}>
+                  + prestations sur devis
+                </div>
+              )}
+            </div>
+          )}
+
+          {!pricedServices.length && hasQuoteOnlyServices && (
+            <div className={styles.summaryTotal}>
+              <div className={styles.summaryTotalLabel}>Tarif</div>
+              <div className={styles.summaryTotalValue}>Sur devis</div>
             </div>
           )}
 
@@ -403,6 +451,6 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId }) {
           </p>
         </aside>
       </div>
-    </div>
+    </form>
   )
 }

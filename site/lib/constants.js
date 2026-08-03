@@ -41,10 +41,10 @@ export const OPENING_HOURS_SCHEMA = [
 ]
 
 export const SOCIALS = {
-  instagram: 'https://www.instagram.com/la_clean_compagny',
-  tiktok: 'https://www.tiktok.com/@la_clean_compagny',
-  facebook: 'https://www.facebook.com/lacleancompagny',
-  linkedin: 'https://www.linkedin.com/company/la-clean-compagny',
+  instagram: 'https://www.instagram.com/la_clean_compagny/',
+  tiktok: 'https://www.tiktok.com/@lacleancompagny?_r=1&_t=ZN-98Wc8hA3yWh',
+  facebook: 'https://www.facebook.com/share/198SXjCbm3/?mibextid=wwXIfr',
+  linkedin: 'https://www.linkedin.com/in/enzo-soldet-76a17329a',
 }
 
 export function whatsappLink(message) {
