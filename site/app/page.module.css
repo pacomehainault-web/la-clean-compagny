@@ -352,24 +352,24 @@
   overflow: hidden;
   padding: clamp(48px, 7vw, 80px);
   text-align: center;
-  background: linear-gradient(135deg, #062a7a 0%, #0a6cff 55%, #38b6ff 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-ink) 0%, #1c2c4a 55%, var(--color-blue-dark) 100%);
+  color: var(--color-bg);
 }
 
-.ctaBanner .eyebrow {
-  color: rgba(255, 255, 255, 0.85);
+.ctaBanner :global(.eyebrow) {
+  color: var(--color-blue-light);
 }
 
-.ctaBanner .eyebrow::before {
-  background: #fff;
+.ctaBanner :global(.eyebrow)::before {
+  background: var(--color-blue-light);
 }
 
 .ctaBanner h2 {
-  color: #fff;
+  color: var(--color-bg);
 }
 
-.ctaBanner .lead {
-  color: rgba(255, 255, 255, 0.82);
+.ctaBanner :global(.lead) {
+  color: var(--color-on-ink-muted);
 }
 
 .ctaBannerInner {
@@ -411,4 +411,106 @@
   background: #fff;
   transform: translateY(-2px);
   box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.35);
+}
+
+.lustrageGrid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .lustrageGrid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+.lustrageVisual {
+  position: relative;
+}
+
+.lustrageMainImage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+}
+
+.lustrageMainImage img {
+  object-fit: cover;
+}
+
+.lustrageAccentImage {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 40%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 3px solid var(--color-bg);
+  box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.55);
+}
+
+.lustrageAccentImage img {
+  object-fit: cover;
+}
+
+.lustrageBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(79, 195, 255, 0.12);
+  border: 1px solid rgba(79, 195, 255, 0.35);
+  color: var(--color-blue-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 18px;
+}
+
+.lustrageLead {
+  margin-top: 16px;
+  font-size: clamp(1.1rem, 0.4vw + 1rem, 1.35rem);
+  font-weight: 700;
+  color: var(--color-bg);
+  line-height: 1.5;
+}
+
+.lustrageText {
+  margin-top: 14px;
+  color: var(--color-on-ink-muted);
+  line-height: 1.7;
+}
+
+.lustrageFeatures {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lustrageFeatures li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-bg);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.lustrageFeatures li svg {
+  flex: none;
+  color: var(--color-blue-light);
+}
+
+.lustrageContent :global(.btn-cta) {
+  margin-top: 32px;
 }

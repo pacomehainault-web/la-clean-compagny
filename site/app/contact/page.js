@@ -1,8 +1,8 @@
 import PageHero from '@/components/PageHero'
 import ContactForm from '@/components/ContactForm'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
-import { IconMapPin, IconPhone, IconMail, IconClock, IconWhatsapp } from '@/components/Icons'
-import { CONTACT, HOURS, telLink, mailtoLink, whatsappLink } from '@/lib/constants'
+import { IconMapPin, IconPhone, IconMail, IconWhatsapp } from '@/components/Icons'
+import { CONTACT, telLink, mailtoLink, whatsappLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
 
@@ -49,7 +49,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className={styles.infoItem}>
-                  <IconWhatsapp size={20} />
+                  <IconWhatsapp size={20} style={{ color: '#25D366' }} />
                   <div>
                     <div className={styles.infoTitle}>WhatsApp</div>
                     <div className={styles.infoText}>
@@ -65,20 +65,6 @@ export default function ContactPage() {
                     <div className={styles.infoTitle}>Email</div>
                     <div className={styles.infoText}>
                       <a href={mailtoLink({})}>{CONTACT.email}</a>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.infoItem}>
-                  <IconClock size={20} />
-                  <div>
-                    <div className={styles.infoTitle}>Horaires</div>
-                    <div className={styles.hoursTable} style={{ marginTop: 6 }}>
-                      {HOURS.map((h) => (
-                        <div className={styles.hoursRow} key={h.day}>
-                          <span>{h.day}</span>
-                          <span>{h.hours}</span>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 </div>

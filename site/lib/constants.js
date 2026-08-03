@@ -24,22 +24,6 @@ export const CONTACT = {
   googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBE/review',
 }
 
-export const HOURS = [
-  { day: 'Lundi', hours: '8h30 – 19h00' },
-  { day: 'Mardi', hours: '8h30 – 19h00' },
-  { day: 'Mercredi', hours: '8h30 – 19h00' },
-  { day: 'Jeudi', hours: '8h30 – 19h00' },
-  { day: 'Vendredi', hours: '8h30 – 19h00' },
-  { day: 'Samedi', hours: '9h00 – 17h00' },
-  { day: 'Dimanche', hours: 'Fermé' },
-]
-
-// schema.org openingHoursSpecification day codes
-export const OPENING_HOURS_SCHEMA = [
-  { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:30', closes: '19:00' },
-  { days: ['Saturday'], opens: '09:00', closes: '17:00' },
-]
-
 export const SOCIALS = {
   instagram: 'https://www.instagram.com/la_clean_compagny/',
   tiktok: 'https://www.tiktok.com/@lacleancompagny?_r=1&_t=ZN-98Wc8hA3yWh',

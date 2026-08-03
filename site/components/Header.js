@@ -45,47 +45,56 @@ export default function Header() {
   }, [open])
 
   return (
-    <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
-      <div className={`container ${styles.inner}`}>
-        <Link href="/" className={styles.brand} onClick={() => setOpen(false)}>
-          <Image
-            src="/images/logo/logo-onlight.png"
-            alt="La Clean Compagny — service de nettoyage automobile"
-            width={280}
-            height={187}
-            priority
-            style={{ height: 44, width: 'auto' }}
-          />
-        </Link>
-
-        <nav className={styles.nav} aria-label="Navigation principale">
-          {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className={styles.actions}>
-          <a href={telLink()} className={styles.phone}>
-            <IconPhone size={17} />
-            {CONTACT.phoneDisplay}
-          </a>
-          <Link href="/devis" className="btn btn-cta btn-sm">
-            Voir les tarifs et réserver
+    <>
+      <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
+        <div className={`container ${styles.inner}`}>
+          <Link href="/" className={styles.brand} onClick={() => setOpen(false)}>
+            <Image
+              src="/images/logo/logo-onlight.png"
+              alt="La Clean Compagny — service de nettoyage automobile"
+              width={280}
+              height={187}
+              priority
+              style={{ height: 44, width: 'auto' }}
+            />
           </Link>
-          <button
-            type="button"
-            className={styles.menuBtn}
-            aria-label="Ouvrir le menu"
-            aria-expanded={open}
-            onClick={() => setOpen(true)}
-          >
-            <IconMenu />
-          </button>
-        </div>
-      </div>
 
+          <nav className={styles.nav} aria-label="Navigation principale">
+            {NAV_LINKS.map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className={styles.actions}>
+            <a href={telLink()} className={styles.phone}>
+              <IconPhone size={17} />
+              {CONTACT.phoneDisplay}
+            </a>
+            <Link href="/devis" className="btn btn-cta btn-sm">
+              Voir les tarifs et réserver
+            </Link>
+            <button
+              type="button"
+              className={styles.menuBtn}
+              aria-label="Ouvrir le menu"
+              aria-expanded={open}
+              onClick={() => setOpen(true)}
+            >
+              <IconMenu />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/*
+        Le backdrop et le drawer sont rendus HORS du <header> (qui utilise
+        backdrop-filter). Sur Safari/WebKit, un ancêtre avec backdrop-filter ou
+        filter crée un nouveau bloc de positionnement pour ses descendants en
+        position:fixed — le menu se retrouvait alors coincé derrière le
+        contenu de la page au lieu de s'afficher au premier plan.
+      */}
       <div
         className={`${styles.backdrop} ${open ? styles.backdropOpen : ''}`}
         onClick={() => setOpen(false)}
@@ -143,6 +152,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
+    </>
   )
 }

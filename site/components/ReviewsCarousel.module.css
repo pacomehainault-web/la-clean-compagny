@@ -59,6 +59,41 @@
   transform: translateY(-2px);
 }
 
+.arrow:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  transform: none;
+}
+
+.trackWrap {
+  position: relative;
+}
+
+.edgeFade {
+  position: absolute;
+  top: 0;
+  bottom: 12px;
+  width: 64px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.25s var(--ease);
+}
+
+.edgeFadeLeft {
+  left: 0;
+  background: linear-gradient(90deg, var(--color-bg) 0%, transparent 100%);
+}
+
+.edgeFadeRight {
+  right: 0;
+  background: linear-gradient(270deg, var(--color-bg) 0%, transparent 100%);
+}
+
+.edgeFadeHidden {
+  opacity: 0;
+}
+
 .track {
   display: flex;
   gap: 20px;
@@ -84,6 +119,47 @@
   flex-direction: column;
   gap: 16px;
   box-shadow: var(--shadow-soft);
+}
+
+.cardWithPhoto {
+  width: min(400px, 88vw);
+  border-color: var(--color-blue-light);
+  box-shadow: 0 14px 34px -14px rgba(10, 108, 255, 0.28), var(--shadow-soft);
+}
+
+.photoGrid {
+  position: relative;
+  display: flex;
+  gap: 6px;
+}
+
+.photoThumb {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface-2);
+}
+
+.photoBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  background: rgba(20, 22, 26, 0.72);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.35);
 }
 
 .cardTop {

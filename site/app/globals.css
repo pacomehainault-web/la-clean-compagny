@@ -211,6 +211,14 @@ ul {
   line-height: 1.7;
 }
 
+@media (max-width: 640px) {
+  /* Réserve un peu d'espace pour ne jamais passer sous le bouton WhatsApp flottant
+     (bas droite) ou la barre d'action fixe (bas de l'écran) sur mobile. */
+  .lead {
+    padding-right: 56px;
+  }
+}
+
 /* Buttons */
 
 .btn {

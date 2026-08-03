@@ -13,6 +13,7 @@ export default async function DevisPage({ searchParams }) {
   const params = await searchParams
   const initialVehicleId = typeof params?.vehicule === 'string' ? params.vehicule : ''
   const initialFormulaId = typeof params?.formule === 'string' ? params.formule : ''
+  const initialExtraId = typeof params?.extra === 'string' ? params.extra : ''
 
   return (
     <>
@@ -24,7 +25,11 @@ export default async function DevisPage({ searchParams }) {
       />
       <section className="section">
         <div className="container">
-          <QuoteWizard initialVehicleId={initialVehicleId} initialFormulaId={initialFormulaId} />
+          <QuoteWizard
+            initialVehicleId={initialVehicleId}
+            initialFormulaId={initialFormulaId}
+            initialExtraId={initialExtraId}
+          />
         </div>
       </section>
     </>

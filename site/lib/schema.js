@@ -1,4 +1,4 @@
-import { SITE, CONTACT, OPENING_HOURS_SCHEMA, SOCIALS } from './constants'
+import { SITE, CONTACT, SOCIALS } from './constants'
 import { AGGREGATE_RATING } from './data/reviews'
 import { absoluteUrl } from './seo'
 
@@ -32,12 +32,6 @@ export function localBusinessSchema() {
       },
       geoRadius: `${CONTACT.radiusKm}000`,
     },
-    openingHoursSpecification: OPENING_HOURS_SCHEMA.map((o) => ({
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: o.days,
-      opens: o.opens,
-      closes: o.closes,
-    })),
     sameAs: Object.values(SOCIALS),
     aggregateRating: {
       '@type': 'AggregateRating',

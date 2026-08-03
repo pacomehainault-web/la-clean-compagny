@@ -6,17 +6,11 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr 1.1fr;
+  grid-template-columns: 1.3fr 1fr 1fr;
   gap: 40px;
 }
 
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 560px) {
+@media (max-width: 700px) {
   .grid {
     grid-template-columns: 1fr;
   }
@@ -100,19 +94,6 @@
 
 .contactItem a:hover {
   color: var(--color-bg);
-}
-
-.hours {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.88rem;
-  color: var(--color-on-ink-muted);
-}
-
-.hours strong {
-  color: var(--color-bg);
-  font-weight: 600;
 }
 
 .bottom {

@@ -113,6 +113,62 @@ export default function HomePage() {
         </div>
       </div>
 
+      <section className="section section-ink">
+        <div className="container">
+          <div className={`${styles.lustrageGrid} reveal`}>
+            <div className={styles.lustrageVisual}>
+              <div className={styles.lustrageMainImage}>
+                <Image
+                  src="/images/lustrage/lustrage-showroom.jpg"
+                  alt="Carrosserie noire au fini miroir après lustrage, showroom BMW à Angers"
+                  fill
+                  sizes="(max-width: 900px) 90vw, 480px"
+                />
+              </div>
+              <div className={styles.lustrageAccentImage}>
+                <Image
+                  src="/images/lustrage/lustrage-reflet-phare.jpg"
+                  alt="Détail d'un feu avant et d'une carrosserie au fini miroir après lustrage"
+                  fill
+                  sizes="220px"
+                />
+              </div>
+            </div>
+
+            <div className={styles.lustrageContent}>
+              <span className={styles.lustrageBadge}>🌟 Notre spécialité</span>
+              <h2>Lustrage minute</h2>
+              <p className={styles.lustrageLead}>
+                Redonnez l&apos;éclat du neuf à votre carrosserie en un temps record.
+              </p>
+              <p className={styles.lustrageText}>
+                Notre prestation phare : une finition brillance haute performance qui ravive la
+                peinture, efface les micro-ternissures et sublime chaque reflet, sans les heures
+                que demande un polissage complet.
+              </p>
+              <ul className={styles.lustrageFeatures}>
+                <li>
+                  <IconCheck size={18} />
+                  Brillance miroir immédiate
+                </li>
+                <li>
+                  <IconCheck size={18} />
+                  Intervention rapide, directement à domicile
+                </li>
+                <li>
+                  <IconCheck size={18} />
+                  Protège la peinture entre deux entretiens
+                </li>
+              </ul>
+              <Link href="/devis?extra=lustrage" className="btn btn-cta">
+                Réserver mon lustrage minute
+                <IconArrowRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section">
         <div className="container">
           <div className={`${styles.sectionHeadRow} reveal`}>

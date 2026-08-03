@@ -67,7 +67,7 @@ export default async function VillePage({ params }) {
               </div>
               <div className={styles.point}>
                 <IconClock size={18} />
-                <span>Ouvert du lundi au vendredi de 8h30 à 19h, et le samedi de 9h à 17h.</span>
+                <span>Devis rapide et sans engagement, avec une réponse sous 24h ouvrées.</span>
               </div>
               <div className={styles.point}>
                 <IconShield size={18} />

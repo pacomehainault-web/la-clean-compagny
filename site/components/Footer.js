@@ -5,13 +5,12 @@ import {
   IconMapPin,
   IconPhone,
   IconMail,
-  IconClock,
   IconInstagram,
   IconTiktok,
   IconFacebook,
   IconLinkedin,
 } from './Icons'
-import { SITE, CONTACT, HOURS, SOCIALS, telLink, mailtoLink } from '@/lib/constants'
+import { SITE, CONTACT, SOCIALS, telLink, mailtoLink } from '@/lib/constants'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -79,21 +78,6 @@ export default function Footer() {
                 <IconMail size={17} />
                 <a href={mailtoLink({})}>{CONTACT.email}</a>
               </div>
-            </div>
-          </div>
-
-          <div className={styles.col}>
-            <div className={styles.colTitle}>
-              <IconClock size={13} style={{ marginRight: 6, verticalAlign: '-2px' }} />
-              Horaires
-            </div>
-            <div className={styles.linkList}>
-              {HOURS.map((h) => (
-                <div key={h.day} className={styles.hours}>
-                  <span>{h.day}</span>
-                  <strong>{h.hours}</strong>
-                </div>
-              ))}
             </div>
           </div>
         </div>
