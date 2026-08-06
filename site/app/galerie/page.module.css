@@ -7,16 +7,7 @@
   margin-top: 14px;
 }
 
-.sliderGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 900px) {
-  .sliderGrid {
-    grid-template-columns: 1fr;
-    max-width: 420px;
-    margin-inline: auto;
-  }
+.sliderSingle {
+  max-width: 460px;
+  margin-inline: auto;
 }

@@ -18,10 +18,27 @@ const CLOUDINARY_CLOUD_NAME = 'yn3d3ee9'
 const CLOUDINARY_UPLOAD_PRESET = 'La clean compagny'
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`
 
-const MIN_PHOTOS = 2
-const MAX_PHOTOS = 6
+const MIN_PHOTOS = 3
+const MAX_PHOTOS = 5
 
 const EXTRA_SERVICES = [...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT]
+
+// Prestations complémentaires requises par d'autres prestations actives
+// (ex : le lustrage classique impose le lavage extérieur). Générique : fonctionne
+// avec n'importe quelle prestation qui déclare un champ `requires`.
+function getRequiredIds(activeIds) {
+  const required = new Set()
+  EXTRA_SERVICES.forEach((s) => {
+    if (activeIds.has(s.id) && s.requires) {
+      s.requires.forEach((reqId) => required.add(reqId))
+    }
+  })
+  return required
+}
+
+function getLockingServiceNames(id, activeIds) {
+  return EXTRA_SERVICES.filter((s) => activeIds.has(s.id) && s.requires?.includes(id)).map((s) => s.name)
+}
 
 const STEPS = [
   { id: 1, label: 'Véhicule' },
@@ -76,6 +93,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   const formula = FORMULAS.find((f) => f.id === formulaId)
   const extras = EXTRA_SERVICES.filter((s) => extraIds.has(s.id))
   const selectedServices = [formula, ...extras].filter(Boolean)
+  const lockedExtraIds = useMemo(() => getRequiredIds(extraIds), [extraIds])
 
   const multiplier = vehicle?.priceMultiplier || 1
   const pricedServices = selectedServices.filter((s) => !s.priceOnRequest)
@@ -101,9 +119,16 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
   function toggleExtra(id) {
     setExtraIds((prev) => {
+      // Une prestation requise par une autre prestation active ne peut pas être décochée.
+      if (prev.has(id) && getRequiredIds(prev).has(id)) return prev
+
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
+
+      // Coche automatiquement les prestations requises par la sélection active.
+      getRequiredIds(next).forEach((reqId) => next.add(reqId))
+
       return next
     })
   }
@@ -163,9 +188,26 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
     return lines.filter((l) => l !== null).join('\n')
   }, [vehicleLabel, formulaLabel, extrasLabel, estimationLabel, photos.length, contact])
 
+  // Validation partagée entre l'envoi par email et l'envoi par WhatsApp : coordonnées
+  // complètes (dont l'email, obligatoire) et un nombre de photos compris entre
+  // MIN_PHOTOS et MAX_PHOTOS. Renvoie un message d'erreur, ou null si tout est valide.
+  function validateContactAndPhotos() {
+    if (!contact.name || !contact.phone || !contact.email) {
+      return 'Merci de renseigner votre nom, votre téléphone et votre email.'
+    }
+    if (photos.length < MIN_PHOTOS) {
+      return `Merci d'ajouter au moins ${MIN_PHOTOS} photos de votre véhicule (${MIN_PHOTOS} à ${MAX_PHOTOS} photos).`
+    }
+    if (photos.length > MAX_PHOTOS) {
+      return `Vous ne pouvez pas joindre plus de ${MAX_PHOTOS} photos.`
+    }
+    return null
+  }
+
   function handleWhatsapp() {
-    if (!contact.name || !contact.phone) {
-      setError('Merci de renseigner au moins votre nom et votre téléphone.')
+    const validationError = validateContactAndPhotos()
+    if (validationError) {
+      setError(validationError)
       return
     }
     setError('')
@@ -186,13 +228,9 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   const envoyerEmail = async (e) => {
     e.preventDefault()
 
-    if (!contact.name || !contact.phone) {
-      setError('Merci de renseigner au moins votre nom et votre téléphone.')
-      return
-    }
-
-    if (photos.length < MIN_PHOTOS) {
-      setError(`Merci d'ajouter au moins ${MIN_PHOTOS} photos de votre véhicule avant d'envoyer votre demande.`)
+    const validationError = validateContactAndPhotos()
+    if (validationError) {
+      setError(validationError)
       return
     }
 
@@ -364,17 +402,21 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                 <div className={styles.formulaOptions}>
                   {EXTRA_SERVICES.map((s) => {
                     const active = extraIds.has(s.id)
+                    const locked = active && lockedExtraIds.has(s.id)
+                    const lockingNames = locked ? getLockingServiceNames(s.id, extraIds) : []
                     return (
                       <div
                         key={s.id}
-                        className={`${styles.optionCard} ${active ? styles.optionCardActive : ''}`}
+                        className={`${styles.optionCard} ${active ? styles.optionCardActive : ''} ${locked ? styles.optionCardLocked : ''}`}
                         onClick={() => {
+                          if (locked) return
                           toggleExtra(s.id)
                           setError('')
                         }}
                         role="checkbox"
                         aria-checked={active}
-                        tabIndex={0}
+                        aria-disabled={locked || undefined}
+                        tabIndex={locked ? -1 : 0}
                       >
                         <span className={`${styles.optionControl} ${styles.optionControlCheckbox} ${active ? styles.optionControlActive : ''}`}>
                           {active && <IconCheck size={12} />}
@@ -387,6 +429,14 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                             </span>
                           </div>
                           <p className={styles.optionDesc}>{s.description}</p>
+                          {locked && (
+                            <p className={styles.optionLockedNote}>
+                              🔒 Inclus automatiquement avec {lockingNames.join(', ')}
+                            </p>
+                          )}
+                          {active && s.requiresNote && (
+                            <p className={styles.optionInfoNote}>{s.requiresNote}</p>
+                          )}
                         </div>
                       </div>
                     )
@@ -427,7 +477,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                     />
                   </div>
                   <div className={styles.field}>
-                    <label htmlFor="email">Email (optionnel)</label>
+                    <label htmlFor="email">Email *</label>
                     <input
                       id="email"
                       name="email"
@@ -435,6 +485,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                       value={contact.email}
                       onChange={(e) => setContact({ ...contact, email: e.target.value })}
                       autoComplete="email"
+                      required
                     />
                   </div>
                   <div className={styles.field}>
@@ -462,7 +513,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
                 <div className={styles.photoField}>
                   <p style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                    Photos de votre véhicule * ({MIN_PHOTOS} minimum)
+                    Photos de votre véhicule * ({MIN_PHOTOS} à {MAX_PHOTOS} photos)
                   </p>
 
                   <label
@@ -577,37 +628,15 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
               <p className={styles.summaryEmpty}>Votre sélection apparaîtra ici.</p>
             )}
 
-            {selectedServices.map((s) => (
-              <div className={styles.summaryRow} key={s.id}>
-                <span>{s.name}</span>
-                <strong>{s.priceOnRequest ? 'Sur devis' : `${s.basePrice} €`}</strong>
-              </div>
-            ))}
-
-            {pricedServices.length > 0 && (
-              <div className={styles.summaryTotal}>
-                <div className={styles.summaryTotalLabel}>Estimation indicative</div>
-                <div className={styles.summaryTotalValue}>
-                  {estimateLow} € – {estimateHigh} €
-                </div>
-                {hasQuoteOnlyServices && (
-                  <div className={styles.summaryTotalLabel} style={{ marginTop: 6 }}>
-                    + prestations sur devis
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!pricedServices.length && hasQuoteOnlyServices && (
-              <div className={styles.summaryTotal}>
-                <div className={styles.summaryTotalLabel}>Tarif</div>
-                <div className={styles.summaryTotalValue}>Sur devis</div>
-              </div>
+            {selectedServices.length > 0 && (
+              <p className={styles.summaryText}>
+                Vous avez sélectionné : {selectedServices.map((s) => s.name).join(' + ')}
+              </p>
             )}
 
             <p className={styles.summaryDisclaimer}>
-              Estimation indicative non contractuelle, calculée selon le gabarit du véhicule. Le
-              devis définitif est établi avant toute intervention.
+              Récapitulatif indicatif de votre sélection, sans engagement. Le devis chiffré
+              définitif vous est communiqué par nos soins avant toute intervention.
             </p>
           </aside>
         </div>

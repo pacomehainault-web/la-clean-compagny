@@ -5,6 +5,7 @@ import PhotoGallery from '@/components/PhotoGallery'
 import { IconArrowRight } from '@/components/Icons'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
+import { getRotatingIndex } from '@/lib/rotatingSelection'
 import styles from './page.module.css'
 
 export const metadata = buildMetadata({
@@ -14,7 +15,11 @@ export const metadata = buildMetadata({
   path: '/galerie',
 })
 
-const SLIDERS = Array.from({ length: 13 }, (_, i) => {
+// Régénère la page toutes les heures : suffisant pour suivre la rotation de
+// l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
+export const revalidate = 3600
+
+const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
   const n = i + 1
   return {
     before: `/images/avant-apres/paire-${n}-avant.jpg`,
@@ -42,6 +47,8 @@ const INTERIOR_PHOTOS = [
 ]
 
 export default function GaleriePage() {
+  const featuredBeforeAfter = ALL_BEFORE_AFTER[getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'galerie' })]
+
   return (
     <>
       <PageHero
@@ -57,10 +64,8 @@ export default function GaleriePage() {
             <span className="eyebrow">Comparatif interactif</span>
             <h2>Avant / Après</h2>
           </div>
-          <div className={styles.sliderGrid}>
-            {SLIDERS.map((s) => (
-              <BeforeAfterSlider key={s.before} {...s} />
-            ))}
+          <div className={styles.sliderSingle}>
+            <BeforeAfterSlider key={featuredBeforeAfter.before} {...featuredBeforeAfter} />
           </div>
         </div>
       </section>

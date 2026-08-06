@@ -58,11 +58,24 @@ export const COMPLEMENTARY_SERVICES = [
     category: 'exterieur',
   },
   {
-    id: 'lustrage',
-    name: 'Lustrage',
+    id: 'lustrage-classique',
+    name: 'Lustrage classique',
     priceOnRequest: true,
     description:
       "Finition brillance sans correction agressive, pour raviver l'éclat de la peinture entre deux polissages.",
+    category: 'exterieur',
+    // Le lavage extérieur est un prérequis technique : impossible de lustrer
+    // une carrosserie qui n'a pas été lavée. Voir QuoteWizard → applyServiceDependencies.
+    requires: ['lavage-exterieur'],
+    requiresNote:
+      'Pour assurer une prestation dans les meilleures conditions et garantir un résultat optimal, le lavage extérieur est obligatoirement inclus avec le lustrage.',
+  },
+  {
+    id: 'lustrage-minute',
+    name: 'Lustrage minute',
+    priceOnRequest: true,
+    description:
+      "Notre prestation phare : une finition brillance express qui ravive la peinture et sublime chaque reflet, sans les heures d'un lustrage complet.",
     category: 'exterieur',
   },
   {
@@ -113,6 +126,24 @@ export const OZONE_TREATMENT = {
   basePrice: 59,
   description:
     'Traitement par ozone qui élimine bactéries, acariens, moisissures et odeurs incrustées (tabac, animaux…) en profondeur.',
+}
+
+// Abonnement prépayé trimestriel (particuliers). Le prix affiché dans la section
+// marketing est calculé à partir des prix réels du catalogue (voir
+// SubscriptionSection) plutôt que codé en dur, pour rester cohérent si les tarifs
+// de base évoluent. `exampleComplementaryService` ne sert qu'à chiffrer le prix
+// affiché (et son comparatif barré) : le client peut choisir n'importe quelle
+// prestation complémentaire, le tarif final étant alors confirmé sur devis pour
+// celles qui sont sur devis. Le détail des prestations incluses est directement
+// rédigé dans SubscriptionSection (un des points contient un lien ancre).
+export const QUARTERLY_SUBSCRIPTION = {
+  id: 'abonnement-trimestriel',
+  name: 'Sérénité Trimestrielle',
+  eyebrow: 'Abonnement',
+  tagline: "L'entretien régulier de votre véhicule, à prix réduit et sans y repenser.",
+  durationMonths: 3,
+  discountPercent: 15,
+  exampleComplementaryService: OPTICS_RENOVATION,
 }
 
 export const ALL_SERVICES = [

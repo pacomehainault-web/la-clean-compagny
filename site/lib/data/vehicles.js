@@ -34,6 +34,27 @@ export const VEHICLE_TYPES = [
     examples: 'Trafic, Jumpy, Transit…',
     priceMultiplier: 1.5,
   },
+  {
+    id: 'camion',
+    label: 'Camion',
+    description: 'Camions et poids lourds',
+    examples: 'Porteur, benne, semi-remorque…',
+    priceMultiplier: 1.8,
+  },
+  {
+    id: 'tracteur',
+    label: 'Tracteur',
+    description: 'Tracteurs et engins agricoles',
+    examples: 'Tracteur, moissonneuse, télescopique…',
+    priceMultiplier: 2,
+  },
+  {
+    id: 'pelleteuse',
+    label: 'Pelleteuse',
+    description: 'Engins de chantier',
+    examples: 'Pelleteuse, mini-pelle, chargeuse…',
+    priceMultiplier: 2.2,
+  },
 ]
 
 export function getVehicleType(id) {

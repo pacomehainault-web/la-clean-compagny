@@ -75,12 +75,55 @@ export function IconUtilitaire(props) {
   )
 }
 
+export function IconCamion(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M8,46 L8,30 C8,25 12,21 17,21 L26,21 L32,12 C34,9.5 37,8 40,8 L48,8 L48,46 Z" />
+      <rect x="48" y="10" width="60" height="36" />
+      <line x1="8" y1="46" x2="108" y2="46" />
+      <circle cx="26" cy="46" r="7" fill="currentColor" stroke="none" />
+      <circle cx="90" cy="46" r="7" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconTracteur(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M10,48 L10,40 L26,26 L26,14 L48,14 L48,34 L64,34" />
+      <line x1="30" y1="26" x2="30" y2="12" />
+      <line x1="27" y1="12" x2="33" y2="12" />
+      <line x1="4" y1="48" x2="94" y2="48" />
+      <circle cx="21" cy="48" r="8" fill="currentColor" stroke="none" />
+      <circle cx="72" cy="44" r="13" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
+export function IconPelleteuse(props) {
+  return (
+    <VehicleBase {...props}>
+      <rect x="8" y="42" width="60" height="10" rx="5" />
+      <circle cx="18" cy="52" r="3" fill="currentColor" stroke="none" />
+      <circle cx="30" cy="52" r="3" fill="currentColor" stroke="none" />
+      <circle cx="46" cy="52" r="3" fill="currentColor" stroke="none" />
+      <circle cx="58" cy="52" r="3" fill="currentColor" stroke="none" />
+      <path d="M18,42 L18,26 C18,23 20,21 23,21 L42,21 C45,21 47,23 47,26 L47,42 Z" />
+      <path d="M38,24 L66,8 L92,20" />
+      <path d="M92,19 L101,25 L93,34 L83,29 Z" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
 export const VEHICLE_ICONS = {
   citadine: IconCitadine,
   berline: IconBerline,
   suv: IconSUV,
   monospace: IconMonospace,
   utilitaire: IconUtilitaire,
+  camion: IconCamion,
+  tracteur: IconTracteur,
+  pelleteuse: IconPelleteuse,
 }
 
 function UiBase({ children, size = 22, ...props }) {

@@ -29,8 +29,8 @@ export default function ContactForm() {
   }
 
   function handleWhatsapp() {
-    if (!form.name || (!form.phone && !form.email)) {
-      setError('Merci de renseigner votre nom, et un téléphone ou un email.')
+    if (!form.name || !form.email) {
+      setError('Merci de renseigner votre nom et votre email.')
       return
     }
     setError('')
@@ -38,8 +38,8 @@ export default function ContactForm() {
   }
 
   async function handleEmailSubmit() {
-    if (!form.name || (!form.phone && !form.email)) {
-      setError('Merci de renseigner votre nom, et un téléphone ou un email.')
+    if (!form.name || !form.email) {
+      setError('Merci de renseigner votre nom et votre email.')
       return
     }
     setError('')
@@ -70,15 +70,15 @@ export default function ContactForm() {
     <div className={styles.form}>
       <div className={styles.field}>
         <label htmlFor="c-name">Nom &amp; prénom *</label>
-        <input id="c-name" type="text" value={form.name} onChange={set('name')} autoComplete="name" />
+        <input id="c-name" type="text" value={form.name} onChange={set('name')} autoComplete="name" required />
       </div>
       <div className={styles.field}>
         <label htmlFor="c-phone">Téléphone</label>
         <input id="c-phone" type="tel" value={form.phone} onChange={set('phone')} autoComplete="tel" />
       </div>
       <div className={styles.field}>
-        <label htmlFor="c-email">Email</label>
-        <input id="c-email" type="email" value={form.email} onChange={set('email')} autoComplete="email" />
+        <label htmlFor="c-email">Email *</label>
+        <input id="c-email" type="email" value={form.email} onChange={set('email')} autoComplete="email" required />
       </div>
       <div className={`${styles.field} ${styles.fieldFull}`}>
         <label htmlFor="c-message">Message</label>

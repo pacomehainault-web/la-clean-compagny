@@ -1,0 +1,130 @@
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(28px, 4vw, 44px);
+  box-shadow: var(--shadow-soft);
+}
+
+.ribbon {
+  position: absolute;
+  top: -1px;
+  right: 28px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 0 0 10px 10px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.price {
+  font-family: var(--font-heading), serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.priceUnit {
+  font-size: 0.95rem;
+  color: var(--color-text-faint);
+}
+
+.priceCompare {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.priceStrike {
+  text-decoration: line-through;
+  color: var(--color-text-faint);
+  margin-right: 6px;
+}
+
+.includes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.includes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.includes svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--color-brand-blue);
+}
+
+.inlineLink {
+  color: var(--color-brand-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s var(--ease);
+}
+
+.inlineLink:hover {
+  color: var(--color-blue-dark);
+}
+
+.actionCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-blue-soft);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.b2bNote {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.b2bNote a {
+  color: var(--color-brand-blue);
+  font-weight: 600;
+  text-decoration: underline;
+}

@@ -1,14 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
-import ParallaxImage from '@/components/ParallaxImage'
 import StatsRow from '@/components/StatsRow'
 import FormulaCard from '@/components/FormulaCard'
+import SubscriptionSection from '@/components/SubscriptionSection'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
-import { VEHICLE_ICONS, IconStar, IconMapPin, IconShield, IconArrowRight, IconCheck } from '@/components/Icons'
+import { VEHICLE_ICONS, IconArrowRight, IconCheck } from '@/components/Icons'
 import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { REVIEWS } from '@/lib/data/reviews'
@@ -16,6 +16,7 @@ import { FAQ_ITEMS } from '@/lib/data/faq'
 import { CITIES } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
+import { getRotatingIndex } from '@/lib/rotatingSelection'
 
 export const metadata = buildMetadata({
   title: 'Detailing automobile haut de gamme à Angers',
@@ -24,78 +25,49 @@ export const metadata = buildMetadata({
   path: '/',
 })
 
-const HOME_SLIDERS = [
-  { before: '/images/avant-apres/paire-1-avant.jpg', after: '/images/avant-apres/paire-1-apres.jpg', alt: 'Nettoyage intérieur — véhicule' },
-  { before: '/images/avant-apres/paire-2-avant.jpg', after: '/images/avant-apres/paire-2-apres.jpg', alt: 'Rénovation esthétique — véhicule' },
-  { before: '/images/avant-apres/paire-3-avant.jpg', after: '/images/avant-apres/paire-3-apres.jpg', alt: 'Detailing complet — véhicule' },
-]
+// Régénère la page toutes les heures : suffisant pour suivre la rotation de
+// l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
+export const revalidate = 3600
+
+const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
+  const n = i + 1
+  return {
+    before: `/images/avant-apres/paire-${n}-avant.jpg`,
+    after: `/images/avant-apres/paire-${n}-apres.jpg`,
+    alt: `Detailing avant / après — véhicule ${n}`,
+  }
+})
 
 export default function HomePage() {
+  const featuredBeforeAfter = ALL_BEFORE_AFTER[getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'home' })]
+
   return (
     <>
       <section className={styles.hero}>
-        <div className={styles.heroGlow} aria-hidden="true" />
-        <div className="container">
-          <div className={styles.heroGrid}>
-            <div className={`${styles.heroContent} reveal`}>
-              <span className="eyebrow">Detailing automobile haut de gamme — Angers</span>
-              <h1>
-                Chaque véhicule,
-                <br />
-                <span className="text-gradient">même exigence.</span>
-              </h1>
-              <p className={`lead ${styles.heroLead}`}>
-                De la citadine du quotidien à la voiture de collection, nous redonnons à votre
-                véhicule l&apos;éclat et le soin qu&apos;il mérite. Un travail minutieux, réalisé
-                directement chez vous ou sur votre lieu de travail, dans un rayon de{' '}
-                {CONTACT.radiusKm} km autour d&apos;Angers.
-              </p>
-              <div className={styles.heroActions}>
-                <Link href="/devis" className="btn btn-cta">
-                  Voir les tarifs et réserver
-                  <IconArrowRight size={18} />
-                </Link>
-                <Link href="/prestations" className="btn btn-outline">
-                  Découvrir nos prestations
-                </Link>
-              </div>
-              <div className={styles.trustRow}>
-                <span className={styles.trustItem}>
-                  <IconShield size={16} /> Micro-entreprise déclarée — SIREN {SITE.siren}
-                </span>
-                <span className={styles.trustItem}>
-                  <IconMapPin size={16} /> Intervention à domicile, {CONTACT.radiusKm} km autour d&apos;Angers
-                </span>
-                <span className={styles.trustItem}>
-                  <IconCheck size={16} /> Véhicules du quotidien, utilitaires &amp; prestige
-                </span>
-              </div>
-            </div>
+        <video
+          className={styles.heroVideo}
+          src="/videos/ferrari-video-arriere-plan-heros.mp4"
+          poster="/images/exterieur/ferrari-california-lavage-prestige-angers.jpg"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        />
+        <div className={styles.heroOverlay} aria-hidden="true" />
 
-            <div className={styles.heroVisual}>
-              <div className={styles.heroImageFrame}>
-                <ParallaxImage
-                  src="/images/exterieur/ferrari-california-lavage-prestige-angers.jpg"
-                  alt="Ferrari California, l'emblème de La Clean Compagny, en plein soin à Angers"
-                  priority
-                />
-                <div className={styles.heroImageOverlay} aria-hidden="true" />
-                <div className={styles.heroBadgeFloat}>
-                  <div className={styles.heroBadgeStars} aria-hidden="true">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <IconStar key={i} size={16} />
-                    ))}
-                  </div>
-                  <div>
-                    <strong>5.0 / 5</strong>
-                    <div className={styles.heroBadgeLabel}>Avis Google</div>
-                  </div>
-                </div>
-                <div className={styles.heroImageCaption}>
-                  Ferrari California <span>— l&apos;emblème La Clean Compagny</span>
-                </div>
-              </div>
-            </div>
+        <div className={`${styles.heroContent} reveal`}>
+          <h1 className={styles.heroTitle}>{SITE.name}</h1>
+          <p className={styles.heroSlogan}>{SITE.slogan}</p>
+          <div className={styles.heroActions}>
+            <Link href="/devis" className="btn btn-cta">
+              Voir les tarifs et réserver
+              <IconArrowRight size={18} />
+            </Link>
+            <Link href="/prestations" className="btn btn-outline">
+              Découvrir nos prestations
+            </Link>
           </div>
         </div>
       </section>
@@ -155,15 +127,35 @@ export default function HomePage() {
                   <IconCheck size={18} />
                   Intervention rapide, directement à domicile
                 </li>
-                <li>
-                  <IconCheck size={18} />
-                  Protège la peinture entre deux entretiens
-                </li>
               </ul>
-              <Link href="/devis?extra=lustrage" className="btn btn-cta">
+              <Link href="/devis?extra=lustrage-minute" className="btn btn-cta">
                 Réserver mon lustrage minute
                 <IconArrowRight size={18} />
               </Link>
+            </div>
+          </div>
+
+          <div className={`${styles.caseStudy} reveal`}>
+            <div className={styles.caseStudyText}>
+              <span className={styles.caseStudyBadge}>📍 Étude de cas</span>
+              <p>
+                Une rayure ciblée sur votre carrosserie ? Inutile de passer par la case
+                carrosserie. Chez La Clean Compagny, nous intervenons directement chez vous pour
+                effacer les éraflures.
+              </p>
+              <p>
+                <strong>Exemple avec ce client</strong> : après avoir frotté un poteau dans un
+                parking, il a fait appel à nos services. Intervention réalisée en bas de chez lui
+                pour un résultat impeccable, sans immobiliser son véhicule (BMW X1).
+              </p>
+            </div>
+            <div className={styles.caseStudyVisual}>
+              <BeforeAfterSlider
+                before="/images/lustrage/x1-lustrage-minute-avant.jpg"
+                after="/images/lustrage/x1-lustrage-minute-apres.jpg"
+                alt="Rayure sur la portière d'un BMW X1 effacée par un lustrage minute à domicile"
+              />
+              <span className={styles.caseStudyCaption}>BMW X1 — rayure de poteau effacée à domicile</span>
             </div>
           </div>
         </div>
@@ -188,7 +180,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className={styles.complementaryNote}>
+          <div className={styles.complementaryNote} id="prestations-complementaires">
             <span>Et aussi, sur devis :</span>
             <div className={styles.chipRow}>
               {[...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT].map((s) => (
@@ -200,6 +192,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <SubscriptionSection />
 
       <section className="section section-alt">
         <div className="container">
@@ -233,10 +227,8 @@ export default function HomePage() {
               <IconArrowRight size={16} />
             </Link>
           </div>
-          <div className={`${styles.sliderGrid} reveal`}>
-            {HOME_SLIDERS.map((s) => (
-              <BeforeAfterSlider key={s.before} {...s} />
-            ))}
+          <div className={`${styles.sliderSingle} reveal`}>
+            <BeforeAfterSlider key={featuredBeforeAfter.before} {...featuredBeforeAfter} />
           </div>
         </div>
       </section>

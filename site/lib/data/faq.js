@@ -7,7 +7,7 @@ export const FAQ_ITEMS = [
   {
     question: 'Combien de temps dure un traitement céramique ?',
     answer:
-      "Selon l'entretien et les conditions d'exposition (extérieur, kilométrage, lavages), un traitement céramique protège la carrosserie durablement, généralement plusieurs mois à plus d'un an. Nous évaluons la durée adaptée à votre usage lors du devis et vous conseillons sur l'entretien à adopter pour en prolonger les effets.",
+      "La protection dure entre 3 et 5 ans, selon l'entretien et l'utilisation du véhicule (conditions d'exposition, kilométrage, fréquence des lavages). Nous évaluons la durée adaptée à votre usage lors du devis et vous conseillons sur l'entretien à adopter pour en prolonger les effets.",
   },
   {
     question: 'Faut-il réserver à l’avance pour un detailing complet ?',
