@@ -297,6 +297,28 @@ export function IconGift(props) {
   )
 }
 
+export function IconInvoice(props) {
+  return (
+    <UiBase {...props}>
+      <path d="M6 2h9l3 3v17H6z" />
+      <path d="M15 2v3h3" />
+      <line x1="9" y1="10" x2="15" y2="10" />
+      <line x1="9" y1="13" x2="15" y2="13" />
+      <line x1="9" y1="16" x2="13" y2="16" />
+    </UiBase>
+  )
+}
+
+export function IconPercent(props) {
+  return (
+    <UiBase {...props}>
+      <line x1="19" y1="5" x2="5" y2="19" />
+      <circle cx="7.5" cy="7.5" r="2.5" />
+      <circle cx="16.5" cy="16.5" r="2.5" />
+    </UiBase>
+  )
+}
+
 export function IconMail(props) {
   return (
     <UiBase {...props}>

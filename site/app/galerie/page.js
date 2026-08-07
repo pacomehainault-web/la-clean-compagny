@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
+import StaticBeforeAfterGallery from '@/components/StaticBeforeAfterGallery'
 import PhotoGallery from '@/components/PhotoGallery'
 import { IconArrowRight } from '@/components/Icons'
 import { CONTACT, telLink } from '@/lib/constants'
@@ -46,6 +47,14 @@ const INTERIOR_PHOTOS = [
   { src: '/images/interieur/utilitaire-nettoyage-interieur-angers.jpg', alt: 'Véhicule utilitaire — nettoyage intérieur à Angers', caption: 'Utilitaire' },
 ]
 
+const STATIC_RESULTS_IDS = [2, 5, 8, 11, 13]
+const STATIC_RESULTS = STATIC_RESULTS_IDS.map((n) => ({
+  id: n,
+  before: `/images/avant-apres/paire-${n}-avant.jpg`,
+  after: `/images/avant-apres/paire-${n}-apres.jpg`,
+  alt: `Detailing avant / après — véhicule ${n}`,
+}))
+
 export default function GaleriePage() {
   const featuredBeforeAfter = ALL_BEFORE_AFTER[getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'galerie' })]
 
@@ -71,6 +80,16 @@ export default function GaleriePage() {
       </section>
 
       <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Résultats en images</span>
+            <h2>D&apos;autres réalisations, sans curseur à glisser</h2>
+          </div>
+          <StaticBeforeAfterGallery pairs={STATIC_RESULTS} />
+        </div>
+      </section>
+
+      <section className="section">
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">Extérieur</span>

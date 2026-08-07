@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import styles from './Header.module.css'
-import { IconMenu, IconClose, IconPhone, IconInstagram, IconTiktok, IconFacebook, IconLinkedin } from './Icons'
+import { IconMenu, IconClose, IconPhone, IconInstagram, IconTiktok, IconFacebook, IconLinkedin, IconArrowRight } from './Icons'
 import { CONTACT, SOCIALS, telLink } from '@/lib/constants'
 
 const NAV_LINKS = [
@@ -20,6 +21,16 @@ const NAV_LINKS = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+  const [isProQuery, setIsProQuery] = useState(false)
+  const isProSpace = pathname?.startsWith('/pro') || isProQuery
+
+  // Lu depuis window.location plutôt que useSearchParams() : ce Header est monté
+  // sur tout le site via le layout racine, et useSearchParams() forcerait un rendu
+  // dynamique (avec Suspense) sur des pages autrement statiques.
+  useEffect(() => {
+    setIsProQuery(new URLSearchParams(window.location.search).get('pro') === '1')
+  }, [pathname])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -46,6 +57,28 @@ export default function Header() {
 
   return (
     <>
+      <div className={styles.proBar}>
+        <div className={`container ${styles.proBarInner}`}>
+          {isProSpace ? (
+            <>
+              <span className={styles.proBarText}>Vous êtes un particulier ?</span>
+              <Link href="/" className={styles.proBarLink}>
+                Retour au site grand public
+                <IconArrowRight size={14} />
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className={styles.proBarText}>Vous êtes un professionnel ? Découvrez nos offres flottes</span>
+              <Link href="/pro" className={styles.proBarLink}>
+                Espace Pro
+                <IconArrowRight size={14} />
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
       <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
         <div className={`container ${styles.inner}`}>
           <Link href="/" className={styles.brand} onClick={() => setOpen(false)}>

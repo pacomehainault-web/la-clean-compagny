@@ -3,7 +3,7 @@
   height: 100vh;
   min-height: 560px;
   max-height: 1080px;
-  margin-top: calc(-1 * var(--header-height));
+  margin-top: calc(-1 * var(--fixed-header-total));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +38,7 @@
   gap: 22px;
   max-width: 760px;
   padding-inline: 24px;
-  padding-top: var(--header-height);
+  padding-top: var(--fixed-header-total);
   text-align: center;
 }
 

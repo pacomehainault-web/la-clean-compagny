@@ -49,6 +49,12 @@
 
   --container-width: 1240px;
   --header-height: 84px;
+  --pro-bar-height: 40px;
+  /* Hauteur totale réservée en haut de page (barre "Espace Pro" + barre de nav
+     principale) : à utiliser pour tout positionnement/offset lié au header, la
+     hauteur du header seul (--header-height) restant réservée au composant
+     Header lui-même. */
+  --fixed-header-total: calc(var(--pro-bar-height) + var(--header-height));
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -58,7 +64,7 @@
 }
 
 html {
-  scroll-padding-top: calc(var(--header-height) + 16px);
+  scroll-padding-top: calc(var(--fixed-header-total) + 16px);
   scroll-behavior: smooth;
 }
 
@@ -100,7 +106,7 @@ video {
 
 main {
   display: block;
-  padding-top: var(--header-height);
+  padding-top: var(--fixed-header-total);
   min-height: 60vh;
 }
 

@@ -46,7 +46,21 @@ const STEPS = [
   { id: 3, label: 'Coordonnées' },
 ]
 
-const EMPTY_CONTACT = { name: '', phone: '', email: '', date: '', message: '' }
+const EMPTY_CONTACT = {
+  name: '',
+  phone: '',
+  email: '',
+  date: '',
+  message: '',
+  fleetSize: '',
+  maintenanceFrequency: '',
+}
+
+const MAINTENANCE_FREQUENCY_OPTIONS = [
+  { value: 'ponctuel', label: 'Ponctuel' },
+  { value: 'regulier', label: 'Régulier' },
+  { value: 'contrat-annuel', label: 'Contrat annuel' },
+]
 
 // Upload une photo vers Cloudinary et renvoie son secure_url.
 // Logue chaque étape dans la console pour pouvoir déboguer facilement (F12 → Console).
@@ -75,7 +89,7 @@ async function uploadPhotoToCloudinary(file, index) {
   return json.secure_url
 }
 
-export default function QuoteWizard({ initialVehicleId, initialFormulaId, initialExtraId }) {
+export default function QuoteWizard({ initialVehicleId, initialFormulaId, initialExtraId, isPro = false }) {
   const form = useRef(null)
   const [step, setStep] = useState(1)
   const [vehicleId, setVehicleId] = useState(initialVehicleId || '')
@@ -168,15 +182,21 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
   // Récapitulatif complet en un seul champ (recapitulatif_complet),
   // pratique pour un template EmailJS minimal avec un seul placeholder.
+  const maintenanceFrequencyLabel = MAINTENANCE_FREQUENCY_OPTIONS.find(
+    (o) => o.value === contact.maintenanceFrequency
+  )?.label
+
   const recap = useMemo(() => {
     const lines = [
-      'Nouvelle demande de devis — La Clean Compagny',
+      isPro ? 'Nouvelle demande de devis flotte — La Clean Compagny' : 'Nouvelle demande de devis — La Clean Compagny',
       '',
       `Véhicule : ${vehicleLabel}`,
       `Formule habitacle : ${formulaLabel}`,
       `Prestations complémentaires : ${extrasLabel}`,
-      `Estimation indicative : ${estimationLabel}`,
+      isPro ? null : `Estimation indicative : ${estimationLabel}`,
       `Photos jointes : ${photos.length}`,
+      isPro && contact.fleetSize ? `Taille de la flotte : ${contact.fleetSize} véhicule(s)` : null,
+      isPro && maintenanceFrequencyLabel ? `Fréquence d'entretien souhaitée : ${maintenanceFrequencyLabel}` : null,
       '',
       'Coordonnées :',
       `Nom : ${contact.name || '—'}`,
@@ -186,7 +206,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
       contact.message ? `Message : ${contact.message}` : null,
     ]
     return lines.filter((l) => l !== null).join('\n')
-  }, [vehicleLabel, formulaLabel, extrasLabel, estimationLabel, photos.length, contact])
+  }, [isPro, vehicleLabel, formulaLabel, extrasLabel, estimationLabel, photos.length, contact, maintenanceFrequencyLabel])
 
   // Validation partagée entre l'envoi par email et l'envoi par WhatsApp : coordonnées
   // complètes (dont l'email, obligatoire) et un nombre de photos compris entre
@@ -194,6 +214,9 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   function validateContactAndPhotos() {
     if (!contact.name || !contact.phone || !contact.email) {
       return 'Merci de renseigner votre nom, votre téléphone et votre email.'
+    }
+    if (isPro && (!contact.fleetSize || !contact.maintenanceFrequency)) {
+      return 'Merci de renseigner la taille de votre flotte et la fréquence d’entretien souhaitée.'
     }
     if (photos.length < MIN_PHOTOS) {
       return `Merci d'ajouter au moins ${MIN_PHOTOS} photos de votre véhicule (${MIN_PHOTOS} à ${MAX_PHOTOS} photos).`
@@ -271,6 +294,8 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
       nombre_photos: String(photoUrls.length),
       // Repli garanti : liste de liens texte (fonctionne dans un simple bloc Texte).
       photos_liens: photosLiens,
+      taille_flotte: isPro ? contact.fleetSize : '',
+      frequence_entretien: isPro ? maintenanceFrequencyLabel || '' : '',
     }
     // Variables individuelles pour lier chaque photo à un bloc "Image" du Design Editor.
     for (let i = 0; i < MAX_PHOTOS; i += 1) {
@@ -332,9 +357,13 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
           <div className={styles.panel}>
             {step === 1 && (
               <div>
-                <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Quel est votre véhicule ?</h2>
+                <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>
+                  {isPro ? 'Quel est le gabarit principal de votre flotte ?' : 'Quel est votre véhicule ?'}
+                </h2>
                 <p className="lead" style={{ marginBottom: 28 }}>
-                  Le tarif final dépend du gabarit de votre véhicule.
+                  {isPro
+                    ? 'Sélectionnez le type de véhicule dominant : vous pourrez préciser la composition exacte de votre flotte à l’étape suivante.'
+                    : 'Le tarif final dépend du gabarit de votre véhicule.'}
                 </p>
                 <div className={styles.vehicleGrid}>
                   {VEHICLE_TYPES.map((v) => {
@@ -389,7 +418,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                         <div className={styles.optionBody}>
                           <div className={styles.optionName}>
                             <span>{f.name}</span>
-                            <span className={styles.optionPrice}>dès {f.basePrice} €</span>
+                            <span className={styles.optionPrice}>{isPro ? 'Sur devis' : `dès ${f.basePrice} €`}</span>
                           </div>
                           <p className={styles.optionDesc}>{f.tagline}</p>
                         </div>
@@ -425,7 +454,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                           <div className={styles.optionName}>
                             <span>{s.name}</span>
                             <span className={styles.optionPrice}>
-                              {s.priceOnRequest ? 'Sur devis' : `dès ${s.basePrice} €`}
+                              {isPro || s.priceOnRequest ? 'Sur devis' : `dès ${s.basePrice} €`}
                             </span>
                           </div>
                           <p className={styles.optionDesc}>{s.description}</p>
@@ -447,9 +476,13 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
             {step === 3 && (
               <div>
-                <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Vos coordonnées</h2>
+                <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>
+                  {isPro ? 'Vos coordonnées et votre flotte' : 'Vos coordonnées'}
+                </h2>
                 <p className="lead" style={{ marginBottom: 28 }}>
-                  Nous vous recontactons rapidement pour confirmer votre devis définitif.
+                  {isPro
+                    ? 'Nous vous recontactons rapidement pour établir votre devis flotte, sur-mesure selon votre volume.'
+                    : 'Nous vous recontactons rapidement pour confirmer votre devis définitif.'}
                 </p>
                 <div className={styles.form}>
                   <div className={styles.field}>
@@ -488,6 +521,42 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                       required
                     />
                   </div>
+                  {isPro && (
+                    <div className={styles.field}>
+                      <label htmlFor="fleetSize">Taille de la flotte (nombre de véhicules) *</label>
+                      <input
+                        id="fleetSize"
+                        name="taille_flotte"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={contact.fleetSize}
+                        onChange={(e) => setContact({ ...contact, fleetSize: e.target.value })}
+                        required
+                      />
+                    </div>
+                  )}
+                  {isPro && (
+                    <div className={styles.field}>
+                      <label htmlFor="maintenanceFrequency">Fréquence d&apos;entretien souhaitée *</label>
+                      <select
+                        id="maintenanceFrequency"
+                        name="frequence_entretien"
+                        value={contact.maintenanceFrequency}
+                        onChange={(e) => setContact({ ...contact, maintenanceFrequency: e.target.value })}
+                        required
+                      >
+                        <option value="" disabled>
+                          Choisissez une fréquence
+                        </option>
+                        {MAINTENANCE_FREQUENCY_OPTIONS.map((o) => (
+                          <option value={o.value} key={o.value}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div className={styles.field}>
                     <label htmlFor="date">Date souhaitée (optionnel)</label>
                     <input
@@ -506,7 +575,11 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                       rows={4}
                       value={contact.message}
                       onChange={(e) => setContact({ ...contact, message: e.target.value })}
-                      placeholder="Précisez tout élément utile : état du véhicule, accès, disponibilités…"
+                      placeholder={
+                        isPro
+                          ? 'Précisez la composition de votre flotte, vos contraintes de planning, vos sites…'
+                          : 'Précisez tout élément utile : état du véhicule, accès, disponibilités…'
+                      }
                     />
                   </div>
                 </div>

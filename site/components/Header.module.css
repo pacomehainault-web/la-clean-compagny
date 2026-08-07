@@ -1,6 +1,50 @@
-.header {
+.proBar {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  height: var(--pro-bar-height);
+  display: flex;
+  align-items: center;
+  background: var(--color-ink);
+}
+
+.proBarInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.proBarText {
+  font-size: 0.82rem;
+  color: var(--color-on-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.proBarLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-blue-light);
+  transition: color 0.2s var(--ease);
+}
+
+.proBarLink:hover {
+  color: #fff;
+}
+
+.header {
+  position: fixed;
+  top: var(--pro-bar-height);
   left: 0;
   right: 0;
   z-index: 100;

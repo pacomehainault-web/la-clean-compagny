@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
+import SpaceGateway from '@/components/SpaceGateway'
 import StatsRow from '@/components/StatsRow'
 import FormulaCard from '@/components/FormulaCard'
 import SubscriptionSection from '@/components/SubscriptionSection'
@@ -43,6 +44,8 @@ export default function HomePage() {
 
   return (
     <>
+      <SpaceGateway />
+
       <section className={styles.hero}>
         <video
           className={styles.heroVideo}

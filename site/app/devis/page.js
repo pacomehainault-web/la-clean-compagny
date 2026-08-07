@@ -14,14 +14,19 @@ export default async function DevisPage({ searchParams }) {
   const initialVehicleId = typeof params?.vehicule === 'string' ? params.vehicule : ''
   const initialFormulaId = typeof params?.formule === 'string' ? params.formule : ''
   const initialExtraId = typeof params?.extra === 'string' ? params.extra : ''
+  const isPro = params?.pro === '1'
 
   return (
     <>
       <PageHero
-        eyebrow="Devis en ligne"
-        title="Composez votre devis en 3 étapes"
-        lead="Véhicule, prestations, coordonnées : obtenez une estimation immédiate et envoyez votre demande en un clic."
-        breadcrumb={[{ label: 'Devis' }]}
+        eyebrow={isPro ? 'Devis flotte en ligne' : 'Devis en ligne'}
+        title={isPro ? 'Composez votre devis flotte en 3 étapes' : 'Composez votre devis en 3 étapes'}
+        lead={
+          isPro
+            ? 'Type de véhicule, prestations, flotte et coordonnées : envoyez votre demande en un clic, nous revenons vers vous avec un devis sur-mesure.'
+            : 'Véhicule, prestations, coordonnées : obtenez une estimation immédiate et envoyez votre demande en un clic.'
+        }
+        breadcrumb={isPro ? [{ label: 'Espace Pro', href: '/pro' }, { label: 'Devis flotte' }] : [{ label: 'Devis' }]}
       />
       <section className="section">
         <div className="container">
@@ -29,6 +34,7 @@ export default async function DevisPage({ searchParams }) {
             initialVehicleId={initialVehicleId}
             initialFormulaId={initialFormulaId}
             initialExtraId={initialExtraId}
+            isPro={isPro}
           />
         </div>
       </section>
