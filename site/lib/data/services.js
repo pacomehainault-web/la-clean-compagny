@@ -39,12 +39,14 @@ export const FORMULAS = [
   },
 ]
 
-// Prestations complémentaires, sur devis
+// Prestations complémentaires. La plupart ont un tarif de départ (palier Citadine
+// de la grille tarifaire, cf. lib/data/pricing.js) ; celles qui n'ont pas
+// d'équivalent dans la nouvelle grille (céramique, nettoyage moteur) restent sur devis.
 export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lavage-exterieur',
     name: 'Lavage extérieur',
-    priceOnRequest: true,
+    basePrice: 45,
     description:
       'Lavage carrosserie en deux phases, sans risque de micro-rayure, pour une brillance immédiate.',
     category: 'exterieur',
@@ -52,7 +54,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'polissage',
     name: 'Polissage',
-    priceOnRequest: true,
+    basePrice: 350,
     description:
       'Correction de peinture pour effacer hologrammes, micro-rayures et ternissures et redonner sa profondeur à la carrosserie.',
     category: 'exterieur',
@@ -60,7 +62,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lustrage-classique',
     name: 'Lustrage classique',
-    priceOnRequest: true,
+    basePrice: 150,
     description:
       "Finition brillance sans correction agressive, pour raviver l'éclat de la peinture entre deux polissages.",
     category: 'exterieur',
@@ -81,7 +83,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'decontamination',
     name: 'Décontamination',
-    priceOnRequest: true,
+    basePrice: 100,
     description:
       'Élimination des particules ferreuses, goudrons et résidus incrustés que le lavage seul ne retire pas.',
     category: 'exterieur',
@@ -105,7 +107,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'traitement-cuir',
     name: 'Traitement cuir',
-    priceOnRequest: true,
+    basePrice: 60,
     description:
       'Nettoyage, nourrissage et protection du cuir pour préserver sa souplesse et éviter le craquellement.',
     category: 'interieur',
@@ -115,7 +117,7 @@ export const COMPLEMENTARY_SERVICES = [
 export const OPTICS_RENOVATION = {
   id: 'renovation-optiques',
   name: 'Rénovation optiques',
-  basePrice: 69,
+  basePrice: 80,
   description:
     "Ponçage et polissage des optiques jaunies ou ternes pour retrouver transparence et sécurité d'éclairage.",
 }
@@ -126,24 +128,6 @@ export const OZONE_TREATMENT = {
   basePrice: 59,
   description:
     'Traitement par ozone qui élimine bactéries, acariens, moisissures et odeurs incrustées (tabac, animaux…) en profondeur.',
-}
-
-// Abonnement prépayé trimestriel (particuliers). Le prix affiché dans la section
-// marketing est calculé à partir des prix réels du catalogue (voir
-// SubscriptionSection) plutôt que codé en dur, pour rester cohérent si les tarifs
-// de base évoluent. `exampleComplementaryService` ne sert qu'à chiffrer le prix
-// affiché (et son comparatif barré) : le client peut choisir n'importe quelle
-// prestation complémentaire, le tarif final étant alors confirmé sur devis pour
-// celles qui sont sur devis. Le détail des prestations incluses est directement
-// rédigé dans SubscriptionSection (un des points contient un lien ancre).
-export const QUARTERLY_SUBSCRIPTION = {
-  id: 'abonnement-trimestriel',
-  name: 'Sérénité Trimestrielle',
-  eyebrow: 'Abonnement',
-  tagline: "L'entretien régulier de votre véhicule, à prix réduit et sans y repenser.",
-  durationMonths: 3,
-  discountPercent: 15,
-  exampleComplementaryService: OPTICS_RENOVATION,
 }
 
 export const ALL_SERVICES = [

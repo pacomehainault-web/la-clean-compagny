@@ -4,7 +4,7 @@ export default function GoogleMapEmbed({ height = 400 }) {
   return (
     <iframe
       src={CONTACT.mapEmbedSrc}
-      title={`Localisation de ${CONTACT.fullAddress}`}
+      title={`Zone d'intervention de La Clean Compagny à ${CONTACT.city}`}
       width="100%"
       height={height}
       style={{ border: 0, borderRadius: 'var(--radius-lg)' }}

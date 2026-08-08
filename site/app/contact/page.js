@@ -31,11 +31,10 @@ export default function ContactPage() {
                 <div className={styles.infoItem}>
                   <IconMapPin size={20} />
                   <div>
-                    <div className={styles.infoTitle}>Adresse</div>
+                    <div className={styles.infoTitle}>Zone d&apos;intervention</div>
                     <div className={styles.infoText}>
-                      {CONTACT.fullAddress}
-                      <br />
-                      Intervention à domicile dans un rayon de {CONTACT.radiusKm} km
+                      Intervention à domicile à {CONTACT.city} et dans un rayon de{' '}
+                      {CONTACT.radiusKm} km
                     </div>
                   </div>
                 </div>

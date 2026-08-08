@@ -113,6 +113,28 @@
   color: var(--color-brand-blue);
 }
 
+/* Comble l'espace sous le Pass Trimestriel (contenu plus court que le Pass
+   Annuel) pour égaliser la hauteur des deux cartes sur desktop. Masqué sur
+   mobile : les cartes s'empilent en pleine largeur et cette image y ajouterait
+   un défilement inutile sans apporter d'information nouvelle. */
+.trimestrielImage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: block;
+}
+
+.trimestrielImage img {
+  object-fit: cover;
+}
+
+@media (max-width: 800px) {
+  .trimestrielImage {
+    display: none;
+  }
+}
+
 .commitmentNote {
   font-size: 0.8rem;
   color: var(--color-text-faint);

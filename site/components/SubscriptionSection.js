@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import styles from './SubscriptionSection.module.css'
 import { IconCheck, IconWhatsapp } from './Icons'
 import { VEHICLE_TIERS, PRICED_TIER_IDS, PASS_TRIMESTRIEL, PASS_ANNUEL } from '@/lib/data/pricing'
@@ -39,6 +40,15 @@ export default function SubscriptionSection() {
                 </li>
               ))}
             </ul>
+
+            <div className={styles.trimestrielImage}>
+              <Image
+                src="/images/lustrage/lustrage-showroom.jpg"
+                alt="Véhicule parfaitement propre après un entretien La Clean Compagny"
+                fill
+                sizes="(max-width: 800px) 90vw, 420px"
+              />
+            </div>
 
             <div className={styles.actions}>
               <a

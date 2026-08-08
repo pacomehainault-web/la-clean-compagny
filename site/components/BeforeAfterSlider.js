@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from './BeforeAfterSlider.module.css'
-import { IconMotion } from './Icons'
+import { IconMotion, IconSlideArrows } from './Icons'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -73,8 +73,7 @@ export default function BeforeAfterSlider({ before, after, alt }) {
       <div className={styles.handle}>
         <div className={styles.handleLine} />
         <div className={styles.handleGrip}>
-          <span />
-          <span />
+          <IconSlideArrows size={18} />
         </div>
       </div>
 

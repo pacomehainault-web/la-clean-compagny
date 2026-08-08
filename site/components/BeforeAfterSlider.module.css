@@ -79,15 +79,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  color: var(--color-ink);
   box-shadow: var(--shadow-soft);
-}
-
-.handleGrip span {
-  width: 3px;
-  height: 14px;
-  background: var(--color-ink);
-  border-radius: 2px;
 }
 
 .motionBtn {

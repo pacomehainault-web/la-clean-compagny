@@ -384,6 +384,15 @@ export function IconMotion(props) {
   )
 }
 
+export function IconSlideArrows(props) {
+  return (
+    <UiBase {...props} strokeWidth="2.4">
+      <path d="M8 6L2 12L8 18" />
+      <path d="M16 6L22 12L16 18" />
+    </UiBase>
+  )
+}
+
 export function IconGoogleG({ size = 22, ...props }) {
   return (
     <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden="true" {...props}>

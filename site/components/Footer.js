@@ -21,10 +21,10 @@ export default function Footer() {
         <div className={styles.grid}>
           <div className={styles.brandCol}>
             <Image
-              src="/images/logo/logo-transparent.png"
+              src="/images/logo/logo-new.png"
               alt="La Clean Compagny"
               width={280}
-              height={187}
+              height={188}
               className={styles.brandLogo}
               style={{ height: 46, width: 'auto' }}
             />
@@ -68,7 +68,9 @@ export default function Footer() {
             <div className={styles.linkList}>
               <div className={styles.contactItem}>
                 <IconMapPin size={17} />
-                <span>{CONTACT.fullAddress}</span>
+                <span>
+                  {CONTACT.city} et {CONTACT.radiusKm} km alentour
+                </span>
               </div>
               <div className={styles.contactItem}>
                 <IconPhone size={17} />

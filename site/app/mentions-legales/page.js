@@ -25,7 +25,7 @@ export default function MentionsLegalesPage() {
             </p>
             <ul>
               <li>SIREN : {SITE.siren}</li>
-              <li>Adresse : {CONTACT.fullAddress}</li>
+              <li>Zone d&apos;intervention : {CONTACT.city} et {CONTACT.radiusKm} km alentour</li>
               <li>Téléphone : {CONTACT.phoneDisplay}</li>
               <li>Email : {CONTACT.email}</li>
               <li>{SITE.vatNote}</li>

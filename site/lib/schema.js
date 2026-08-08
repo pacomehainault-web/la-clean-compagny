@@ -16,10 +16,12 @@ export function localBusinessSchema() {
     email: CONTACT.email,
     image: absoluteUrl('/opengraph-image.jpg'),
     priceRange: '€€',
+    // Pas d'adresse postale publiée (entreprise sans point de vente physique,
+    // intervention exclusivement à domicile) : on ne déclare que la ville et la
+    // zone de service, conformément aux recommandations pour les "service-area
+    // businesses" sans adresse publique.
     address: {
       '@type': 'PostalAddress',
-      streetAddress: CONTACT.addressLine,
-      postalCode: CONTACT.postalCode,
       addressLocality: CONTACT.city,
       addressCountry: 'FR',
     },

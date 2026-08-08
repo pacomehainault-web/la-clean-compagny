@@ -9,7 +9,7 @@ export const VEHICLE_TIERS = [
   { id: 'citadine', emoji: '🚗', label: 'Citadine' },
   { id: 'compacte-berline', emoji: '🚘', label: 'Berline / Compacte' },
   { id: 'suv-break', emoji: '🚙', label: 'SUV / Break' },
-  { id: 'grand-suv', emoji: '🚙', label: 'Grand SUV / 7 places' },
+  { id: 'grand-suv', emoji: '🚙', label: 'Grand SUV / 7 places / Utilitaires' },
   { id: 'prestige', emoji: '🏎️', label: 'Prestige / Collection' },
 ]
 
@@ -108,9 +108,9 @@ export const ADDITIONAL_CARE = [
   { id: 'textile-complet', name: 'Nettoyage textile complet', price: 70 },
   { id: 'cuir-soin', name: 'Nettoyage + soin cuir', price: 60 },
   { id: 'cuir-complet', name: 'Sellerie cuir complète', price: 80 },
-  { id: 'coffre', name: 'Coffre', price: 30 },
-  { id: 'vitres', name: 'Vitres', price: 30 },
-  { id: 'jantes-approfondi', name: 'Jantes approfondi', price: 40 },
+  { id: 'coffre', name: 'Nettoyage approfondi du coffre', price: 30 },
+  { id: 'vitres', name: 'Nettoyage complet des vitres', price: 30 },
+  { id: 'jantes-approfondi', name: 'Nettoyage approfondi des jantes', price: 40 },
   { id: 'desodorisation-pro', name: 'Désodorisation professionnelle', price: 30 },
   { id: 'odeurs-tenaces', name: 'Traitement odeurs tenaces', priceOnRequest: true },
 ]

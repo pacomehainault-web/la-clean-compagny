@@ -48,16 +48,14 @@ export default function HomePage() {
       <SpaceGateway />
 
       <section className={styles.hero}>
-        <video
-          className={styles.heroVideo}
-          src="/videos/ferrari-video-arriere-plan-heros.mp4"
-          poster="/images/exterieur/ferrari-california-lavage-prestige-angers.jpg"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
+        <Image
+          className={styles.heroImage}
+          src="/images/hero/ferrari-lavage-mousse-hero.jpg"
+          alt="Ferrari recouverte de mousse active lors d'un lavage La Clean Compagny"
+          fill
+          sizes="100vw"
+          priority
+          quality={85}
         />
         <div className={styles.heroOverlay} aria-hidden="true" />
 
@@ -95,16 +93,16 @@ export default function HomePage() {
             <div className={styles.lustrageVisual}>
               <div className={styles.lustrageMainImage}>
                 <Image
-                  src="/images/lustrage/lustrage-showroom.jpg"
-                  alt="Carrosserie noire au fini miroir après lustrage, showroom BMW à Angers"
+                  src="/images/lustrage/mini-cooper-lustrage-minute-apres.jpg"
+                  alt="Mini Cooper au fini miroir après un lustrage minute"
                   fill
                   sizes="(max-width: 900px) 90vw, 480px"
                 />
               </div>
               <div className={styles.lustrageAccentImage}>
                 <Image
-                  src="/images/lustrage/lustrage-reflet-phare.jpg"
-                  alt="Détail d'un feu avant et d'une carrosserie au fini miroir après lustrage"
+                  src="/images/lustrage/mini-cooper-lustrage-minute-avant.jpg"
+                  alt="Micro-rayures sur la carrosserie de la Mini Cooper avant le lustrage minute"
                   fill
                   sizes="220px"
                 />

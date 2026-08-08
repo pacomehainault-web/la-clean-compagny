@@ -83,10 +83,10 @@ export default function Header() {
         <div className={`container ${styles.inner}`}>
           <Link href="/" className={styles.brand} onClick={() => setOpen(false)}>
             <Image
-              src="/images/logo/logo-onlight.png"
+              src="/images/logo/logo-new.png"
               alt="La Clean Compagny — service de nettoyage automobile"
               width={280}
-              height={187}
+              height={188}
               priority
               style={{ height: 44, width: 'auto' }}
             />
@@ -136,10 +136,10 @@ export default function Header() {
       <div className={`${styles.drawer} ${open ? styles.drawerOpen : ''}`} role="dialog" aria-modal="true" aria-label="Menu">
         <div className={styles.drawerTop}>
           <Image
-            src="/images/logo/logo-transparent.png"
+            src="/images/logo/logo-new.png"
             alt="La Clean Compagny"
             width={280}
-            height={187}
+            height={188}
             className={styles.drawerLogo}
             style={{ height: 34, width: 'auto' }}
           />

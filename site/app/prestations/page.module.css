@@ -152,29 +152,38 @@
   font-size: 0.9rem;
 }
 
-.careList {
+.careTableWrap {
   margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  overflow-x: auto;
 }
 
-.careList li {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.careTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.careTable td {
+  padding: 12px 4px;
   font-size: 0.92rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.careDots {
-  flex: 1;
-  border-bottom: 1px dotted var(--color-border-strong);
-  margin-bottom: 4px;
+.careTable tr:last-child td {
+  border-bottom: none;
 }
 
-.careList strong {
+.carePriceCell {
+  text-align: right;
   white-space: nowrap;
+  font-weight: 700;
   color: var(--color-text);
+}
+
+.careFootnote {
+  margin-top: 28px;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+  text-align: center;
 }
 
 .prestigeBanner {

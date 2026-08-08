@@ -14,13 +14,11 @@ export const CONTACT = {
   phoneTel: '+33638578304',
   phoneWhatsapp: '33638578304',
   email: 'lacleancompagny49@gmail.com',
-  addressLine: '3 impasse du Chasselas',
-  postalCode: '49000',
+  // Pas d'adresse postale publiée : l'entreprise se déplace exclusivement chez
+  // le client, on communique uniquement la zone d'intervention (ville + rayon).
   city: 'Angers',
-  fullAddress: '3 impasse du Chasselas, 49000 Angers',
   radiusKm: 30,
-  mapEmbedSrc:
-    'https://www.google.com/maps?q=3+impasse+du+chasselas+49000+Angers&output=embed',
+  mapEmbedSrc: 'https://www.google.com/maps?q=Angers&output=embed',
   googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBE/review',
 }
 

@@ -119,18 +119,28 @@ export default function PrestationsPage() {
             </div>
 
             <div className={styles.careCard}>
-              <h3>Soins additionnels</h3>
-              <ul className={styles.careList}>
-                {ADDITIONAL_CARE.map((item) => (
-                  <li key={item.id}>
-                    <span>{item.name}</span>
-                    <span className={styles.careDots} aria-hidden="true" />
-                    <strong>{item.priceOnRequest ? 'Sur devis' : `${item.price} €`}</strong>
-                  </li>
-                ))}
-              </ul>
+              <h3>Soins &amp; prestations complémentaires</h3>
+              <div className={styles.careTableWrap}>
+                <table className={styles.careTable}>
+                  <tbody>
+                    {ADDITIONAL_CARE.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.name}</td>
+                        <td className={styles.carePriceCell}>
+                          {item.priceOnRequest ? 'Sur devis' : `${item.price} €`}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+
+          <p className={styles.careFootnote}>
+            Les prestations complémentaires peuvent être ajoutées aux formules ou réalisées
+            indépendamment.
+          </p>
 
           {REMAINING_ON_REQUEST.length > 0 && (
             <>

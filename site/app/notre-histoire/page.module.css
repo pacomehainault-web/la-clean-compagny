@@ -5,21 +5,29 @@
   align-items: start;
 }
 
-@media (max-width: 900px) {
-  .storyGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .storyImage {
-  position: relative;
+  position: sticky;
+  top: calc(var(--fixed-header-total) + 24px);
   border-radius: var(--radius-lg);
   overflow: hidden;
   aspect-ratio: 4 / 5;
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-elevated);
-  position: sticky;
-  top: calc(var(--fixed-header-total) + 24px);
+}
+
+/* En dessous de 900px, la grille repasse sur une seule colonne (cf. plus bas) :
+   l'image "sticky" y produirait un chevauchement illisible (image figée pendant
+   que le texte défile par-dessus). On revient donc à un flux normal, image et
+   texte s'empilant et défilant ensemble. */
+@media (max-width: 900px) {
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .storyImage {
+    position: static;
+    top: auto;
+  }
 }
 
 .storyImage img {

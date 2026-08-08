@@ -50,10 +50,10 @@ export default function SpaceGateway() {
     <div className={`${styles.gateway} ${closing ? styles.gatewayClosing : ''}`} role="dialog" aria-modal="true" aria-label="Choix de votre espace">
       <div className={styles.brand}>
         <Image
-          src="/images/logo/logo-transparent.png"
+          src="/images/logo/logo-new.png"
           alt="La Clean Compagny"
           width={280}
-          height={187}
+          height={188}
           priority
           style={{ height: 40, width: 'auto' }}
         />
