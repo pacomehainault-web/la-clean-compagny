@@ -1,9 +1,22 @@
 import Link from 'next/link'
 import PageHero from '@/components/PageHero'
-import FormulaCard from '@/components/FormulaCard'
 import ServiceCard from '@/components/ServiceCard'
-import { IconArrowRight } from '@/components/Icons'
-import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
+import PricingMatrixTable from '@/components/PricingMatrixTable'
+import SubscriptionSection from '@/components/SubscriptionSection'
+import { IconArrowRight, IconCheck } from '@/components/Icons'
+import { OZONE_TREATMENT, ALL_SERVICES } from '@/lib/data/services'
+import {
+  FORMULAS_PRICING,
+  EXTERIOR_PRICING,
+  CORRECTION_PRICING,
+  CORRECTION_PRESTIGE,
+  LUSTRAGE_MINUTE_HIGHLIGHT,
+  PRICING_NOTES,
+  OPTICS_PRICING,
+  ADDITIONAL_CARE,
+  PRESTIGE_SECTION,
+  PRICING_TERMS,
+} from '@/lib/data/pricing'
 import { telLink, CONTACT, SITE } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
@@ -11,9 +24,13 @@ import styles from './page.module.css'
 export const metadata = buildMetadata({
   title: 'Prestations & tarifs — Detailing automobile à Angers',
   description:
-    "Découvrez nos formules Coup de Propre et Sortie de Concession, ainsi que nos prestations complémentaires : polissage, lustrage, traitement céramique, rénovation optiques, désinfection à l'ozone.",
+    "Grille tarifaire complète par gabarit : Coup de Propre, Sortie de Concession, lavage, décontamination, lustrage, correction, rénovation optiques et Pass Entretien. Tarifs transparents, à partir de.",
   path: '/prestations',
 })
+
+// Services de la carte historique non couverts par la nouvelle grille tarifaire
+// par gabarit (traitement céramique, nettoyage moteur) : toujours sur devis.
+const REMAINING_ON_REQUEST = ALL_SERVICES.filter((s) => ['ceramique', 'nettoyage-moteur'].includes(s.id))
 
 export default function PrestationsPage() {
   return (
@@ -21,7 +38,7 @@ export default function PrestationsPage() {
       <PageHero
         eyebrow="Prestations & tarifs"
         title="Des prestations sur-mesure, un tarif toujours transparent"
-        lead="Deux formules pensées pour l'entretien de l'habitacle, et une palette de prestations complémentaires sur devis pour aller plus loin : carrosserie, protection longue durée, optiques, désinfection."
+        lead="Nos tarifs dépendent du gabarit de votre véhicule et de son état initial. Voici l'intégralité de notre grille, prestation par prestation."
         breadcrumb={[{ label: 'Prestations' }]}
       />
 
@@ -31,45 +48,132 @@ export default function PrestationsPage() {
             <span className="eyebrow">Formules habitacle</span>
             <h2>Nos deux formules principales</h2>
           </div>
-          <div className={styles.formulaGrid}>
-            {FORMULAS.map((formula) => (
-              <FormulaCard formula={formula} key={formula.id} />
-            ))}
-          </div>
+          <PricingMatrixTable services={FORMULAS_PRICING} />
         </div>
       </section>
 
       <section className="section section-alt">
         <div className="container">
           <div className={styles.sectionHead}>
-            <span className="eyebrow">Sur devis</span>
-            <h2>Prestations complémentaires</h2>
+            <span className="eyebrow">Extérieur</span>
+            <h2>Lavage &amp; décontamination</h2>
           </div>
-          <div className={styles.serviceGrid}>
-            {COMPLEMENTARY_SERVICES.map((s) => (
-              <ServiceCard service={s} key={s.id} />
-            ))}
-          </div>
+          <PricingMatrixTable services={EXTERIOR_PRICING} />
         </div>
       </section>
 
       <section className="section">
         <div className="container">
           <div className={styles.sectionHead}>
-            <span className="eyebrow">Prestations spécifiques</span>
-            <h2>Optiques &amp; désinfection</h2>
+            <span className="eyebrow">Brillance</span>
+            <h2>Lustrage &amp; correction</h2>
           </div>
-          <div className={styles.serviceGrid}>
-            <ServiceCard service={OPTICS_RENOVATION} />
-            <ServiceCard service={OZONE_TREATMENT} />
+          <PricingMatrixTable services={CORRECTION_PRICING} />
+
+          <div className={styles.highlightRow}>
+            <div className={styles.highlightCard}>
+              <span className={styles.highlightLabel}>À la une</span>
+              <div className={styles.highlightTop}>
+                <h3>{LUSTRAGE_MINUTE_HIGHLIGHT.name}</h3>
+                <span className={styles.highlightPrice}>à partir de {LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €</span>
+              </div>
+              <p>{LUSTRAGE_MINUTE_HIGHLIGHT.description}</p>
+            </div>
+            <div className={styles.highlightCard}>
+              <div className={styles.highlightTop}>
+                <h3>{CORRECTION_PRESTIGE.name}</h3>
+                <span className={styles.highlightPrice}>à partir de {CORRECTION_PRESTIGE.fromPrice} €</span>
+              </div>
+              <p>{CORRECTION_PRESTIGE.description}</p>
+            </div>
           </div>
 
-          <div className={styles.note}>
-            <strong style={{ color: 'var(--color-text)' }}>Bon à savoir — </strong>
-            Les prix de nos formules sont indiqués « à partir de » : le tarif final dépend du
-            gabarit et de l&apos;état du véhicule. Toutes nos prestations complémentaires sont
-            systématiquement établies sur devis avant intervention, sans engagement.{' '}
-            {SITE.vatNote}.
+          <p className={styles.inlineNote}>
+            <IconCheck size={16} />
+            {PRICING_NOTES.decontaminationInLustrage}
+          </p>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Prestations spécifiques</span>
+            <h2>Rénovation optiques &amp; soins complémentaires</h2>
+          </div>
+
+          <div className={styles.opticsAndCare}>
+            <div className={styles.opticsCard}>
+              <h3>{OPTICS_PRICING.name}</h3>
+              <p className={styles.opticsUnit}>
+                À partir de <strong>{OPTICS_PRICING.fromPrice} €</strong> {OPTICS_PRICING.unit}
+              </p>
+              <div className={styles.opticsLevels}>
+                {OPTICS_PRICING.levels.map((level) => (
+                  <div className={styles.opticsLevelRow} key={level.id}>
+                    <span>{level.label}</span>
+                    <strong>{level.price} €</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.careCard}>
+              <h3>Soins additionnels</h3>
+              <ul className={styles.careList}>
+                {ADDITIONAL_CARE.map((item) => (
+                  <li key={item.id}>
+                    <span>{item.name}</span>
+                    <span className={styles.careDots} aria-hidden="true" />
+                    <strong>{item.priceOnRequest ? 'Sur devis' : `${item.price} €`}</strong>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {REMAINING_ON_REQUEST.length > 0 && (
+            <>
+              <div className={styles.sectionHead} style={{ marginTop: 56 }}>
+                <span className="eyebrow">Et aussi, sur devis</span>
+                <h2>Autres prestations</h2>
+              </div>
+              <div className={styles.serviceGrid}>
+                {REMAINING_ON_REQUEST.map((s) => (
+                  <ServiceCard service={s} key={s.id} />
+                ))}
+                <ServiceCard service={OZONE_TREATMENT} />
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      <SubscriptionSection />
+
+      <section className="section" id="prestige">
+        <div className="container">
+          <div className={styles.prestigeBanner}>
+            <span className="eyebrow">{PRESTIGE_SECTION.eyebrow}</span>
+            <h2 style={{ marginTop: 14 }}>{PRESTIGE_SECTION.title}</h2>
+            <p className={styles.prestigeBrands}>{PRESTIGE_SECTION.brands.join(' · ')}</p>
+            <p className="lead" style={{ marginTop: 20, maxWidth: 640, marginInline: 'auto' }}>
+              {PRESTIGE_SECTION.text}
+            </p>
+            <div className={styles.prestigePriceRow}>
+              <span>à partir de</span>
+              <strong>{PRESTIGE_SECTION.fromPrice} €</strong>
+            </div>
+            <p className={styles.prestigeNote}>{PRESTIGE_SECTION.note}</p>
+            <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <Link href="/devis" className="btn btn-cta">
+                Demander mon devis Prestige
+                <IconArrowRight size={18} />
+              </Link>
+              <a href={telLink()} className="btn btn-outline">
+                {CONTACT.phoneDisplay}
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -92,6 +196,16 @@ export default function PrestationsPage() {
                 {CONTACT.phoneDisplay}
               </a>
             </div>
+          </div>
+
+          <div className={styles.terms}>
+            <p className={styles.termsTitle}>Conditions tarifaires</p>
+            <ul>
+              {PRICING_TERMS.map((term) => (
+                <li key={term}>{term}</li>
+              ))}
+            </ul>
+            <p className={styles.termsVat}>{SITE.vatNote}.</p>
           </div>
         </div>
       </section>

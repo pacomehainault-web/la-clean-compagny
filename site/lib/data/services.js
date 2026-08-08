@@ -4,7 +4,7 @@ export const FORMULAS = [
     id: 'coup-de-propre',
     name: 'Coup de Propre',
     tagline: 'La remise en état essentielle',
-    basePrice: 95,
+    basePrice: 109,
     duration: '2h à 3h',
     description:
       "L'entretien qu'il faut pour retrouver un habitacle sain et net, sans attendre le grand nettoyage. Idéal en entretien régulier.",
@@ -21,7 +21,7 @@ export const FORMULAS = [
     id: 'sortie-concession',
     name: 'Sortie de Concession',
     tagline: 'La formule la plus complète',
-    basePrice: 149,
+    basePrice: 179,
     duration: '4h à 6h',
     description:
       "Le véhicule ressort comme au premier jour : un nettoyage en profondeur, poste par poste, pour un rendu digne d'une sortie de concession.",
@@ -73,7 +73,7 @@ export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lustrage-minute',
     name: 'Lustrage minute',
-    priceOnRequest: true,
+    basePrice: 59,
     description:
       "Notre prestation phare : une finition brillance express qui ravive la peinture et sublime chaque reflet, sans les heures d'un lustrage complet.",
     category: 'exterieur',

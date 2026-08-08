@@ -1,15 +1,3 @@
-.formulaGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 26px;
-}
-
-@media (max-width: 800px) {
-  .formulaGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .sectionHead {
   max-width: 640px;
   margin-bottom: 40px;
@@ -37,15 +25,211 @@
   }
 }
 
-.note {
-  margin-top: 40px;
-  padding: 24px 28px;
+.highlightRow {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 700px) {
+  .highlightRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.highlightCard {
+  position: relative;
+  padding: 24px 26px;
   border-radius: var(--radius-md);
   background: var(--color-brand-blue-soft);
   border: 1px solid rgba(10, 108, 255, 0.22);
+}
+
+.highlightLabel {
+  position: absolute;
+  top: -1px;
+  right: 22px;
+  padding: 5px 12px;
+  border-radius: 0 0 8px 8px;
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.highlightTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.highlightTop h3 {
+  font-size: 1.1rem;
+}
+
+.highlightPrice {
+  font-weight: 700;
+  color: var(--color-blue-dark);
+  white-space: nowrap;
+}
+
+.highlightCard p {
+  margin-top: 8px;
+  font-size: 0.88rem;
   color: var(--color-text-muted);
+}
+
+.inlineNote {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.inlineNote svg {
+  flex: none;
+  color: var(--color-brand-blue);
+}
+
+.opticsAndCare {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .opticsAndCare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.opticsCard,
+.careCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-soft);
+}
+
+.opticsCard h3,
+.careCard h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.opticsUnit {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.opticsUnit strong {
+  color: var(--color-text);
+}
+
+.opticsLevels {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.opticsLevelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  font-size: 0.9rem;
+}
+
+.careList {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.careList li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   font-size: 0.92rem;
-  line-height: 1.65;
+}
+
+.careDots {
+  flex: 1;
+  border-bottom: 1px dotted var(--color-border-strong);
+  margin-bottom: 4px;
+}
+
+.careList strong {
+  white-space: nowrap;
+  color: var(--color-text);
+}
+
+.prestigeBanner {
+  border-radius: var(--radius-lg);
+  padding: clamp(40px, 6vw, 64px);
+  text-align: center;
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.prestigeBanner :global(.eyebrow) {
+  color: var(--color-blue-light);
+}
+
+.prestigeBanner :global(.eyebrow)::before {
+  background: var(--color-blue-light);
+}
+
+.prestigeBanner h2 {
+  color: var(--color-bg);
+}
+
+.prestigeBanner :global(.lead) {
+  color: var(--color-on-ink-muted);
+}
+
+.prestigeBrands {
+  margin-top: 14px;
+  color: var(--color-on-ink-muted);
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+}
+
+.prestigePriceRow {
+  margin-top: 28px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  color: var(--color-on-ink-muted);
+  font-size: 0.95rem;
+}
+
+.prestigePriceRow strong {
+  font-family: var(--font-heading), serif;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.prestigeNote {
+  margin-top: 10px;
+  color: var(--color-on-ink-muted);
+  font-size: 0.82rem;
+  max-width: 460px;
+  margin-inline: auto;
 }
 
 .ctaBanner {
@@ -56,11 +240,11 @@
   color: #fff;
 }
 
-.ctaBanner .eyebrow {
+.ctaBanner :global(.eyebrow) {
   color: rgba(255, 255, 255, 0.85);
 }
 
-.ctaBanner .eyebrow::before {
+.ctaBanner :global(.eyebrow)::before {
   background: #fff;
 }
 
@@ -95,4 +279,40 @@
   background: #fff;
   color: var(--color-blue-dark);
   box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.3);
+}
+
+.terms {
+  margin-top: 32px;
+  padding: 24px 28px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+}
+
+.termsTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  margin-bottom: 12px;
+}
+
+.terms ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+}
+
+.terms li {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.termsVat {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--color-text-faint);
 }

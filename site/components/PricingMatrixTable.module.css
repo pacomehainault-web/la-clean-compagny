@@ -1,0 +1,69 @@
+.wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+
+.table th,
+.table td {
+  padding: 16px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table thead th {
+  background: var(--color-surface-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.serviceHeader {
+  min-width: 230px;
+}
+
+.tierLabel {
+  margin-left: 6px;
+}
+
+.serviceCell {
+  min-width: 230px;
+}
+
+.serviceName {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.serviceTagline {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.serviceIncludes {
+  margin-top: 4px;
+  font-size: 0.76rem;
+  color: var(--color-text-faint);
+  line-height: 1.5;
+}
+
+.priceCell {
+  font-family: var(--font-heading), serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}

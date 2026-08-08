@@ -3,14 +3,14 @@ import Link from 'next/link'
 import styles from './page.module.css'
 import SpaceGateway from '@/components/SpaceGateway'
 import StatsRow from '@/components/StatsRow'
-import FormulaCard from '@/components/FormulaCard'
+import PricingSelector from '@/components/PricingSelector'
 import SubscriptionSection from '@/components/SubscriptionSection'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import { VEHICLE_ICONS, IconArrowRight, IconCheck } from '@/components/Icons'
-import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
+import { COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { REVIEWS } from '@/lib/data/reviews'
 import { FAQ_ITEMS } from '@/lib/data/faq'
@@ -18,6 +18,7 @@ import { CITIES } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
+import { LUSTRAGE_MINUTE_HIGHLIGHT } from '@/lib/data/pricing'
 
 export const metadata = buildMetadata({
   title: 'Detailing automobile haut de gamme à Angers',
@@ -113,6 +114,10 @@ export default function HomePage() {
             <div className={styles.lustrageContent}>
               <span className={styles.lustrageBadge}>🌟 Notre spécialité</span>
               <h2>Lustrage minute</h2>
+              <div className={styles.lustragePrice}>
+                <span>à partir de</span>
+                <strong>{LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €</strong>
+              </div>
               <p className={styles.lustrageLead}>
                 Redonnez l&apos;éclat du neuf à votre carrosserie en un temps record.
               </p>
@@ -177,10 +182,8 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className={`${styles.formulaGrid} reveal`}>
-            {FORMULAS.map((formula) => (
-              <FormulaCard formula={formula} key={formula.id} />
-            ))}
+          <div className="reveal">
+            <PricingSelector />
           </div>
 
           <div className={styles.complementaryNote} id="prestations-complementaires">

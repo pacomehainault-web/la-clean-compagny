@@ -96,18 +96,6 @@
   margin-bottom: 48px;
 }
 
-.formulaGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 26px;
-}
-
-@media (max-width: 800px) {
-  .formulaGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .complementaryNote {
   margin-top: 28px;
   display: flex;
@@ -378,6 +366,21 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   margin-bottom: 18px;
+}
+
+.lustragePrice {
+  margin-top: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--color-on-ink-muted);
+  font-size: 0.9rem;
+}
+
+.lustragePrice strong {
+  font-family: var(--font-heading), serif;
+  font-size: 1.8rem;
+  color: var(--color-bg);
 }
 
 .lustrageLead {
