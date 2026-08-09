@@ -168,6 +168,27 @@
   margin-inline: auto;
 }
 
+/* 3 modules Avant/Après sur ordinateur. */
+.sliderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+/* Mobile (et tablette) : repli à 2 colonnes, 3e module masqué en CSS pour ne
+   pas surcharger le défilement — le DOM reste identique, seul l'affichage
+   change selon la largeur d'écran. */
+@media (max-width: 900px) {
+  .sliderGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .sliderGrid > *:nth-child(3) {
+    display: none;
+  }
+}
+
 .storyGrid {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
@@ -242,8 +263,22 @@
   overflow: hidden;
   padding: clamp(48px, 7vw, 80px);
   text-align: center;
-  background: linear-gradient(135deg, var(--color-ink) 0%, #1c2c4a 55%, var(--color-blue-dark) 100%);
+  background: var(--color-ink);
   color: var(--color-bg);
+}
+
+.ctaBannerImage {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0.55;
+}
+
+.ctaBannerOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(10, 14, 26, 0.88) 0%, rgba(20, 32, 58, 0.82) 55%, rgba(10, 60, 130, 0.8) 100%);
 }
 
 .ctaBanner :global(.eyebrow) {
@@ -264,7 +299,7 @@
 
 .ctaBannerInner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 640px;
   margin-inline: auto;
 }
@@ -417,6 +452,153 @@
 }
 
 .lustrageContent :global(.btn-cta) {
+  margin-top: 32px;
+}
+
+.motoGrid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .motoGrid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* Grille asymétrique : grande image à gauche (pleine hauteur), deux vignettes
+   empilées en haut à droite, une image large en bas sur toute la largeur. */
+.motoShowcase {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  grid-template-rows: 160px 160px 140px;
+  grid-template-areas:
+    'big top'
+    'big bot'
+    'wide wide';
+  gap: 14px;
+}
+
+@media (max-width: 700px) {
+  .motoShowcase {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px 130px 130px;
+    grid-template-areas:
+      'big big'
+      'top bot'
+      'wide wide';
+  }
+}
+
+.motoBig,
+.motoTop,
+.motoBot,
+.motoWide {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.motoBig {
+  grid-area: big;
+  border-radius: var(--radius-lg);
+}
+
+.motoTop {
+  grid-area: top;
+}
+
+.motoBot {
+  grid-area: bot;
+}
+
+.motoWide {
+  grid-area: wide;
+}
+
+.motoBig img,
+.motoTop img,
+.motoBot img,
+.motoWide img {
+  object-fit: cover;
+}
+
+.motoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(79, 195, 255, 0.12);
+  border: 1px solid rgba(79, 195, 255, 0.35);
+  color: var(--color-blue-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 18px;
+}
+
+.motoContent h2 {
+  color: var(--color-bg);
+}
+
+.motoPrice {
+  margin-top: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--color-on-ink-muted);
+  font-size: 0.9rem;
+}
+
+.motoPrice strong {
+  font-family: var(--font-heading), serif;
+  font-size: 1.8rem;
+  color: var(--color-bg);
+}
+
+.motoLead {
+  margin-top: 16px;
+  font-size: clamp(1.1rem, 0.4vw + 1rem, 1.35rem);
+  font-weight: 700;
+  color: var(--color-bg);
+  line-height: 1.5;
+}
+
+.motoText {
+  margin-top: 14px;
+  color: var(--color-on-ink-muted);
+  line-height: 1.7;
+}
+
+.motoFeatures {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.motoFeatures li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-bg);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.motoFeatures li svg {
+  flex: none;
+  color: var(--color-blue-light);
+}
+
+.motoContent :global(.btn-cta) {
   margin-top: 32px;
 }
 

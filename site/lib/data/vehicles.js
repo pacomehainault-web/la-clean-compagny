@@ -28,6 +28,13 @@ export const VEHICLE_TYPES = [
     priceMultiplier: 1.35,
   },
   {
+    id: 'moto',
+    label: 'Moto',
+    description: 'Motos et scooters',
+    examples: 'Roadster, trail, custom, scooter…',
+    priceMultiplier: 0.6,
+  },
+  {
     id: 'utilitaire',
     label: 'Utilitaire',
     description: 'Fourgons et utilitaires',

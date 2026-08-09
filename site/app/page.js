@@ -18,7 +18,7 @@ import { CITIES } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
-import { LUSTRAGE_MINUTE_HIGHLIGHT } from '@/lib/data/pricing'
+import { LUSTRAGE_MINUTE_HIGHLIGHT, MOTO_PRICING } from '@/lib/data/pricing'
 
 export const metadata = buildMetadata({
   title: 'Detailing automobile haut de gamme à Angers',
@@ -40,8 +40,16 @@ const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
   }
 })
 
+// 3 modules sur desktop, 2 sur mobile (le 3e est masqué en CSS, cf. .sliderGrid
+// > *:nth-child(3) — DOM identique sur les deux versions, pas de rendu conditionnel).
+const FEATURED_COUNT = 3
+
 export default function HomePage() {
-  const featuredBeforeAfter = ALL_BEFORE_AFTER[getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'home' })]
+  const baseIndex = getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'home' })
+  const featuredBeforeAfters = Array.from(
+    { length: FEATURED_COUNT },
+    (_, i) => ALL_BEFORE_AFTER[(baseIndex + i) % ALL_BEFORE_AFTER.length]
+  )
 
   return (
     <>
@@ -219,6 +227,87 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Section Moto — exclusivité Espace Particulier. La page d'accueil n'a pas
+          de variante Pro (contrairement à /devis?pro=1), donc aucune condition
+          d'affichage supplémentaire n'est nécessaire ici : elle n'existe tout
+          simplement pas côté Pro. */}
+      <section className="section section-ink">
+        <div className="container">
+          <div className={`${styles.motoGrid} reveal`}>
+            <div className={styles.motoShowcase}>
+              <div className={styles.motoBig}>
+                <Image
+                  src="/images/moto/bmw-r12-detailing-moto-angers.jpg"
+                  alt="BMW R12 après un detailing complet — finition showroom"
+                  fill
+                  sizes="(max-width: 700px) 60vw, (max-width: 900px) 45vw, 320px"
+                />
+              </div>
+              <div className={styles.motoTop}>
+                <Image
+                  src="/images/moto/bmw-ce04-nettoyage-moto-angers.jpg"
+                  alt="BMW CE 04 nettoyée, en atelier"
+                  fill
+                  sizes="(max-width: 700px) 40vw, 220px"
+                />
+              </div>
+              <div className={styles.motoBot}>
+                <Image
+                  src="/images/moto/bmw-f900-detail-echappement-moto-angers.jpg"
+                  alt="Détail échappement carbone BMW F900 après lustrage"
+                  fill
+                  sizes="(max-width: 700px) 40vw, 220px"
+                />
+              </div>
+              <div className={styles.motoWide}>
+                <Image
+                  src="/images/moto/enzo-lustrage-moto-bmw-angers.jpg"
+                  alt="Enzo, gérant de La Clean Compagny, lustre une moto sur pont"
+                  fill
+                  sizes="(max-width: 700px) 90vw, 480px"
+                />
+              </div>
+            </div>
+
+            <div className={styles.motoContent}>
+              <span className={styles.motoBadge}>🏍️ Exclusivité Particuliers</span>
+              <h2>Votre moto, prête à briller</h2>
+              <div className={styles.motoPrice}>
+                <span>à partir de</span>
+                <strong>{MOTO_PRICING.fromPrice} €</strong>
+              </div>
+              <p className={styles.motoLead}>
+                De la citadine électrique au roadster de caractère, chaque moto reçoit le même
+                soin méticuleux que nos plus belles voitures.
+              </p>
+              <p className={styles.motoText}>
+                Nettoyage complet, décontamination, lustrage de la carrosserie, des pièces
+                chromées et carbone, protection longue durée : on prend soin de chaque détail,
+                du réservoir aux jantes.
+              </p>
+              <ul className={styles.motoFeatures}>
+                <li>
+                  <IconCheck size={18} />
+                  Nettoyage minutieux, jusqu&apos;au moindre recoin
+                </li>
+                <li>
+                  <IconCheck size={18} />
+                  Lustrage carrosserie, échappement &amp; pièces carbone
+                </li>
+                <li>
+                  <IconCheck size={18} />
+                  Intervention à domicile, devis rapide
+                </li>
+              </ul>
+              <Link href="/devis?vehicule=moto" className="btn btn-cta">
+                Prendre soin de ma moto
+                <IconArrowRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section">
         <div className="container">
           <div className={`${styles.sectionHeadRow} reveal`}>
@@ -231,8 +320,10 @@ export default function HomePage() {
               <IconArrowRight size={16} />
             </Link>
           </div>
-          <div className={`${styles.sliderSingle} reveal`}>
-            <BeforeAfterSlider key={featuredBeforeAfter.before} {...featuredBeforeAfter} />
+          <div className={`${styles.sliderGrid} reveal`}>
+            {featuredBeforeAfters.map((pair) => (
+              <BeforeAfterSlider key={pair.before} {...pair} />
+            ))}
           </div>
         </div>
       </section>
@@ -337,6 +428,15 @@ export default function HomePage() {
       <section className="section">
         <div className="container">
           <div className={`${styles.ctaBanner} reveal`}>
+            <Image
+              className={styles.ctaBannerImage}
+              src="/images/lustrage/lustrage-reflet-phare.jpg"
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="(max-width: 900px) 100vw, 1200px"
+            />
+            <div className={styles.ctaBannerOverlay} aria-hidden="true" />
             <div className={styles.ctaBannerInner}>
               <span className="eyebrow">Prêt à commencer ?</span>
               <h2>Offrez à votre véhicule le traitement qu&apos;il mérite</h2>

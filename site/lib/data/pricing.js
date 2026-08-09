@@ -87,6 +87,14 @@ export const LUSTRAGE_MINUTE_HIGHLIGHT = {
   fromPrice: 59,
 }
 
+// Catégorie Moto — exclusivité Espace Particulier (jamais affichée côté Pro).
+export const MOTO_PRICING = {
+  id: 'moto',
+  name: 'Moto',
+  description: 'Nettoyage, lustrage et protection pour motos et scooters : la même exigence que pour vos véhicules.',
+  fromPrice: 65,
+}
+
 export const PRICING_NOTES = {
   decontaminationInLustrage: 'La décontamination est comprise dans le lustrage.',
 }
@@ -115,35 +123,75 @@ export const ADDITIONAL_CARE = [
   { id: 'odeurs-tenaces', name: 'Traitement odeurs tenaces', priceOnRequest: true },
 ]
 
-export const PASS_TRIMESTRIEL = {
-  id: 'pass-trimestriel',
-  name: 'Pass Entretien Trimestriel',
-  price: 249,
-  period: 'trimestre',
-  includes: [
-    '3 passages dans le trimestre (3× Coup de Propre)',
-    'Priorité de réservation',
-    'Tarif préférentiel sur les prestations complémentaires',
-  ],
+// Gabarits tarifés des Pass Entretien — taxonomie dédiée aux abonnements : les
+// utilitaires y sont détaillés en 3 paliers (contrairement à VEHICLE_TIERS, qui
+// les regroupe avec le Grand SUV pour les prestations à l'unité).
+export const PASS_TIERS = [
+  { id: 'citadine', emoji: '🚗', label: 'Citadine' },
+  { id: 'compacte-berline', emoji: '🚘', label: 'Compacte / Berline' },
+  { id: 'suv-break', emoji: '🚙', label: 'SUV / Break' },
+  { id: 'grand-suv', emoji: '🚙', label: 'Grand SUV / 7 places' },
+  { id: 'petit-utilitaire', emoji: '🚐', label: 'Petit utilitaire' },
+  { id: 'utilitaire-moyen', emoji: '🚐', label: 'Utilitaire moyen' },
+  { id: 'grand-utilitaire', emoji: '🚐', label: 'Grand utilitaire' },
+]
+
+const PASS_INCLUDES = [
+  'Remise au meilleur niveau esthétique comprise',
+  'Pas de supplément lié à l’état courant du véhicule',
+  'Suivi personnalisé du véhicule pendant 1 an',
+  'Historique des interventions',
+  'Photos et suivi de l’évolution du véhicule',
+  'Priorité de réservation',
+  '-10 % sur les prestations complémentaires',
+]
+
+export const PASS_6_MOIS = {
+  id: 'pass-6-mois',
+  eyebrow: '🔵',
+  badge: '6 mois',
+  name: 'Pass Entretien 6 mois',
+  subtitle: 'Votre véhicule suivi pendant 1 an',
+  frequency: '2 passages sur 12 mois',
+  description:
+    'Une formule idéale pour conserver son véhicule propre et soigné toute l’année avec un suivi régulier par La Clean Compagny.',
+  includes: ['2 passages sur 12 mois', '1 passage tous les 6 mois', ...PASS_INCLUDES],
+  pricesLabel: 'Tarifs — contrat 12 mois (Pass 6 mois)',
+  period: 'an',
+  prices: {
+    citadine: 299,
+    'compacte-berline': 329,
+    'suv-break': 359,
+    'grand-suv': 389,
+    'petit-utilitaire': 359,
+    'utilitaire-moyen': 429,
+    'grand-utilitaire': 499,
+  },
+  prestigeOnRequest: true,
 }
 
-export const PASS_ANNUEL = {
-  id: 'pass-annuel',
-  name: 'Pass Entretien Annuel',
-  tagline: 'Le suivi esthétique pendant 1 an.',
+export const PASS_3_MOIS = {
+  id: 'pass-3-mois',
+  eyebrow: '🔷',
+  badge: '3 mois',
+  name: 'Pass Entretien 3 mois',
+  subtitle: 'Le suivi régulier de votre véhicule',
+  frequency: '4 passages sur 12 mois (1 passage tous les 3 mois)',
+  description:
+    'La formule idéale pour les clients qui souhaitent maintenir leur véhicule dans un excellent état toute l’année.',
+  includes: ['4 passages sur 12 mois', '1 passage tous les 3 mois', ...PASS_INCLUDES],
+  pricesLabel: 'Tarifs — contrat 12 mois (Pass 3 mois)',
   period: 'an',
-  prices: { citadine: 499, 'compacte-berline': 549, 'suv-break': 599, 'grand-suv': 649 },
+  prices: {
+    citadine: 499,
+    'compacte-berline': 549,
+    'suv-break': 599,
+    'grand-suv': 649,
+    'petit-utilitaire': 599,
+    'utilitaire-moyen': 699,
+    'grand-utilitaire': 799,
+  },
   prestigeOnRequest: true,
-  includes: [
-    '1 passage tous les 3 mois (4 passages au total)',
-    "Remise au meilleur niveau esthétique prévu par la formule, sans supplément salissure",
-    'Suivi personnalisé et historique',
-    'Photos avant / après',
-    'Recommandations personnalisées',
-    'Priorité de réservation',
-    '-10 % sur les prestations complémentaires',
-  ],
-  commitmentNote: 'Engagement de 12 mois. Les grosses rénovations restent hors forfait.',
 }
 
 export const PRESTIGE_SECTION = {

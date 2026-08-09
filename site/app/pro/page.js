@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import StaticBeforeAfterGallery from '@/components/StaticBeforeAfterGallery'
+import PhotoGallery from '@/components/PhotoGallery'
 import { VEHICLE_ICONS, IconMapPin, IconInvoice, IconPercent, IconArrowRight, IconWhatsapp } from '@/components/Icons'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { whatsappLink, CONTACT, telLink } from '@/lib/constants'
@@ -31,8 +33,28 @@ const ARGUMENTS = [
   },
 ]
 
-const FLEET_VEHICLE_IDS = ['utilitaire', 'camion', 'tracteur', 'pelleteuse']
+// La Moto reste une exclusivité Espace Particulier : volontairement absente de
+// cette liste (cf. lib/data/vehicles.js) pour ne jamais apparaître côté Pro.
+const FLEET_VEHICLE_IDS = ['citadine', 'berline', 'suv', 'monospace', 'utilitaire', 'camion', 'tracteur', 'pelleteuse']
 const FLEET_VEHICLES = VEHICLE_TYPES.filter((v) => FLEET_VEHICLE_IDS.includes(v.id))
+
+const FLEET_CARS_PHOTOS = [
+  {
+    src: '/images/exterieur/bmw-m3-lavage-exterieur-angers.jpg',
+    alt: 'BMW M3 de flotte — lavage extérieur à Angers',
+    caption: 'Berlines de fonction',
+  },
+  {
+    src: '/images/interieur/bmw-x5-nettoyage-interieur-angers.jpg',
+    alt: 'BMW X5 de flotte — nettoyage intérieur à Angers',
+    caption: 'SUV & véhicules de direction',
+  },
+  {
+    src: '/images/interieur/audi-rs6-dressing-habitacle-angers.jpg',
+    alt: 'Audi RS6 de flotte — dressing habitacle à Angers',
+    caption: 'Citadines & berlines commerciales',
+  },
+]
 
 const BTP_RESULTS = Array.from({ length: 5 }, (_, i) => {
   const n = i + 1
@@ -98,13 +120,27 @@ export default function ProPage() {
         </div>
       </section>
 
+      <section className={styles.siteBanner}>
+        <Image
+          src="/images/evenements/intervention-domicile-la-clean-compagny-1.jpg"
+          alt="Technicien La Clean Compagny intervenant sur un véhicule d'entreprise, directement sur site"
+          fill
+          sizes="100vw"
+        />
+        <div className={styles.siteBannerOverlay} aria-hidden="true" />
+        <p className={styles.siteBannerCaption}>
+          Nos techniciens interviennent directement sur votre site, avec leur propre matériel.
+        </p>
+      </section>
+
       <section className="section section-alt">
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">Tous les gabarits</span>
-            <h2>Du fourgon utilitaire à l&apos;engin de chantier</h2>
+            <h2>De la citadine de service à l&apos;engin de chantier</h2>
             <p className="lead" style={{ marginTop: 14 }}>
-              Le même niveau d&apos;exigence, quel que soit le véhicule à traiter.
+              Voitures de fonction, utilitaires, poids lourds, engins de chantier : le même niveau
+              d&apos;exigence, quel que soit le véhicule à traiter.
             </p>
           </div>
           <div className={styles.vehicleGrid}>
@@ -118,6 +154,20 @@ export default function ProPage() {
               )
             })}
           </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Voitures de fonction</span>
+            <h2>Vos flottes de voitures n&apos;ont pas que des utilitaires</h2>
+            <p className="lead" style={{ marginTop: 14 }}>
+              Berlines de direction, citadines commerciales, SUV : nous entretenons aussi les
+              voitures classiques de votre flotte, pas uniquement les véhicules techniques.
+            </p>
+          </div>
+          <PhotoGallery photos={FLEET_CARS_PHOTOS} />
         </div>
       </section>
 

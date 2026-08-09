@@ -72,6 +72,12 @@ html,
 body {
   padding: 0;
   margin: 0;
+  /* Filet de sécurité : sur WebKit, un élément position:fixed + transform hors
+     écran (ex. le tiroir de menu mobile) peut ponctuellement être compté dans
+     la largeur scrollable du document et créer un défilement horizontal
+     fantôme. Les zones de défilement horizontal volontaires (carrousels,
+     tableaux) gèrent leur propre overflow-x et ne sont pas affectées. */
+  overflow-x: hidden;
 }
 
 body {

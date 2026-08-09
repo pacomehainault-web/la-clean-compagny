@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
 import styles from './QuoteWizard.module.css'
 import { VEHICLE_ICONS, IconCheck, IconArrowRight, IconWhatsapp, IconMail, IconUpload, IconClose } from './Icons'
-import { VEHICLE_TYPES, getVehicleType } from '@/lib/data/vehicles'
+import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
 import { whatsappLink, CONTACT } from '@/lib/constants'
 
@@ -103,7 +103,14 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   const [submitError, setSubmitError] = useState('')
   const [emailStatus, setEmailStatus] = useState('idle') // idle | uploading | sending | sent | error
 
-  const vehicle = getVehicleType(vehicleId)
+  // La Moto est une exclusivité Espace Particulier : invisible côté Pro, quel
+  // que soit l'état déjà sélectionné (bascule pro=1 en cours de route incluse).
+  const vehicleOptions = isPro ? VEHICLE_TYPES.filter((v) => v.id !== 'moto') : VEHICLE_TYPES
+
+  // Recherché dans vehicleOptions (pas VEHICLE_TYPES) : si l'URL forçait
+  // vehicule=moto côté Pro (?pro=1&vehicule=moto), la Moto reste introuvable et
+  // ne peut apparaître nulle part dans l'interface, résumé inclus.
+  const vehicle = vehicleOptions.find((v) => v.id === vehicleId)
   const formula = FORMULAS.find((f) => f.id === formulaId)
   const extras = EXTRA_SERVICES.filter((s) => extraIds.has(s.id))
   const selectedServices = [formula, ...extras].filter(Boolean)
@@ -366,7 +373,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                     : 'Le tarif final dépend du gabarit de votre véhicule.'}
                 </p>
                 <div className={styles.vehicleGrid}>
-                  {VEHICLE_TYPES.map((v) => {
+                  {vehicleOptions.map((v) => {
                     const Icon = VEHICLE_ICONS[v.id]
                     const active = v.id === vehicleId
                     return (

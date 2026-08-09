@@ -62,6 +62,21 @@ export function IconMonospace(props) {
   )
 }
 
+export function IconMoto(props) {
+  return (
+    <VehicleBase {...props}>
+      <path d="M20,38 C20,30 27,25 36,25 L54,25 C60,25 64,22 67,16" />
+      <line x1="67" y1="16" x2="67" y2="8" />
+      <line x1="58" y1="10" x2="78" y2="8" />
+      <path d="M67,16 L92,44" />
+      <path d="M36,25 L42,38 L58,38" />
+      <line x1="8" y1="47" x2="112" y2="47" />
+      <circle cx="24" cy="47" r="10.5" fill="currentColor" stroke="none" />
+      <circle cx="92" cy="47" r="10.5" fill="currentColor" stroke="none" />
+    </VehicleBase>
+  )
+}
+
 export function IconUtilitaire(props) {
   return (
     <VehicleBase {...props}>
@@ -120,6 +135,7 @@ export const VEHICLE_ICONS = {
   berline: IconBerline,
   suv: IconSUV,
   monospace: IconMonospace,
+  moto: IconMoto,
   utilitaire: IconUtilitaire,
   camion: IconCamion,
   tracteur: IconTracteur,

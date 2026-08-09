@@ -1,16 +1,12 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import styles from './SubscriptionSection.module.css'
 import { IconCheck, IconWhatsapp } from './Icons'
-import { VEHICLE_TIERS, PRICED_TIER_IDS, PASS_TRIMESTRIEL, PASS_ANNUEL } from '@/lib/data/pricing'
+import { PASS_TIERS, PASS_6_MOIS, PASS_3_MOIS } from '@/lib/data/pricing'
 import { whatsappLink } from '@/lib/constants'
 
-const PRICED_TIERS = VEHICLE_TIERS.filter((t) => PRICED_TIER_IDS.includes(t.id))
+const PASSES = [PASS_6_MOIS, PASS_3_MOIS]
 
 export default function SubscriptionSection() {
-  const trimestrielMessage = `Bonjour, je suis intéressé(e) par le ${PASS_TRIMESTRIEL.name} (${PASS_TRIMESTRIEL.price} € / ${PASS_TRIMESTRIEL.period}). Pouvez-vous m'en dire plus ?`
-  const annuelMessage = `Bonjour, je suis intéressé(e) par le ${PASS_ANNUEL.name}. Pouvez-vous m'en dire plus ?`
-
   return (
     <section className="section section-alt">
       <div className="container">
@@ -24,96 +20,67 @@ export default function SubscriptionSection() {
         </div>
 
         <div className={styles.grid}>
-          <div className={styles.card}>
-            <span className={styles.badge}>Trimestriel</span>
-            <h3>{PASS_TRIMESTRIEL.name}</h3>
-            <div className={styles.priceRow}>
-              <span className={styles.price}>{PASS_TRIMESTRIEL.price} €</span>
-              <span className={styles.priceUnit}>/ {PASS_TRIMESTRIEL.period}</span>
-            </div>
+          {PASSES.map((pass, index) => {
+            const message = `Bonjour, je suis intéressé(e) par le ${pass.name} (${pass.subtitle}). Pouvez-vous m'en dire plus ?`
+            const featured = index === 1
 
-            <ul className={styles.includes}>
-              {PASS_TRIMESTRIEL.includes.map((item) => (
-                <li key={item}>
-                  <IconCheck size={16} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <div className={styles.trimestrielImage}>
-              <Image
-                src="/images/lustrage/lustrage-showroom.jpg"
-                alt="Véhicule parfaitement propre après un entretien La Clean Compagny"
-                fill
-                sizes="(max-width: 800px) 90vw, 420px"
-              />
-            </div>
-
-            <div className={styles.actions}>
-              <a
-                href={whatsappLink(trimestrielMessage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-cta btn-block"
-              >
-                <IconWhatsapp size={18} />
-                Souscrire au Pass Trimestriel
-              </a>
-              <Link href="/contact" className="btn btn-outline btn-block">
-                Être recontacté(e)
-              </Link>
-            </div>
-          </div>
-
-          <div className={`${styles.card} ${styles.cardFeatured}`}>
-            <span className={styles.badge}>Annuel</span>
-            <h3>{PASS_ANNUEL.name}</h3>
-            <p className={styles.tagline}>{PASS_ANNUEL.tagline}</p>
-
-            <div className={styles.tierPrices}>
-              {PRICED_TIERS.map((tier) => (
-                <div className={styles.tierPriceRow} key={tier.id}>
-                  <span>
-                    <span aria-hidden="true">{tier.emoji}</span> {tier.label}
-                  </span>
-                  <strong>{PASS_ANNUEL.prices[tier.id]} € / an</strong>
-                </div>
-              ))}
-              <div className={styles.tierPriceRow}>
-                <span>
-                  <span aria-hidden="true">🏎️</span> Prestige / Collection
+            return (
+              <div className={`${styles.card} ${featured ? styles.cardFeatured : ''}`} key={pass.id}>
+                <span className={styles.badge}>
+                  <span aria-hidden="true">{pass.eyebrow}</span> {pass.badge}
                 </span>
-                <strong>Sur devis</strong>
+                <h3>{pass.name}</h3>
+                <p className={styles.tagline}>{pass.subtitle}</p>
+                <p className={styles.frequency}>{pass.frequency}</p>
+                <p className={styles.description}>{pass.description}</p>
+
+                <div className={styles.includesBlock}>
+                  <span className={styles.includesTitle}>Comprend :</span>
+                  <ul className={styles.includes}>
+                    {pass.includes.map((item) => (
+                      <li key={item}>
+                        <IconCheck size={16} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className={styles.tierPrices}>
+                  <span className={styles.tierPricesTitle}>{pass.pricesLabel}</span>
+                  {PASS_TIERS.map((tier) => (
+                    <div className={styles.tierPriceRow} key={tier.id}>
+                      <span>
+                        <span aria-hidden="true">{tier.emoji}</span> {tier.label}
+                      </span>
+                      <strong>{pass.prices[tier.id]} € / {pass.period}</strong>
+                    </div>
+                  ))}
+                  <div className={styles.tierPriceRow}>
+                    <span>
+                      <span aria-hidden="true">🏎️</span> Prestige / Collection
+                    </span>
+                    <strong>Sur devis</strong>
+                  </div>
+                </div>
+
+                <div className={styles.actions}>
+                  <a
+                    href={whatsappLink(message)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-cta btn-block"
+                  >
+                    <IconWhatsapp size={18} />
+                    Souscrire au {pass.name}
+                  </a>
+                  <Link href="/contact" className="btn btn-outline btn-block">
+                    Être recontacté(e)
+                  </Link>
+                </div>
               </div>
-            </div>
-
-            <ul className={styles.includes}>
-              {PASS_ANNUEL.includes.map((item) => (
-                <li key={item}>
-                  <IconCheck size={16} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <p className={styles.commitmentNote}>{PASS_ANNUEL.commitmentNote}</p>
-
-            <div className={styles.actions}>
-              <a
-                href={whatsappLink(annuelMessage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-cta btn-block"
-              >
-                <IconWhatsapp size={18} />
-                Souscrire au Pass Annuel
-              </a>
-              <Link href="/contact" className="btn btn-outline btn-block">
-                Être recontacté(e)
-              </Link>
-            </div>
-          </div>
+            )
+          })}
         </div>
 
         <p className={styles.b2bNote}>
