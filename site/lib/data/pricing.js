@@ -213,3 +213,48 @@ export const PRICING_TERMS = [
 export function getTierPrice(service, tierId) {
   return service.prices ? service.prices[tierId] : undefined
 }
+
+// ---------------------------------------------------------------------------
+// Source unique de vérité "Prestations × Gabarits" — consommée aussi bien par
+// le sélecteur de la page d'accueil que par le formulaire de devis, pour que
+// les deux affichent strictement le même prix pour une même combinaison.
+// Assemblée à partir des grilles ci-dessus : aucun chiffre n'est dupliqué.
+// ---------------------------------------------------------------------------
+export const PRICING_MATRIX = [...FORMULAS_PRICING, ...EXTERIOR_PRICING, ...CORRECTION_PRICING].reduce(
+  (matrix, service) => {
+    matrix[service.id] = service.prices
+    return matrix
+  },
+  {}
+)
+
+// Une prestation n'a pas forcément de grille par gabarit (ex. lustrage minute,
+// rénovation optiques : prix fixe quel que soit le véhicule). On le distingue
+// explicitement d'un simple "gabarit absent de la grille" (ex. Prestige, ou un
+// véhicule hors grille) : les deux cas doivent afficher "Sur devis", mais pour
+// des raisons différentes — utile pour le composant appelant.
+export function hasPriceGrid(serviceId) {
+  return Boolean(PRICING_MATRIX[serviceId])
+}
+
+// Prix exact pour une prestation donnée, pour un gabarit donné. `undefined` si
+// cette prestation n'a pas de grille, ou si ce gabarit précis n'y figure pas
+// (Prestige et les véhicules hors grille grand public → toujours sur devis).
+export function getExactPrice(serviceId, tierId) {
+  return tierId ? PRICING_MATRIX[serviceId]?.[tierId] : undefined
+}
+
+// Correspondance entre la taxonomie du configurateur de devis (lib/data/vehicles.js,
+// orientée "types de véhicules") et celle de la grille tarifaire ci-dessus
+// (VEHICLE_TIERS, orientée "paliers de prix"). La Moto a son propre tarif fixe
+// (cf. MOTO_PRICING) plutôt qu'une grille par prestation ; les gabarits
+// professionnels (camion, tracteur, pelleteuse) restent toujours sur devis,
+// comme annoncé sur l'espace Pro — ils n'ont donc volontairement pas d'entrée
+// ici, ce qui fait retomber getExactPrice() sur "Sur devis" pour eux.
+export const VEHICLE_TYPE_TO_TIER = {
+  citadine: 'citadine',
+  berline: 'compacte-berline',
+  suv: 'suv-break',
+  monospace: 'grand-suv',
+  utilitaire: 'grand-suv',
+}

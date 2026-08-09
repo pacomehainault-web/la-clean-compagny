@@ -6,6 +6,7 @@ import styles from './QuoteWizard.module.css'
 import { VEHICLE_ICONS, IconCheck, IconArrowRight, IconWhatsapp, IconMail, IconUpload, IconClose } from './Icons'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
+import { VEHICLE_TYPE_TO_TIER, MOTO_PRICING, hasPriceGrid, getExactPrice } from '@/lib/data/pricing'
 import { whatsappLink, CONTACT } from '@/lib/constants'
 
 const EMAILJS_SERVICE_ID = 'service_ugnog14'
@@ -38,6 +39,32 @@ function getRequiredIds(activeIds) {
 
 function getLockingServiceNames(id, activeIds) {
   return EXTRA_SERVICES.filter((s) => activeIds.has(s.id) && s.requires?.includes(id)).map((s) => s.name)
+}
+
+// Prix exact d'une prestation pour un véhicule donné, résolu STRICTEMENT depuis
+// lib/data/pricing.js — même source que le sélecteur de la page d'accueil et la
+// matrice de /prestations, pour ne plus jamais désynchroniser le formulaire.
+// `exact: true` = prix issu de la grille par gabarit (varie selon le véhicule).
+// `exact: false` = prix fixe connu mais non gradué par gabarit (ex. lustrage
+// minute, rénovation optiques : `item.basePrice`, identique quel que soit le
+// véhicule). `price: undefined` = aucun prix connu → "Sur devis".
+function resolveItemPrice(item, tierId, isPro) {
+  if (isPro || item.priceOnRequest) return { price: undefined, exact: false }
+
+  const refId = item.pricingRef || item.id
+  if (hasPriceGrid(refId)) {
+    const exactPrice = getExactPrice(refId, tierId)
+    return { price: exactPrice, exact: exactPrice !== undefined }
+  }
+
+  if (item.basePrice !== undefined) return { price: item.basePrice, exact: false }
+  return { price: undefined, exact: false }
+}
+
+function formatItemPrice(item, tierId, isPro) {
+  const { price, exact } = resolveItemPrice(item, tierId, isPro)
+  if (price === undefined) return 'Sur devis'
+  return exact ? `${price} €` : `dès ${price} €`
 }
 
 const STEPS = [
@@ -111,26 +138,31 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   // vehicule=moto côté Pro (?pro=1&vehicule=moto), la Moto reste introuvable et
   // ne peut apparaître nulle part dans l'interface, résumé inclus.
   const vehicle = vehicleOptions.find((v) => v.id === vehicleId)
+  const tierId = VEHICLE_TYPE_TO_TIER[vehicleId]
+  const isMoto = vehicleId === 'moto'
   const formula = FORMULAS.find((f) => f.id === formulaId)
   const extras = EXTRA_SERVICES.filter((s) => extraIds.has(s.id))
   const selectedServices = [formula, ...extras].filter(Boolean)
   const lockedExtraIds = useMemo(() => getRequiredIds(extraIds), [extraIds])
 
-  const multiplier = vehicle?.priceMultiplier || 1
-  const pricedServices = selectedServices.filter((s) => !s.priceOnRequest)
-  const hasQuoteOnlyServices = selectedServices.some((s) => s.priceOnRequest)
-  const subtotal = pricedServices.reduce((sum, s) => sum + s.basePrice, 0)
-  const estimateLow = Math.round(subtotal * multiplier * 0.92)
-  const estimateHigh = Math.round(subtotal * multiplier * 1.18)
+  // Total EXACT (plus d'estimation à la louche par multiplicateur) : chaque
+  // prestation sélectionnée est résolue individuellement via resolveItemPrice,
+  // qui interroge la même grille tarifaire que la page d'accueil.
+  const pricedLines = selectedServices.map((s) => resolveItemPrice(s, tierId, isPro))
+  const knownPriceLines = pricedLines.filter((l) => l.price !== undefined)
+  const hasQuoteOnlyServices = pricedLines.some((l) => l.price === undefined)
+  const total = knownPriceLines.reduce((sum, l) => sum + l.price, 0)
 
   const vehicleLabel = vehicle ? vehicle.label : 'Non précisé'
   const formulaLabel = formula ? formula.name : 'Aucune formule sélectionnée'
   const extrasLabel = extras.length ? extras.map((s) => s.name).join(', ') : 'Aucune'
-  const estimationLabel = pricedServices.length
-    ? `${estimateLow} € – ${estimateHigh} €${hasQuoteOnlyServices ? ' + prestations sur devis' : ''}`
-    : hasQuoteOnlyServices
-      ? 'Sur devis'
-      : 'Non estimé'
+  const estimationLabel = knownPriceLines.length
+    ? `${total} €${hasQuoteOnlyServices ? ' + prestations sur devis' : ''}`
+    : isMoto
+      ? `à partir de ${MOTO_PRICING.fromPrice} €`
+      : hasQuoteOnlyServices || selectedServices.length
+        ? 'Sur devis'
+        : 'Non estimé'
 
   // Aperçus locaux des photos sélectionnées (avant upload), révoqués à chaque changement
   const previewUrls = useMemo(() => photos.map((file) => URL.createObjectURL(file)), [photos])
@@ -403,6 +435,15 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                   Choisissez une formule habitacle et/ou des prestations complémentaires.
                 </p>
 
+                {isMoto && (
+                  <div className={styles.motoNote}>
+                    🏍️ Prestation moto : à partir de {MOTO_PRICING.fromPrice} €. Les formules
+                    ci-dessous sont pensées pour l&apos;habitacle d&apos;une voiture — sélectionnez
+                    plutôt les soins souhaités, nous affinons le tarif exact avec vous selon le
+                    modèle.
+                  </div>
+                )}
+
                 <div className={styles.blockTitle}>Formule habitacle (au choix)</div>
                 <div className={styles.formulaOptions}>
                   {FORMULAS.map((f) => {
@@ -425,7 +466,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                         <div className={styles.optionBody}>
                           <div className={styles.optionName}>
                             <span>{f.name}</span>
-                            <span className={styles.optionPrice}>{isPro ? 'Sur devis' : `dès ${f.basePrice} €`}</span>
+                            <span className={styles.optionPrice}>{formatItemPrice(f, tierId, isPro)}</span>
                           </div>
                           <p className={styles.optionDesc}>{f.tagline}</p>
                         </div>
@@ -460,9 +501,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                         <div className={styles.optionBody}>
                           <div className={styles.optionName}>
                             <span>{s.name}</span>
-                            <span className={styles.optionPrice}>
-                              {isPro || s.priceOnRequest ? 'Sur devis' : `dès ${s.basePrice} €`}
-                            </span>
+                            <span className={styles.optionPrice}>{formatItemPrice(s, tierId, isPro)}</span>
                           </div>
                           <p className={styles.optionDesc}>{s.description}</p>
                           {locked && (
@@ -712,6 +751,13 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
               <p className={styles.summaryText}>
                 Vous avez sélectionné : {selectedServices.map((s) => s.name).join(' + ')}
               </p>
+            )}
+
+            {!isPro && (selectedServices.length > 0 || isMoto) && (
+              <div className={styles.summaryRow}>
+                <span>{knownPriceLines.length ? 'Total' : 'Estimation'}</span>
+                <strong>{estimationLabel}</strong>
+              </div>
             )}
 
             <p className={styles.summaryDisclaimer}>

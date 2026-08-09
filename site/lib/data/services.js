@@ -42,6 +42,12 @@ export const FORMULAS = [
 // Prestations complémentaires. La plupart ont un tarif de départ (palier Citadine
 // de la grille tarifaire, cf. lib/data/pricing.js) ; celles qui n'ont pas
 // d'équivalent dans la nouvelle grille (céramique, nettoyage moteur) restent sur devis.
+//
+// `pricingRef` : identifiant de la prestation correspondante dans
+// lib/data/pricing.js (EXTERIOR_PRICING / CORRECTION_PRICING), quand il diffère
+// de l'id local ci-dessous. C'est ce qui permet au formulaire de devis de
+// retrouver le prix exact par gabarit (cf. QuoteWizard → getExactPrice) sans
+// dupliquer les chiffres ni les faire dériver d'un catalogue à l'autre.
 export const COMPLEMENTARY_SERVICES = [
   {
     id: 'lavage-exterieur',
@@ -55,6 +61,7 @@ export const COMPLEMENTARY_SERVICES = [
     id: 'polissage',
     name: 'Polissage',
     basePrice: 350,
+    pricingRef: 'correction-avancee',
     description:
       'Correction de peinture pour effacer hologrammes, micro-rayures et ternissures et redonner sa profondeur à la carrosserie.',
     category: 'exterieur',
@@ -63,6 +70,7 @@ export const COMPLEMENTARY_SERVICES = [
     id: 'lustrage-classique',
     name: 'Lustrage classique',
     basePrice: 150,
+    pricingRef: 'lustrage-express',
     description:
       "Finition brillance sans correction agressive, pour raviver l'éclat de la peinture entre deux polissages.",
     category: 'exterieur',
@@ -84,6 +92,7 @@ export const COMPLEMENTARY_SERVICES = [
     id: 'decontamination',
     name: 'Décontamination',
     basePrice: 100,
+    pricingRef: 'decontamination-complete',
     description:
       'Élimination des particules ferreuses, goudrons et résidus incrustés que le lavage seul ne retire pas.',
     category: 'exterieur',
