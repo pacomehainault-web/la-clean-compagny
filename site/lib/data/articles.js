@@ -75,7 +75,7 @@ export const ARTICLES = [
       { type: 'p', text: "L'ozone est un gaz oxydant naturellement instable, qui a la particularité de pénétrer partout où l'air circule : tissus, mousses des sièges, moquettes, mais aussi le circuit de ventilation et de climatisation, souvent le grand oublié du nettoyage automobile. En se décomposant, il neutralise bactéries, moisissures, acariens et les molécules responsables des odeurs, sans laisser de résidu chimique ni de parfum masquant." },
       { type: 'h2', text: 'Une étape recommandée après tout achat d’occasion' },
       { type: 'p', text: "Contrairement à un simple désodorisant qui masque temporairement une odeur, l'ozone s'attaque à sa source. C'est pour cette raison que nous recommandons systématiquement ce traitement après l'achat d'un véhicule d'occasion, en complément d'un nettoyage intérieur complet — particulièrement utile en cas d'odeur de tabac, d'animaux ou d'humidité." },
-      { type: 'p', text: "Le traitement est sans danger pour l'habitacle une fois le véhicule aéré, et le résultat se fait sentir (littéralement) dès la première utilisation. Un excellent moyen de faire vraiment vôtre votre nouvelle voiture, avant même son premier trajet." },
+      { type: 'p', text: "Le traitement est sans danger pour l'habitacle une fois le véhicule aéré, et le résultat se fait sentir (littéralement) dès la première utilisation. Un excellent moyen de vous approprier votre nouvelle voiture avant même son premier trajet." },
     ],
   },
 ]

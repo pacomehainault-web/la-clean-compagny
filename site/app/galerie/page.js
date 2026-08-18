@@ -39,11 +39,11 @@ const EXTERIOR_PHOTOS = [
 ]
 
 const INTERIOR_PHOTOS = [
-  { src: '/images/interieur/aston-martin-dbs-nettoyage-interieur-angers.jpg', alt: 'Aston Martin DBS — nettoyage intérieur à Angers', caption: 'Aston Martin DBS' },
+  { src: '/images/interieur/aston-martin-vantage-s-nettoyage-interieur-angers.jpg', alt: 'Aston Martin Vantage S — nettoyage intérieur à Angers', caption: 'Aston Martin Vantage S' },
   { src: '/images/interieur/audi-rs6-dressing-habitacle-angers.jpg', alt: 'Audi RS6 — dressing habitacle à Angers', caption: 'Audi RS6' },
   { src: '/images/interieur/bmw-m3-g80-renovation-habitacle-angers.jpg', alt: 'BMW M3 G80 — rénovation habitacle à Angers', caption: 'BMW M3 G80' },
   { src: '/images/interieur/bmw-m3-nettoyage-interieur-angers.jpg', alt: 'BMW M3 — nettoyage intérieur à Angers', caption: 'BMW M3' },
-  { src: '/images/interieur/bmw-x5-nettoyage-interieur-angers.jpg', alt: 'BMW X5 — nettoyage intérieur à Angers', caption: 'BMW X5' },
+  { src: '/images/interieur/bmw-x7-nettoyage-interieur-angers.jpg', alt: 'BMW X7 — nettoyage intérieur à Angers', caption: 'BMW X7' },
   { src: '/images/interieur/utilitaire-nettoyage-interieur-angers.jpg', alt: 'Véhicule utilitaire — nettoyage intérieur à Angers', caption: 'Utilitaire' },
 ]
 
@@ -70,7 +70,7 @@ export default function GaleriePage() {
       <section className="section">
         <div className="container">
           <div className={styles.sectionHead}>
-            <span className="eyebrow">Comparatif interactif</span>
+            <span className="eyebrow">En images</span>
             <h2>Avant / Après</h2>
           </div>
           <div className={styles.sliderSingle}>
@@ -83,7 +83,7 @@ export default function GaleriePage() {
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">Résultats en images</span>
-            <h2>D&apos;autres réalisations, sans curseur à glisser</h2>
+            <h2>D&apos;autres projets réalisés</h2>
           </div>
           <StaticBeforeAfterGallery pairs={STATIC_RESULTS} />
         </div>

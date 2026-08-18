@@ -25,13 +25,13 @@ export default function CGVPage() {
             <h2>Article 1 — Objet</h2>
             <p>
               Les présentes conditions générales de vente régissent les prestations de detailing
-              et de nettoyage automobile proposées par {SITE.legalName} ({SITE.gerant}),
+              et de nettoyage automobile proposées par {SITE.legalName}{' '}({SITE.gerant}),
               micro-entreprise immatriculée sous le SIREN {SITE.siren}, {SITE.vatNote}.
             </p>
 
             <h2>Article 2 — Prestations</h2>
             <p>
-              {SITE.legalName} propose des prestations de nettoyage intérieur et extérieur, de
+              {SITE.legalName}{' '}propose des prestations de nettoyage intérieur et extérieur, de
               rénovation esthétique (polissage, lustrage, traitement céramique, décontamination,
               rénovation d&apos;optiques, désinfection à l&apos;ozone) sur véhicules du quotidien,
               utilitaires et véhicules de prestige, réalisées à domicile ou sur tout lieu convenu
@@ -50,7 +50,7 @@ export default function CGVPage() {
             <h2>Article 4 — Réservation</h2>
             <p>
               La réservation s&apos;effectue par téléphone, WhatsApp, email ou via le formulaire
-              de devis en ligne. Un rendez-vous est confirmé après échange avec {SITE.legalName}
+              de devis en ligne. Un rendez-vous est confirmé après échange avec {SITE.legalName}{' '}
               sur la date, le lieu et la nature de la prestation.
             </p>
 
@@ -58,8 +58,8 @@ export default function CGVPage() {
             <p>
               Le client s&apos;engage à mettre à disposition un accès approprié (eau, électricité
               si nécessaire) sur le lieu convenu. Le client est invité à retirer tout objet de
-              valeur ou personnel du véhicule avant l&apos;intervention ; {SITE.legalName} décline
-              toute responsabilité concernant les objets laissés à bord.
+              valeur ou personnel du véhicule avant l&apos;intervention ; {SITE.legalName}{' '}
+              décline toute responsabilité concernant les objets laissés à bord.
             </p>
 
             <h2>Article 6 — Paiement</h2>
@@ -70,14 +70,19 @@ export default function CGVPage() {
 
             <h2>Article 7 — Annulation et report</h2>
             <p>
-              Le client peut annuler ou reporter un rendez-vous en prévenant {SITE.legalName}
-              dans un délai raisonnable, idéalement au moins 24 heures à l&apos;avance, par
-              téléphone ou WhatsApp.
+              Toute annulation ou demande de report doit être signalée à {SITE.legalName}{' '}
+              au minimum 24 heures à l&apos;avance, par téléphone ou WhatsApp.
             </p>
+            <p>
+              En cas d&apos;annulation ou de report effectué moins de 24 heures avant le
+              rendez-vous, {SITE.legalName}{' '}se réserve le droit de facturer la prestation ou
+              de retenir des frais d&apos;annulation.
+            </p>
+            <p>En cas d&apos;absence du client sans préavis, la prestation pourra être considérée comme due.</p>
 
             <h2>Article 8 — Responsabilité</h2>
             <p>
-              {SITE.legalName} met en œuvre des produits et méthodes adaptés à chaque type de
+              {SITE.legalName}{' '}met en œuvre des produits et méthodes adaptés à chaque type de
               véhicule et de matière. Sa responsabilité ne saurait être engagée en cas de défaut
               préexistant du véhicule (usure, dommage antérieur, défaut de fabrication) non lié à
               la prestation réalisée.
@@ -103,6 +108,18 @@ export default function CGVPage() {
               Les présentes conditions générales de vente sont soumises au droit français. Tout
               litige relève, à défaut de résolution amiable, de la compétence des tribunaux
               français.
+            </p>
+
+            <h2 id="bons-cadeaux">Article 12 — Bons cadeaux</h2>
+            <p>
+              Les bons cadeaux émis par {SITE.legalName}{' '}sont valables 1 an à compter de leur
+              date d&apos;émission. Passé ce délai, ils ne peuvent plus être utilisés.
+            </p>
+            <p>
+              Les bons cadeaux ne sont ni remboursables, ni échangeables contre de l&apos;argent,
+              en tout ou partie. Ils sont utilisables en une ou plusieurs fois dans la limite du
+              montant disponible et de leur durée de validité, sur l&apos;ensemble des prestations
+              proposées par {SITE.legalName}.
             </p>
           </div>
         </div>

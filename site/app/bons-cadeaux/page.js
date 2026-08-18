@@ -1,9 +1,16 @@
+import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import { IconGift, IconSparkle, IconMail } from '@/components/Icons'
 import { FORMULAS } from '@/lib/data/services'
 import { whatsappLink, CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
+
+const GIFT_CARD_TERMS = [
+  "Valable 1 an à compter de la date d'émission.",
+  'Non remboursable et non échangeable contre de l’argent, en tout ou partie.',
+  'Utilisable en une ou plusieurs fois, sur l’ensemble des prestations proposées.',
+]
 
 export const metadata = buildMetadata({
   title: 'Bons cadeaux — Offrez un detailing haut de gamme',
@@ -72,6 +79,18 @@ export default function BonsCadeauxPage() {
                 </a>
               </div>
             ))}
+          </div>
+
+          <div className={styles.terms}>
+            <p className={styles.termsTitle}>Conditions de validité</p>
+            <ul>
+              {GIFT_CARD_TERMS.map((term) => (
+                <li key={term}>{term}</li>
+              ))}
+            </ul>
+            <p className={styles.termsLink}>
+              Voir le détail dans nos <Link href="/cgv#bons-cadeaux">CGV Bons Cadeaux</Link>.
+            </p>
           </div>
         </div>
       </section>

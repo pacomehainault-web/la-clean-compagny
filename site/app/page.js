@@ -1,11 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
+import IntroSequence from '@/components/IntroSequence'
+import HeroMedia from '@/components/HeroMedia'
 import SpaceGateway from '@/components/SpaceGateway'
 import StatsRow from '@/components/StatsRow'
 import PricingSelector from '@/components/PricingSelector'
 import SubscriptionSection from '@/components/SubscriptionSection'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
+import MotoSlider from '@/components/MotoSlider'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
@@ -44,6 +47,25 @@ const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
 // > *:nth-child(3) — DOM identique sur les deux versions, pas de rendu conditionnel).
 const FEATURED_COUNT = 3
 
+const MOTO_SLIDER_IMAGES = [
+  {
+    src: '/images/moto/bmw-r12-detailing-moto-angers.jpg',
+    alt: 'BMW R12 après un detailing complet — finition showroom',
+  },
+  {
+    src: '/images/moto/enzo-lustrage-moto-bmw-angers.jpg',
+    alt: 'Enzo, gérant de La Clean Compagny, lustre une moto sur pont',
+  },
+  {
+    src: '/images/moto/bmw-ce04-nettoyage-moto-angers.jpg',
+    alt: 'BMW CE 04 nettoyée, en atelier',
+  },
+  {
+    src: '/images/moto/bmw-f900-detail-echappement-moto-angers.jpg',
+    alt: 'Détail échappement carbone BMW F900 après lustrage',
+  },
+]
+
 export default function HomePage() {
   const baseIndex = getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'home' })
   const featuredBeforeAfters = Array.from(
@@ -52,18 +74,13 @@ export default function HomePage() {
   )
 
   return (
-    <>
+    <IntroSequence>
       <SpaceGateway />
 
       <section className={styles.hero}>
-        <Image
-          className={styles.heroImage}
+        <HeroMedia
           src="/images/hero/ferrari-lavage-mousse-hero.jpg"
           alt="Ferrari recouverte de mousse active lors d'un lavage La Clean Compagny"
-          fill
-          sizes="100vw"
-          priority
-          quality={85}
         />
         <div className={styles.heroOverlay} aria-hidden="true" />
 
@@ -234,44 +251,16 @@ export default function HomePage() {
       <section className="section section-ink">
         <div className="container">
           <div className={`${styles.motoGrid} reveal`}>
-            <div className={styles.motoShowcase}>
-              <div className={styles.motoBig}>
-                <Image
-                  src="/images/moto/bmw-r12-detailing-moto-angers.jpg"
-                  alt="BMW R12 après un detailing complet — finition showroom"
-                  fill
-                  sizes="(max-width: 700px) 60vw, (max-width: 900px) 45vw, 320px"
-                />
-              </div>
-              <div className={styles.motoTop}>
-                <Image
-                  src="/images/moto/bmw-ce04-nettoyage-moto-angers.jpg"
-                  alt="BMW CE 04 nettoyée, en atelier"
-                  fill
-                  sizes="(max-width: 700px) 40vw, 220px"
-                />
-              </div>
-              <div className={styles.motoBot}>
-                <Image
-                  src="/images/moto/bmw-f900-detail-echappement-moto-angers.jpg"
-                  alt="Détail échappement carbone BMW F900 après lustrage"
-                  fill
-                  sizes="(max-width: 700px) 40vw, 220px"
-                />
-              </div>
-              <div className={styles.motoWide}>
-                <Image
-                  src="/images/moto/enzo-lustrage-moto-bmw-angers.jpg"
-                  alt="Enzo, gérant de La Clean Compagny, lustre une moto sur pont"
-                  fill
-                  sizes="(max-width: 700px) 90vw, 480px"
-                />
-              </div>
-            </div>
-
-            <div className={styles.motoContent}>
+            <div className={styles.motoHeader}>
               <span className={styles.motoBadge}>🏍️ Exclusivité Particuliers</span>
               <h2>Votre moto, prête à briller</h2>
+            </div>
+
+            <div className={styles.motoVisual}>
+              <MotoSlider images={MOTO_SLIDER_IMAGES} sizes="(max-width: 900px) 100vw, 50vw" />
+            </div>
+
+            <div className={styles.motoBody}>
               <div className={styles.motoPrice}>
                 <span>à partir de</span>
                 <strong>{MOTO_PRICING.fromPrice} €</strong>
@@ -457,6 +446,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </>
+    </IntroSequence>
   )
 }

@@ -145,7 +145,7 @@ export default function PrestationsPage() {
           {REMAINING_ON_REQUEST.length > 0 && (
             <>
               <div className={styles.sectionHead} style={{ marginTop: 56 }}>
-                <span className="eyebrow">Et aussi, sur devis</span>
+                <span className="eyebrow">Sur devis</span>
                 <h2>Autres prestations</h2>
               </div>
               <div className={styles.serviceGrid}>

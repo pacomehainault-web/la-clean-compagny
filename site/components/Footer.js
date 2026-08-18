@@ -92,6 +92,7 @@ export default function Footer() {
             <Link href="/mentions-legales">Mentions légales</Link>
             <Link href="/politique-de-confidentialite">Politique de confidentialité</Link>
             <Link href="/cgv">CGV</Link>
+            <Link href="/cgv#bons-cadeaux">CGV Bons Cadeaux</Link>
           </div>
         </div>
       </div>

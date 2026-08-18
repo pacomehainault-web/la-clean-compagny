@@ -52,7 +52,7 @@ export default function MentionsLegalesPage() {
             <h2>Liens hypertextes</h2>
             <p>
               Ce site peut contenir des liens vers des sites tiers (réseaux sociaux, avis Google,
-              cartographie). {SITE.legalName} n&apos;exerce aucun contrôle sur ces sites et
+              cartographie). {SITE.legalName}{' '}n&apos;exerce aucun contrôle sur ces sites et
               décline toute responsabilité quant à leur contenu.
             </p>
 

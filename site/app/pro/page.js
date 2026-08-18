@@ -45,8 +45,8 @@ const FLEET_CARS_PHOTOS = [
     caption: 'Berlines de fonction',
   },
   {
-    src: '/images/interieur/bmw-x5-nettoyage-interieur-angers.jpg',
-    alt: 'BMW X5 de flotte — nettoyage intérieur à Angers',
+    src: '/images/interieur/bmw-x7-nettoyage-interieur-angers.jpg',
+    alt: 'BMW X7 de flotte — nettoyage intérieur à Angers',
     caption: 'SUV & véhicules de direction',
   },
   {

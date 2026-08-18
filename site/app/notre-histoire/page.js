@@ -65,8 +65,8 @@ export default function NotreHistoirePage() {
                 mois. La Clean Compagny est née en {SITE.foundedYear}, portée par une conviction simple :
                 chaque véhicule mérite un soin minutieux, qu&apos;il s&apos;agisse d&apos;une citadine
                 utilisée tous les jours ou d&apos;une voiture de collection sortie une fois par mois.
-                Enzo a transformé son sens du détail — hérité de son ancien métier — en exigence de
-                qualité pour chaque prestation.
+                Habitué à travailler avec précision dans son ancien métier, Enzo a gardé cette
+                même exigence dans son activité actuelle.
               </p>
               <p>
                 Depuis, il met un point d&apos;honneur à traiter chaque véhicule avec la même

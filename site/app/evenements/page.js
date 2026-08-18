@@ -2,8 +2,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import PageHero from '@/components/PageHero'
 import PhotoGallery from '@/components/PhotoGallery'
-import { IconMapPin, IconSparkle, IconGift, IconArrowRight } from '@/components/Icons'
-import { CONTACT, telLink } from '@/lib/constants'
+import { IconMapPin, IconSparkle, IconGift, IconArrowRight, IconInstagram, IconTiktok, IconFacebook } from '@/components/Icons'
+import { CONTACT, SOCIALS, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
 
@@ -111,6 +111,17 @@ export default function EvenementsPage() {
           <p className="lead" style={{ marginTop: 16, maxWidth: 560, marginInline: 'auto' }}>
             Nos prochaines participations à des événements sont annoncées sur nos réseaux sociaux.
           </p>
+          <div className={styles.socials}>
+            <a href={SOCIALS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <IconInstagram size={20} />
+            </a>
+            <a href={SOCIALS.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <IconTiktok size={20} />
+            </a>
+            <a href={SOCIALS.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <IconFacebook size={20} />
+            </a>
+          </div>
           <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
             <Link href="/devis" className="btn btn-cta">
               Voir les tarifs et réserver

@@ -42,7 +42,7 @@ export const EXTERIOR_PRICING = [
     id: 'lavage-exterieur-approfondi',
     name: 'Lavage extérieur approfondi',
     prices: { citadine: 70, 'compacte-berline': 80, 'suv-break': 90, 'grand-suv': 100 },
-    includes: ['Idem lavage extérieur', 'Passages de roues', 'Décontamination légère'],
+    includes: ['Prélavage & lavage manuel', 'Passages de roues', 'Décontamination légère'],
   },
   {
     id: 'decontamination-complete',
@@ -207,7 +207,10 @@ export const PRICING_TERMS = [
   "Les tarifs indiqués sont des tarifs « à partir de » et peuvent varier selon le gabarit, la configuration et l'état du véhicule.",
   "Les véhicules présentant des salissures ou traitements spécifiques nécessitant une intervention technique particulière peuvent faire l'objet d'un devis personnalisé.",
   "Les prestations de rénovation, correction de peinture, rénovation d'optiques et traitements spécifiques ne sont pas incluses dans les prestations de nettoyage classiques, sauf mention contraire.",
-  "Le Pass Entretien est souscrit pour une durée de 12 mois et comprend 4 passages, à raison d'un passage tous les 3 mois.",
+  "Les prestations sont réalisées sur rendez-vous.",
+  "Le véhicule doit être accessible et présenté dans des conditions permettant la réalisation de la prestation.",
+  "Toute prestation ou demande supplémentaire non prévue dans la formule initiale fera l'objet d'une information et d'une validation préalable du client.",
+  "Les Pass Entretien (6 mois et 3 mois) sont souscrits pour une durée de 12 mois. Ils ne sont pas cumulables avec d'autres offres, ne sont pas cessibles et sont utilisables uniquement pour le véhicule concerné.",
 ]
 
 export function getTierPrice(service, tierId) {

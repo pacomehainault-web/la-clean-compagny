@@ -11,12 +11,6 @@
   background: var(--color-ink);
 }
 
-.heroImage {
-  z-index: 0;
-  object-fit: cover;
-  object-position: center 45%;
-}
-
 .heroOverlay {
   position: absolute;
   inset: 0;
@@ -455,76 +449,63 @@
   margin-top: 32px;
 }
 
+/* Grille à 2 colonnes strictes (50/50) : la zone "visual" (slider) s'étend sur
+   les 2 lignes de la colonne de droite (header + body), ce qui l'oblige à
+   occuper exactement la même hauteur que le texte — son haut colle au badge,
+   son bas colle au bouton, sans le moindre calcul manuel. Sur mobile, les 3
+   zones repassent en une seule colonne, réordonnées : header → visual → body.
+   `min-height: 0` sur chaque zone évite qu'une image ne fasse "déborder" sa
+   piste de grille (comportement par défaut de Grid avec du contenu remplaçable). */
 .motoGrid {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'visual header'
+    'visual body';
+  column-gap: 56px;
+  row-gap: 0;
+  align-items: stretch;
 }
 
 @media (max-width: 900px) {
   .motoGrid {
     grid-template-columns: 1fr;
-    gap: 36px;
-  }
-}
-
-/* Grille asymétrique : grande image à gauche (pleine hauteur), deux vignettes
-   empilées en haut à droite, une image large en bas sur toute la largeur. */
-.motoShowcase {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  grid-template-rows: 160px 160px 140px;
-  grid-template-areas:
-    'big top'
-    'big bot'
-    'wide wide';
-  gap: 14px;
-}
-
-@media (max-width: 700px) {
-  .motoShowcase {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 200px 130px 130px;
     grid-template-areas:
-      'big big'
-      'top bot'
-      'wide wide';
+      'header'
+      'visual'
+      'body';
+    row-gap: 28px;
   }
 }
 
-.motoBig,
-.motoTop,
-.motoBot,
-.motoWide {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-elevated);
+.motoHeader {
+  grid-area: header;
+  min-height: 0;
 }
 
-.motoBig {
-  grid-area: big;
-  border-radius: var(--radius-lg);
+.motoVisual {
+  grid-area: visual;
+  min-height: 0;
+  height: 100%;
 }
 
-.motoTop {
-  grid-area: top;
+@media (max-width: 900px) {
+  .motoVisual {
+    /* Les photos sources sont en format portrait (prises au téléphone) : une
+       hauteur trop courte les recadrait beaucoup trop (à peine plus d'un
+       tiers de l'image visible). Hauteur fixe plus généreuse pour montrer
+       l'essentiel de chaque photo sans occuper tout l'écran.
+       (Note : `aspect-ratio` seul ne fonctionne pas ici — les images en
+       `fill` de next/image sont position:absolute et ne donnent donc aucune
+       taille intrinsèque à ce conteneur, qui s'effondre à 0 dans cette
+       rangée de grille en hauteur "auto".) */
+    height: 480px;
+  }
 }
 
-.motoBot {
-  grid-area: bot;
-}
-
-.motoWide {
-  grid-area: wide;
-}
-
-.motoBig img,
-.motoTop img,
-.motoBot img,
-.motoWide img {
-  object-fit: cover;
+.motoBody {
+  grid-area: body;
+  min-height: 0;
 }
 
 .motoBadge {
@@ -542,7 +523,7 @@
   margin-bottom: 18px;
 }
 
-.motoContent h2 {
+.motoHeader h2 {
   color: var(--color-bg);
 }
 
@@ -598,7 +579,7 @@
   color: var(--color-blue-light);
 }
 
-.motoContent :global(.btn-cta) {
+.motoBody :global(.btn-cta) {
   margin-top: 32px;
 }
 

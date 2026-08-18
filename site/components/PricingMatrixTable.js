@@ -9,7 +9,7 @@ export default function PricingMatrixTable({ services }) {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.serviceHeader}>Prestation</th>
+            <th className={styles.serviceHeader}>Prestations</th>
             {PRICED_TIERS.map((tier) => (
               <th key={tier.id}>
                 <span aria-hidden="true">{tier.emoji}</span>

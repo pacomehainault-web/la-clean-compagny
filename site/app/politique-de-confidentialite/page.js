@@ -56,7 +56,7 @@ export default function PrivacyPage() {
             <h2>Base légale</h2>
             <p>
               Le traitement de vos données repose sur votre consentement (envoi volontaire d&apos;un
-              formulaire) et sur l&apos;intérêt légitime de {SITE.legalName} à répondre à vos
+              formulaire) et sur l&apos;intérêt légitime de {SITE.legalName}{' '}à répondre à vos
               demandes commerciales.
             </p>
 

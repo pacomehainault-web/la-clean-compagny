@@ -1,3 +1,29 @@
+.socials {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.socials a {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.socials a:hover {
+  color: var(--color-brand-blue);
+  border-color: var(--color-brand-blue);
+  transform: translateY(-2px);
+}
+
 .intro {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;

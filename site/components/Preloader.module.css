@@ -1,0 +1,130 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  pointer-events: none;
+}
+
+/* Réservé aux lecteurs d'écran : le contenu visuel est purement décoratif,
+   cette légende porte l'annonce "chargement en cours". */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Les deux "portes de garage" qui composent le fond plein écran et
+   s'écartent au moment de la révélation. */
+.halfTop,
+.halfBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--color-ink);
+}
+
+.halfTop {
+  top: 0;
+}
+
+.halfBottom {
+  bottom: 0;
+}
+
+.center {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Phase 1 — compteur */
+.counterWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.counterRow {
+  display: flex;
+  align-items: flex-start;
+  /* Police corps (Inter, chargée en variable) plutôt que la police de titre
+     (Archivo, seulement disponible en 700+) : c'est elle qui peut vraiment
+     rendre une graisse fine et élégante pour ce compteur. */
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.counterNumber {
+  font-size: clamp(3rem, 9vw, 6rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--color-bg);
+}
+
+.counterPercent {
+  margin-top: 10px;
+  margin-left: 4px;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  color: var(--color-on-ink-muted);
+}
+
+.progressTrack {
+  width: clamp(160px, 22vw, 260px);
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(238, 236, 231, 0.14);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-blue-light);
+}
+
+/* Phase 2 — logo + wordmark */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.logoMask {
+  overflow: hidden;
+}
+
+.logoInner {
+  display: flex;
+}
+
+.logo {
+  height: clamp(56px, 9vw, 96px);
+  width: auto;
+}
+
+.wordmark {
+  display: inline-flex;
+  font-family: var(--font-heading), serif;
+  font-size: clamp(1.05rem, 1vw + 0.85rem, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+}
+
+.letter {
+  display: inline-block;
+}
