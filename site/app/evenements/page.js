@@ -17,8 +17,8 @@ export const metadata = buildMetadata({
 const EVENT_PHOTOS = [
   {
     src: '/images/evenements/enzo-stand-kenotek-angers.jpg',
-    alt: 'Enzo Soldet sur le stand La Clean Compagny, partenaire Kenotek et Motul',
-    caption: 'Sur le stand, aux couleurs Kenotek & Motul',
+    alt: 'Enzo Soldet sur le stand La Clean Compagny, partenaire Kenotek',
+    caption: 'Sur le stand, aux couleurs Kenotek',
     aspect: '1179 / 1716',
   },
   {
@@ -75,7 +75,7 @@ export default function EvenementsPage() {
               <p className="lead" style={{ marginTop: 18 }}>
                 Au-delà des interventions à domicile, La Clean Compagny participe régulièrement à
                 des rassemblements et expositions automobiles dans la région angevine, aux côtés
-                de marques partenaires comme Kenotek et Motul. L&apos;occasion de présenter les
+                de marques partenaires comme Kenotek. L&apos;occasion de présenter les
                 produits et méthodes utilisés au quotidien, d&apos;échanger avec d&apos;autres
                 passionnés, et de faire découvrir le detailing haut de gamme à un plus large public.
               </p>

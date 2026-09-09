@@ -18,14 +18,18 @@
 /* En dessous de 900px, la grille repasse sur une seule colonne (cf. plus bas) :
    l'image "sticky" y produirait un chevauchement illisible (image figée pendant
    que le texte défile par-dessus). On revient donc à un flux normal, image et
-   texte s'empilant et défilant ensemble. */
+   texte s'empilant et défilant ensemble. `position: relative` (et non `static`)
+   reste nécessaire : l'Image `fill` de next/image se positionne en absolute et a
+   besoin de ce conteneur positionné pour se caler dedans — en `static`, l'image
+   s'échappe de sa boîte et ne laisse derrière elle qu'un cadre vide (bordure +
+   ombre visibles, sans photo dedans). */
 @media (max-width: 900px) {
   .storyGrid {
     grid-template-columns: 1fr;
   }
 
   .storyImage {
-    position: static;
+    position: relative;
     top: auto;
   }
 }

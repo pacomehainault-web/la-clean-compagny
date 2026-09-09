@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import ServiceCard from '@/components/ServiceCard'
@@ -112,7 +113,7 @@ export default function PrestationsPage() {
                 {OPTICS_PRICING.levels.map((level) => (
                   <div className={styles.opticsLevelRow} key={level.id}>
                     <span>{level.label}</span>
-                    <strong>{level.price} €</strong>
+                    <strong>dès {level.price} €</strong>
                   </div>
                 ))}
               </div>
@@ -127,7 +128,7 @@ export default function PrestationsPage() {
                       <tr key={item.id}>
                         <td>{item.name}</td>
                         <td className={styles.carePriceCell}>
-                          {item.priceOnRequest ? 'Sur devis' : `${item.price} €`}
+                          {item.priceOnRequest ? 'Sur devis' : `dès ${item.price} €`}
                         </td>
                       </tr>
                     ))}
@@ -164,25 +165,35 @@ export default function PrestationsPage() {
       <section className="section" id="prestige">
         <div className="container">
           <div className={styles.prestigeBanner}>
-            <span className="eyebrow">{PRESTIGE_SECTION.eyebrow}</span>
-            <h2 style={{ marginTop: 14 }}>{PRESTIGE_SECTION.title}</h2>
-            <p className={styles.prestigeBrands}>{PRESTIGE_SECTION.brands.join(' · ')}</p>
-            <p className="lead" style={{ marginTop: 20, maxWidth: 640, marginInline: 'auto' }}>
-              {PRESTIGE_SECTION.text}
-            </p>
-            <div className={styles.prestigePriceRow}>
-              <span>à partir de</span>
-              <strong>{PRESTIGE_SECTION.fromPrice} €</strong>
+            <div className={styles.prestigeImage}>
+              <Image
+                src="/images/exterieur/ferrari-jaune-lavage-mousse-angers.jpg"
+                alt="Ferrari jaune recouverte de mousse active lors d'un lavage prestige La Clean Compagny"
+                fill
+                sizes="(max-width: 900px) 100vw, 1100px"
+              />
             </div>
-            <p className={styles.prestigeNote}>{PRESTIGE_SECTION.note}</p>
-            <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <Link href="/devis" className="btn btn-cta">
-                Demander mon devis Prestige
-                <IconArrowRight size={18} />
-              </Link>
-              <a href={telLink()} className="btn btn-outline">
-                {CONTACT.phoneDisplay}
-              </a>
+            <div className={styles.prestigeContent}>
+              <span className="eyebrow">{PRESTIGE_SECTION.eyebrow}</span>
+              <h2 style={{ marginTop: 14 }}>{PRESTIGE_SECTION.title}</h2>
+              <p className={styles.prestigeBrands}>{PRESTIGE_SECTION.brands.join(' · ')}</p>
+              <p className="lead" style={{ marginTop: 20, maxWidth: 640, marginInline: 'auto' }}>
+                {PRESTIGE_SECTION.text}
+              </p>
+              <div className={styles.prestigePriceRow}>
+                <span>à partir de</span>
+                <strong>{PRESTIGE_SECTION.fromPrice} €</strong>
+              </div>
+              <p className={styles.prestigeNote}>{PRESTIGE_SECTION.note}</p>
+              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <Link href="/devis" className="btn btn-cta">
+                  Demander mon devis Prestige
+                  <IconArrowRight size={18} />
+                </Link>
+                <a href={telLink()} className="btn btn-outline">
+                  {CONTACT.phoneDisplay}
+                </a>
+              </div>
             </div>
           </div>
         </div>

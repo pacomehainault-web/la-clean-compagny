@@ -11,6 +11,9 @@ export default function BeforeAfterSlider({ before, after, alt }) {
   const [pos, setPos] = useState(50)
   const [motionSupported, setMotionSupported] = useState(false)
   const [motionActive, setMotionActive] = useState(false)
+  // Dès que l'utilisateur touche au curseur, l'animation d'aide (qui montre
+  // qu'il est mobile) n'a plus lieu d'être — cf. .handleGrip / handleHint.
+  const [hasInteracted, setHasInteracted] = useState(false)
 
   useEffect(() => {
     const supported =
@@ -59,47 +62,53 @@ export default function BeforeAfterSlider({ before, after, alt }) {
   }
 
   return (
-    <div className={styles.wrap} style={{ '--pos': `${pos}%` }}>
-      <div className={styles.layer}>
-        <Image src={after} alt={`${alt} — après intervention`} fill sizes="(max-width: 768px) 90vw, 480px" />
-      </div>
-      <div className={`${styles.layer} ${styles.beforeLayer}`}>
-        <Image src={before} alt={`${alt} — avant intervention`} fill sizes="(max-width: 768px) 90vw, 480px" />
-      </div>
-
-      <span className={`${styles.tag} ${styles.tagBefore}`}>Avant</span>
-      <span className={`${styles.tag} ${styles.tagAfter}`}>Après</span>
-
-      <div className={styles.handle}>
-        <div className={styles.handleLine} />
-        <div className={styles.handleGrip}>
-          <IconSlideArrows size={18} />
+    <div className={styles.root}>
+      <div className={styles.wrap} style={{ '--pos': `${pos}%` }}>
+        <div className={styles.layer}>
+          <Image src={after} alt={`${alt} — après intervention`} fill sizes="(max-width: 768px) 90vw, 480px" />
         </div>
+        <div className={`${styles.layer} ${styles.beforeLayer}`}>
+          <Image src={before} alt={`${alt} — avant intervention`} fill sizes="(max-width: 768px) 90vw, 480px" />
+        </div>
+
+        <span className={`${styles.tag} ${styles.tagBefore}`}>Avant</span>
+        <span className={`${styles.tag} ${styles.tagAfter}`}>Après</span>
+
+        <div className={styles.handle}>
+          <div className={styles.handleLine} />
+          <div className={`${styles.handleGrip} ${hasInteracted ? '' : styles.handleGripHint}`}>
+            <IconSlideArrows size={18} />
+          </div>
+        </div>
+
+        <input
+          type="range"
+          className={styles.range}
+          min={0}
+          max={100}
+          value={pos}
+          onChange={(e) => {
+            setMotionActive(false)
+            setHasInteracted(true)
+            setPos(Number(e.target.value))
+          }}
+          onPointerDown={() => setHasInteracted(true)}
+          aria-label={`Curseur de comparaison avant / après — ${alt}`}
+        />
+
+        {motionSupported && (
+          <button
+            type="button"
+            className={`${styles.motionBtn} ${motionActive ? styles.motionBtnActive : ''}`}
+            onClick={toggleMotion}
+          >
+            <IconMotion size={14} />
+            {motionActive ? 'Mouvement actif' : 'Incliner le téléphone'}
+          </button>
+        )}
       </div>
 
-      <input
-        type="range"
-        className={styles.range}
-        min={0}
-        max={100}
-        value={pos}
-        onChange={(e) => {
-          setMotionActive(false)
-          setPos(Number(e.target.value))
-        }}
-        aria-label={`Curseur de comparaison avant / après — ${alt}`}
-      />
-
-      {motionSupported && (
-        <button
-          type="button"
-          className={`${styles.motionBtn} ${motionActive ? styles.motionBtnActive : ''}`}
-          onClick={toggleMotion}
-        >
-          <IconMotion size={14} />
-          {motionActive ? 'Mouvement actif' : 'Incliner le téléphone'}
-        </button>
-      )}
+      <p className={styles.hint}>Faites glisser pour voir le résultat</p>
     </div>
   )
 }

@@ -1,3 +1,16 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hint {
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--color-text-faint);
+}
+
 .wrap {
   position: relative;
   width: 100%;
@@ -81,6 +94,35 @@
   justify-content: center;
   color: var(--color-ink);
   box-shadow: var(--shadow-soft);
+}
+
+/* Indice visuel discret au chargement : le curseur glisse de quelques pixels
+   de part et d'autre du centre puis s'immobilise, pour suggérer qu'il est
+   déplaçable. Se joue une seule fois (2 allers-retours) et s'arrête dès que
+   l'utilisateur touche au curseur (cf. hasInteracted côté JS). */
+.handleGripHint {
+  animation: handleHint 1.8s ease-in-out 1;
+  animation-delay: 0.8s;
+  animation-iteration-count: 2;
+}
+
+@keyframes handleHint {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  25% {
+    transform: translate(calc(-50% - 7px), -50%);
+  }
+  75% {
+    transform: translate(calc(-50% + 7px), -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .handleGripHint {
+    animation: none;
+  }
 }
 
 .motionBtn {

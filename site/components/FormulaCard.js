@@ -5,11 +5,13 @@ import { IconCheck, IconClock } from './Icons'
 export default function FormulaCard({ formula }) {
   return (
     <div className={`${styles.card} ${formula.featured ? styles.featured : ''}`}>
-      {formula.featured && <span className={styles.ribbon}>La plus complète</span>}
+      {formula.featured && <span className={styles.ribbon}>{formula.ribbonLabel || 'La plus complète'}</span>}
       <div className={styles.head}>
         <h3>{formula.name}</h3>
         <span className={styles.tagline}>{formula.tagline}</span>
       </div>
+
+      {formula.promo && <span className={styles.promoBadge}>🎁 {formula.promo}</span>}
 
       <div>
         <div className={styles.priceRow}>

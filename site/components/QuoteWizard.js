@@ -7,20 +7,33 @@ import { VEHICLE_ICONS, IconCheck, IconArrowRight, IconWhatsapp, IconMail, IconU
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { FORMULAS, COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
 import { VEHICLE_TYPE_TO_TIER, MOTO_PRICING, hasPriceGrid, getExactPrice } from '@/lib/data/pricing'
-import { whatsappLink, CONTACT } from '@/lib/constants'
+import { whatsappLink } from '@/lib/constants'
+import { sanitizeField, sanitizeMessage, isValidEmail } from '@/lib/sanitize'
 
-const EMAILJS_SERVICE_ID = 'service_ugnog14'
-const EMAILJS_TEMPLATE_ID = 'template_655hkaq'
-const EMAILJS_PUBLIC_KEY = 'SebLXFPtUd5Uj5qLX'
+// Ces identifiants (service/template/clé publique EmailJS, cloud name/preset
+// Cloudinary) ne sont PAS des secrets — EmailJS et Cloudinary les conçoivent
+// pour vivre dans le bundle client (la vraie protection est côté tableau de
+// bord : origines autorisées sur EmailJS, restrictions du preset d'upload non
+// signé sur Cloudinary — voir README). Ils sont néanmoins lus depuis des
+// variables d'environnement plutôt que codés en dur, pour pouvoir changer de
+// compte par environnement (dev/prod) sans toucher au code. Les valeurs de
+// repli ci-dessous reproduisent la configuration actuelle : le site continue
+// de fonctionner tel quel si les variables ne sont pas encore définies.
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_ugnog14'
+const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_655hkaq'
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'SebLXFPtUd5Uj5qLX'
 
 // ⚠️ Le nom du preset contient des espaces — vérifie qu'il correspond exactement
 // (espaces et majuscules compris) à celui créé dans Cloudinary → Settings → Upload.
-const CLOUDINARY_CLOUD_NAME = 'yn3d3ee9'
-const CLOUDINARY_UPLOAD_PRESET = 'La clean compagny'
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'yn3d3ee9'
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'La clean compagny'
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`
 
 const MIN_PHOTOS = 3
 const MAX_PHOTOS = 5
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024 // 5 Mo par photo, contre la saturation de stockage
+const ALLOWED_PHOTO_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp']
+const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const EXTRA_SERVICES = [...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT]
 
@@ -41,30 +54,29 @@ function getLockingServiceNames(id, activeIds) {
   return EXTRA_SERVICES.filter((s) => activeIds.has(s.id) && s.requires?.includes(id)).map((s) => s.name)
 }
 
-// Prix exact d'une prestation pour un véhicule donné, résolu STRICTEMENT depuis
+// Prix d'une prestation pour un véhicule donné, résolu STRICTEMENT depuis
 // lib/data/pricing.js — même source que le sélecteur de la page d'accueil et la
 // matrice de /prestations, pour ne plus jamais désynchroniser le formulaire.
-// `exact: true` = prix issu de la grille par gabarit (varie selon le véhicule).
-// `exact: false` = prix fixe connu mais non gradué par gabarit (ex. lustrage
-// minute, rénovation optiques : `item.basePrice`, identique quel que soit le
-// véhicule). `price: undefined` = aucun prix connu → "Sur devis".
+// `price: undefined` = aucun prix connu → "Sur devis".
 function resolveItemPrice(item, tierId, isPro) {
-  if (isPro || item.priceOnRequest) return { price: undefined, exact: false }
+  if (isPro || item.priceOnRequest) return { price: undefined }
 
   const refId = item.pricingRef || item.id
   if (hasPriceGrid(refId)) {
-    const exactPrice = getExactPrice(refId, tierId)
-    return { price: exactPrice, exact: exactPrice !== undefined }
+    return { price: getExactPrice(refId, tierId) }
   }
 
-  if (item.basePrice !== undefined) return { price: item.basePrice, exact: false }
-  return { price: undefined, exact: false }
+  if (item.basePrice !== undefined) return { price: item.basePrice }
+  return { price: undefined }
 }
 
+// Règle absolue du site : aucun prix de prestation complémentaire ne doit
+// apparaître comme définitif (le tarif final dépend aussi de l'état du
+// véhicule, pas seulement de son gabarit) — toujours préfixé par "dès".
 function formatItemPrice(item, tierId, isPro) {
-  const { price, exact } = resolveItemPrice(item, tierId, isPro)
+  const { price } = resolveItemPrice(item, tierId, isPro)
   if (price === undefined) return 'Sur devis'
-  return exact ? `${price} €` : `dès ${price} €`
+  return `dès ${price} €`
 }
 
 const STEPS = [
@@ -88,6 +100,49 @@ const MAINTENANCE_FREQUENCY_OPTIONS = [
   { value: 'regulier', label: 'Régulier' },
   { value: 'contrat-annuel', label: 'Contrat annuel' },
 ]
+
+// Lit les premiers octets du fichier et vérifie sa "signature magique" — les
+// quelques octets fixes que chaque format d'image place en tête de fichier.
+// Contrairement à l'extension ou à file.type (déclarés par le client, donc
+// falsifiables), ces octets sont écrits par l'outil qui a produit le fichier :
+// renommer un script malveillant en "photo.jpg" ne les change pas.
+async function matchesImageSignature(file) {
+  const buffer = await file.slice(0, 12).arrayBuffer()
+  const b = new Uint8Array(buffer)
+
+  const isJpeg = b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff
+  const isPng =
+    b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 &&
+    b[4] === 0x0d && b[5] === 0x0a && b[6] === 0x1a && b[7] === 0x0a
+  // WebP : conteneur RIFF (octets 0-3 "RIFF") dont la sous-forme est "WEBP" (octets 8-11).
+  const isWebp =
+    b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+    b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
+
+  return isJpeg || isPng || isWebp
+}
+
+// Validation stricte d'une photo avant qu'elle n'entre dans le formulaire :
+// extension autorisée, type MIME réel déclaré par le navigateur, poids
+// maximum, puis signature binaire — les quatre doivent concorder. Renvoie un
+// message d'erreur, ou null si le fichier est accepté.
+async function validatePhotoFile(file) {
+  const extension = file.name.split('.').pop()?.toLowerCase()
+  if (!extension || !ALLOWED_PHOTO_EXTENSIONS.includes(extension)) {
+    return `« ${file.name} » : format non autorisé (jpg, jpeg, png ou webp uniquement).`
+  }
+  if (!ALLOWED_PHOTO_MIME_TYPES.includes(file.type)) {
+    return `« ${file.name} » : ce fichier n'est pas reconnu comme une image valide.`
+  }
+  if (file.size > MAX_PHOTO_SIZE) {
+    return `« ${file.name} » : fichier trop volumineux (5 Mo maximum par photo).`
+  }
+  const signatureOk = await matchesImageSignature(file)
+  if (!signatureOk) {
+    return `« ${file.name} » : le contenu du fichier ne correspond pas à une image valide.`
+  }
+  return null
+}
 
 // Upload une photo vers Cloudinary et renvoie son secure_url.
 // Logue chaque étape dans la console pour pouvoir déboguer facilement (F12 → Console).
@@ -125,6 +180,10 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
     () => new Set(initialExtraId && EXTRA_SERVICES.some((s) => s.id === initialExtraId) ? [initialExtraId] : [])
   )
   const [contact, setContact] = useState(EMPTY_CONTACT)
+  // Honeypot anti-spam : champ invisible pour un humain (CSS), que seuls les
+  // bots naïfs remplissent automatiquement. S'il contient quoi que ce soit,
+  // on fait semblant d'envoyer sans jamais réellement contacter EmailJS/WhatsApp.
+  const [honeypot, setHoneypot] = useState('')
   const [photos, setPhotos] = useState([])
   const [error, setError] = useState('')
   const [submitError, setSubmitError] = useState('')
@@ -143,12 +202,24 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   const formula = FORMULAS.find((f) => f.id === formulaId)
   const extras = EXTRA_SERVICES.filter((s) => extraIds.has(s.id))
   const selectedServices = [formula, ...extras].filter(Boolean)
-  const lockedExtraIds = useMemo(() => getRequiredIds(extraIds), [extraIds])
+  // Prestations offertes par la formule active (ex. lavage extérieur avec
+  // Sortie de Concession) : verrouillées à l'état coché, et jamais facturées
+  // en plus — cf. FORMULAS[...].includedExtraIds dans lib/data/services.js.
+  const formulaIncludedIds = useMemo(() => new Set(formula?.includedExtraIds || []), [formula])
+  const lockedExtraIds = useMemo(() => {
+    const combined = getRequiredIds(extraIds)
+    formulaIncludedIds.forEach((id) => combined.add(id))
+    return combined
+  }, [extraIds, formulaIncludedIds])
 
   // Total EXACT (plus d'estimation à la louche par multiplicateur) : chaque
   // prestation sélectionnée est résolue individuellement via resolveItemPrice,
-  // qui interroge la même grille tarifaire que la page d'accueil.
-  const pricedLines = selectedServices.map((s) => resolveItemPrice(s, tierId, isPro))
+  // qui interroge la même grille tarifaire que la page d'accueil. Les
+  // prestations offertes par la formule (formulaIncludedIds) ne sont jamais
+  // ajoutées au total : leur coût est déjà dans le prix de la formule.
+  const pricedLines = selectedServices.map((s) =>
+    formulaIncludedIds.has(s.id) ? { price: 0 } : resolveItemPrice(s, tierId, isPro)
+  )
   const knownPriceLines = pricedLines.filter((l) => l.price !== undefined)
   const hasQuoteOnlyServices = pricedLines.some((l) => l.price === undefined)
   const total = knownPriceLines.reduce((sum, l) => sum + l.price, 0)
@@ -157,7 +228,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   const formulaLabel = formula ? formula.name : 'Aucune formule sélectionnée'
   const extrasLabel = extras.length ? extras.map((s) => s.name).join(', ') : 'Aucune'
   const estimationLabel = knownPriceLines.length
-    ? `${total} €${hasQuoteOnlyServices ? ' + prestations sur devis' : ''}`
+    ? `à partir de ${total} €${hasQuoteOnlyServices ? ' + prestations sur devis' : ''}`
     : isMoto
       ? `à partir de ${MOTO_PRICING.fromPrice} €`
       : hasQuoteOnlyServices || selectedServices.length
@@ -206,13 +277,30 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  function handlePhotosChange(e) {
+  async function handlePhotosChange(e) {
     const picked = Array.from(e.target.files || [])
     e.target.value = '' // permet de resélectionner le(s) même(s) fichier(s) ensuite
     if (!picked.length) return
 
     setError('')
-    setPhotos((prev) => [...prev, ...picked].slice(0, MAX_PHOTOS))
+
+    // Chaque fichier est validé (extension, MIME réel, poids, signature binaire)
+    // avant d'entrer dans le formulaire — les fichiers rejetés ne sont jamais
+    // ajoutés à `photos` et ne partiront donc jamais vers Cloudinary.
+    const accepted = []
+    const rejectionReasons = []
+    for (const file of picked) {
+      const reason = await validatePhotoFile(file)
+      if (reason) rejectionReasons.push(reason)
+      else accepted.push(file)
+    }
+
+    if (rejectionReasons.length) {
+      setError(rejectionReasons.join(' '))
+    }
+    if (accepted.length) {
+      setPhotos((prev) => [...prev, ...accepted].slice(0, MAX_PHOTOS))
+    }
   }
 
   function removePhoto(index) {
@@ -225,6 +313,22 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
     (o) => o.value === contact.maintenanceFrequency
   )?.label
 
+  // Version nettoyée des coordonnées (balises/scripts et caractères de contrôle
+  // retirés), utilisée pour TOUT ce qui part réellement du formulaire (récapitulatif,
+  // EmailJS, WhatsApp). Les champs de saisie eux-mêmes restent liés à `contact`
+  // (brut) pour ne jamais perturber l'utilisateur pendant qu'il tape.
+  const sanitizedContact = useMemo(
+    () => ({
+      name: sanitizeField(contact.name),
+      phone: sanitizeField(contact.phone, 40),
+      email: sanitizeField(contact.email, 254),
+      date: sanitizeField(contact.date, 20),
+      message: sanitizeMessage(contact.message),
+      fleetSize: sanitizeField(contact.fleetSize, 10),
+    }),
+    [contact]
+  )
+
   const recap = useMemo(() => {
     const lines = [
       isPro ? 'Nouvelle demande de devis flotte — La Clean Compagny' : 'Nouvelle demande de devis — La Clean Compagny',
@@ -234,27 +338,32 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
       `Prestations complémentaires : ${extrasLabel}`,
       isPro ? null : `Estimation indicative : ${estimationLabel}`,
       `Photos jointes : ${photos.length}`,
-      isPro && contact.fleetSize ? `Taille de la flotte : ${contact.fleetSize} véhicule(s)` : null,
+      isPro && sanitizedContact.fleetSize ? `Taille de la flotte : ${sanitizedContact.fleetSize} véhicule(s)` : null,
       isPro && maintenanceFrequencyLabel ? `Fréquence d'entretien souhaitée : ${maintenanceFrequencyLabel}` : null,
       '',
       'Coordonnées :',
-      `Nom : ${contact.name || '—'}`,
-      contact.phone ? `Téléphone : ${contact.phone}` : null,
-      contact.email ? `Email : ${contact.email}` : null,
-      contact.date ? `Date souhaitée : ${contact.date}` : null,
-      contact.message ? `Message : ${contact.message}` : null,
+      `Nom : ${sanitizedContact.name || '—'}`,
+      sanitizedContact.phone ? `Téléphone : ${sanitizedContact.phone}` : null,
+      sanitizedContact.email ? `Email : ${sanitizedContact.email}` : null,
+      sanitizedContact.date ? `Date souhaitée : ${sanitizedContact.date}` : null,
+      sanitizedContact.message ? `Message : ${sanitizedContact.message}` : null,
     ]
     return lines.filter((l) => l !== null).join('\n')
-  }, [isPro, vehicleLabel, formulaLabel, extrasLabel, estimationLabel, photos.length, contact, maintenanceFrequencyLabel])
+  }, [isPro, vehicleLabel, formulaLabel, extrasLabel, estimationLabel, photos.length, sanitizedContact, maintenanceFrequencyLabel])
 
   // Validation partagée entre l'envoi par email et l'envoi par WhatsApp : coordonnées
-  // complètes (dont l'email, obligatoire) et un nombre de photos compris entre
-  // MIN_PHOTOS et MAX_PHOTOS. Renvoie un message d'erreur, ou null si tout est valide.
+  // complètes (dont l'email, obligatoire et de format valide) et un nombre de photos
+  // compris entre MIN_PHOTOS et MAX_PHOTOS. Renvoie un message d'erreur, ou null si
+  // tout est valide. S'appuie sur sanitizedContact : un champ rempli uniquement de
+  // balises/caractères de contrôle est donc traité comme vide, pas comme valide.
   function validateContactAndPhotos() {
-    if (!contact.name || !contact.phone || !contact.email) {
+    if (!sanitizedContact.name || !sanitizedContact.phone || !sanitizedContact.email) {
       return 'Merci de renseigner votre nom, votre téléphone et votre email.'
     }
-    if (isPro && (!contact.fleetSize || !contact.maintenanceFrequency)) {
+    if (!isValidEmail(sanitizedContact.email)) {
+      return 'Merci de renseigner une adresse email valide.'
+    }
+    if (isPro && (!sanitizedContact.fleetSize || !contact.maintenanceFrequency)) {
       return 'Merci de renseigner la taille de votre flotte et la fréquence d’entretien souhaitée.'
     }
     if (photos.length < MIN_PHOTOS) {
@@ -267,6 +376,12 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
   }
 
   function handleWhatsapp() {
+    // Bot piégé par le honeypot : on fait semblant que tout s'est bien passé,
+    // sans jamais ouvrir WhatsApp ni révéler que la soumission a été bloquée.
+    if (honeypot) {
+      setError('')
+      return
+    }
     const validationError = validateContactAndPhotos()
     if (validationError) {
       setError(validationError)
@@ -278,6 +393,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
   function resetWizard() {
     setContact(EMPTY_CONTACT)
+    setHoneypot('')
     setVehicleId('')
     setFormulaId('')
     setExtraIds(new Set())
@@ -289,6 +405,14 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
   const envoyerEmail = async (e) => {
     e.preventDefault()
+
+    // Bot piégé par le honeypot : on affiche un faux succès sans jamais
+    // appeler Cloudinary ni EmailJS, pour ne pas gaspiller de quota/vider la
+    // boîte mail — et sans indice qui permettrait au bot d'ajuster son script.
+    if (honeypot) {
+      setEmailStatus('sent')
+      return
+    }
 
     const validationError = validateContactAndPhotos()
     if (validationError) {
@@ -325,15 +449,15 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
       prestations_complementaires: extrasLabel,
       estimation_prix: estimationLabel,
       recapitulatif_complet: recapAvecPhotos,
-      nom_complet: contact.name,
-      telephone: contact.phone,
-      email: contact.email,
-      date_souhaitee: contact.date,
-      message: contact.message,
+      nom_complet: sanitizedContact.name,
+      telephone: sanitizedContact.phone,
+      email: sanitizedContact.email,
+      date_souhaitee: sanitizedContact.date,
+      message: sanitizedContact.message,
       nombre_photos: String(photoUrls.length),
       // Repli garanti : liste de liens texte (fonctionne dans un simple bloc Texte).
       photos_liens: photosLiens,
-      taille_flotte: isPro ? contact.fleetSize : '',
+      taille_flotte: isPro ? sanitizedContact.fleetSize : '',
       frequence_entretien: isPro ? maintenanceFrequencyLabel || '' : '',
     }
     // Variables individuelles pour lier chaque photo à un bloc "Image" du Design Editor.
@@ -453,8 +577,22 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                         key={f.id}
                         className={`${styles.optionCard} ${active ? styles.optionCardActive : ''}`}
                         onClick={() => {
-                          setFormulaId(active ? '' : f.id)
+                          const nextId = active ? '' : f.id
+                          setFormulaId(nextId)
                           setError('')
+                          // Coche automatiquement les prestations offertes par
+                          // cette formule (ex. lavage extérieur avec Sortie de
+                          // Concession) — jamais décochées automatiquement en
+                          // changeant de formule, l'utilisateur reste libre de
+                          // les retirer lui-même une fois déverrouillées.
+                          const nextIncluded = FORMULAS.find((form) => form.id === nextId)?.includedExtraIds
+                          if (nextIncluded?.length) {
+                            setExtraIds((prev) => {
+                              const next = new Set(prev)
+                              nextIncluded.forEach((extraId) => next.add(extraId))
+                              return next
+                            })
+                          }
                         }}
                         role="radio"
                         aria-checked={active}
@@ -469,6 +607,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                             <span className={styles.optionPrice}>{formatItemPrice(f, tierId, isPro)}</span>
                           </div>
                           <p className={styles.optionDesc}>{f.tagline}</p>
+                          {f.promo && <span className={styles.optionPromo}>🎁 {f.promo}</span>}
                         </div>
                       </div>
                     )
@@ -480,7 +619,10 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                   {EXTRA_SERVICES.map((s) => {
                     const active = extraIds.has(s.id)
                     const locked = active && lockedExtraIds.has(s.id)
-                    const lockingNames = locked ? getLockingServiceNames(s.id, extraIds) : []
+                    const includedByFormula = formulaIncludedIds.has(s.id)
+                    const lockingNames = locked
+                      ? [...getLockingServiceNames(s.id, extraIds), ...(includedByFormula ? [formula.name] : [])]
+                      : []
                     return (
                       <div
                         key={s.id}
@@ -501,7 +643,9 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                         <div className={styles.optionBody}>
                           <div className={styles.optionName}>
                             <span>{s.name}</span>
-                            <span className={styles.optionPrice}>{formatItemPrice(s, tierId, isPro)}</span>
+                            <span className={styles.optionPrice}>
+                              {includedByFormula ? '🎁 Offert' : formatItemPrice(s, tierId, isPro)}
+                            </span>
                           </div>
                           <p className={styles.optionDesc}>{s.description}</p>
                           {locked && (
@@ -531,6 +675,23 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                     : 'Nous vous recontactons rapidement pour confirmer votre devis définitif.'}
                 </p>
                 <div className={styles.form}>
+                  {/* Honeypot anti-spam : invisible pour un humain, souvent rempli par les
+                      bots naïfs qui remplissent tous les champs d'un formulaire. */}
+                  <div
+                    aria-hidden="true"
+                    style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}
+                  >
+                    <label htmlFor="societe">Société</label>
+                    <input
+                      id="societe"
+                      name="societe"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
                   <div className={styles.field}>
                     <label htmlFor="name">Nom &amp; prénom *</label>
                     <input
@@ -632,7 +793,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
                 <div className={styles.photoField}>
                   <p style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                    Photos de votre véhicule * ({MIN_PHOTOS} à {MAX_PHOTOS} photos)
+                    Photos de votre véhicule * ({MIN_PHOTOS} à {MAX_PHOTOS} photos, jpg/png/webp, 5 Mo max chacune)
                   </p>
 
                   <label
@@ -647,7 +808,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
                   <input
                     id="photos"
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     multiple
                     onChange={handlePhotosChange}
                     disabled={photos.length >= MAX_PHOTOS}
@@ -755,7 +916,7 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
 
             {!isPro && (selectedServices.length > 0 || isMoto) && (
               <div className={styles.summaryRow}>
-                <span>{knownPriceLines.length ? 'Total' : 'Estimation'}</span>
+                <span>Estimation</span>
                 <strong>{estimationLabel}</strong>
               </div>
             )}

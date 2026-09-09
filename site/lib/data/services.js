@@ -7,7 +7,7 @@ export const FORMULAS = [
     basePrice: 109,
     duration: '2h à 3h',
     description:
-      "L'entretien qu'il faut pour retrouver un habitacle sain et net, sans attendre le grand nettoyage. Idéal en entretien régulier.",
+      "L'entretien régulier idéal. Une remise au propre de votre habitacle comprenant l'aspiration complète, le dépoussiérage des plastiques, le nettoyage des tapis, des vitres intérieures et du coffre. Parfait pour rafraîchir votre véhicule.",
     includes: [
       'Aspiration complète habitacle et coffre',
       'Dépoussiérage tableau de bord, contre-portes et plastiques',
@@ -24,16 +24,24 @@ export const FORMULAS = [
     basePrice: 179,
     duration: '4h à 6h',
     description:
-      "Le véhicule ressort comme au premier jour : un nettoyage en profondeur, poste par poste, pour un rendu digne d'une sortie de concession.",
+      "Notre prestation signature pour retrouver un intérieur comme neuf. Inclut tout le contenu du « Coup de Propre », avec en supplément : le nettoyage en profondeur et le dressing UV de tous les plastiques, le shampouinage des tapis, le nettoyage minutieux des moindres détails (rails de sièges, aérateurs, contre-portes, recoins difficiles d'accès) et un contrôle qualité rigoureux. Le summum de la propreté.",
+    // Mis en avant sur tout le site (accueil, pages villes, devis) pour pousser
+    // les demandes de devis sur cette formule : nettoyage extérieur offert +
+    // badge "Recommandé".
+    promo: 'Nettoyage extérieur offert',
+    ribbonLabel: '⭐ Recommandé',
+    // Le lavage extérieur (offert) est automatiquement coché et verrouillé dans
+    // le configurateur de devis dès que cette formule est choisie — cf.
+    // QuoteWizard, qui lit ce champ pour ne jamais le facturer en plus.
+    includedExtraIds: ['lavage-exterieur'],
     includes: [
-      'Aspiration complète et dépoussiérage intégral',
-      'Shampouinage sièges, moquettes et coffre',
-      'Nettoyage en profondeur de tous les plastiques',
+      'Tout le contenu de la formule Coup de Propre',
+      'Nettoyage en profondeur et dressing UV de tous les plastiques',
+      'Shampouinage des tapis et moquettes',
+      'Nettoyage minutieux des recoins difficiles d’accès (rails de sièges, aérateurs, contre-portes)',
       'Dressing cuir ou tissu selon sellerie',
-      'Nettoyage vitres intérieures et extérieures',
-      'Nettoyage jantes et passages de roue',
-      'Désodorisation professionnelle',
-      'Finitions et contrôle qualité',
+      'Contrôle qualité rigoureux',
+      'Nettoyage extérieur complet OFFERT (prélavage, lavage, jantes, vitres, séchage)',
     ],
     featured: true,
   },

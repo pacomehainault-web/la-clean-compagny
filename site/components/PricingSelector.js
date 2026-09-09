@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import styles from './PricingSelector.module.css'
 import { IconArrowRight } from './Icons'
-import { VEHICLE_TIERS, FORMULAS_PRICING, MOTO_PRICING } from '@/lib/data/pricing'
+import { VEHICLE_TIERS, FORMULAS_PRICING, MOTO_PRICING, getExactPrice } from '@/lib/data/pricing'
 
 // Palier affiché par défaut : Citadine — correspond aux prix "à partir de 109 € /
 // 179 €" demandés comme affichage initial de la page d'accueil.
@@ -88,23 +88,36 @@ export default function PricingSelector() {
         </div>
       ) : (
         <div className={styles.cards}>
-          {FORMULAS_PRICING.map((formula) => (
-            <div className={styles.card} key={formula.id}>
-              <h3>{formula.name}</h3>
-              <div className={styles.price}>
-                <span className={styles.priceFrom}>à partir de</span>
-                <span className={styles.priceValue}>{formula.prices[tierId]} €</span>
+          {FORMULAS_PRICING.map((formula) => {
+            // Valeur du nettoyage extérieur offert avec cette formule, pour ce
+            // gabarit précis — recalculée à chaque changement d'onglet à partir
+            // de la même grille que /prestations (aucun montant en dur).
+            const exteriorValue = formula.promo ? getExactPrice('lavage-exterieur', tierId) : undefined
+            return (
+              <div className={`${styles.card} ${formula.promo ? styles.cardPromo : ''}`} key={formula.id}>
+                {formula.ribbonLabel && <span className={styles.ribbon}>{formula.ribbonLabel}</span>}
+                {formula.promo && (
+                  <span className={styles.promoBadge}>
+                    🎁 {formula.promo}
+                    {exteriorValue !== undefined ? ` (−${exteriorValue} €)` : ''}
+                  </span>
+                )}
+                <h3>{formula.name}</h3>
+                <div className={styles.price}>
+                  <span className={styles.priceFrom}>à partir de</span>
+                  <span className={styles.priceValue}>{formula.prices[tierId]} €</span>
+                </div>
+                <p className={styles.tagline}>{formula.tagline}</p>
+                <Link
+                  href={`/devis?formule=${formula.id}&vehicule=${TIER_TO_VEHICLE_ID[tierId]}`}
+                  className="btn btn-cta btn-block"
+                >
+                  Choisir ma formule
+                  <IconArrowRight size={16} />
+                </Link>
               </div>
-              <p className={styles.tagline}>{formula.tagline}</p>
-              <Link
-                href={`/devis?formule=${formula.id}&vehicule=${TIER_TO_VEHICLE_ID[tierId]}`}
-                className="btn btn-cta btn-block"
-              >
-                Choisir ma formule
-                <IconArrowRight size={16} />
-              </Link>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

@@ -25,10 +25,11 @@ export default function PricingMatrixTable({ services }) {
                 <div className={styles.serviceName}>{s.name}</div>
                 {s.tagline && <div className={styles.serviceTagline}>{s.tagline}</div>}
                 {s.includes && <div className={styles.serviceIncludes}>{s.includes.join(' · ')}</div>}
+                {s.promo && <span className={styles.servicePromo}>🎁 {s.promo}</span>}
               </td>
               {PRICED_TIER_IDS.map((tierId) => (
                 <td key={tierId} className={styles.priceCell}>
-                  {s.prices[tierId]} €
+                  <span className={styles.priceCellFrom}>dès</span> {s.prices[tierId]} €
                 </td>
               ))}
             </tr>

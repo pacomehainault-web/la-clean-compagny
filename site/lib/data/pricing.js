@@ -27,6 +27,11 @@ export const FORMULAS_PRICING = [
     id: 'sortie-concession',
     name: 'Sortie de Concession',
     tagline: 'Une remise en état complète pour retrouver un véhicule comme neuf.',
+    // Mis en avant sur l'accueil et /prestations : nettoyage extérieur inclus
+    // gratuitement, quel que soit le gabarit (cf. lib/data/services.js pour le
+    // détail complet de la formule).
+    promo: 'Nettoyage extérieur offert',
+    ribbonLabel: '⭐ Recommandé',
     prices: { citadine: 179, 'compacte-berline': 199, 'suv-break': 219, 'grand-suv': 239 },
   },
 ]
@@ -150,7 +155,7 @@ export const PASS_6_MOIS = {
   id: 'pass-6-mois',
   eyebrow: '🔵',
   badge: '6 mois',
-  name: 'Pass Entretien 6 mois',
+  name: 'Pass Semestriel',
   subtitle: 'Votre véhicule suivi pendant 1 an',
   frequency: '2 passages sur 12 mois',
   description:
@@ -174,7 +179,7 @@ export const PASS_3_MOIS = {
   id: 'pass-3-mois',
   eyebrow: '🔷',
   badge: '3 mois',
-  name: 'Pass Entretien 3 mois',
+  name: 'Pass Trimestriel',
   subtitle: 'Le suivi régulier de votre véhicule',
   frequency: '4 passages sur 12 mois (1 passage tous les 3 mois)',
   description:

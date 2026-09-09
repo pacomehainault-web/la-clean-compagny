@@ -40,8 +40,8 @@ const FLEET_VEHICLES = VEHICLE_TYPES.filter((v) => FLEET_VEHICLE_IDS.includes(v.
 
 const FLEET_CARS_PHOTOS = [
   {
-    src: '/images/exterieur/bmw-m3-lavage-exterieur-angers.jpg',
-    alt: 'BMW M3 de flotte — lavage extérieur à Angers',
+    src: '/images/interieur/bmw-m4-nettoyage-interieur-angers.jpg',
+    alt: 'BMW M4 de flotte — nettoyage intérieur à Angers',
     caption: 'Berlines de fonction',
   },
   {

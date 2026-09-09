@@ -61,12 +61,34 @@
   line-height: 1.5;
 }
 
+.servicePromo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-cta);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 .priceCell {
   font-family: var(--font-heading), serif;
   font-weight: 700;
   font-size: 1.05rem;
   white-space: nowrap;
   text-align: center;
+}
+
+.priceCellFrom {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .table tbody tr:last-child td {
