@@ -3,17 +3,21 @@
   margin-bottom: 40px;
 }
 
+/* ---------- Bascule ordinateur / mobile ---------- */
+.desktopOnly { display: block; }
+.mobileOnly { display: none; }
+
+@media (max-width: 799px) {
+  .desktopOnly { display: none; }
+  .mobileOnly { display: block; }
+}
+
+/* ---------- Ordinateur ---------- */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 26px;
-  align-items: start;
-}
-
-@media (max-width: 800px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  align-items: stretch;
 }
 
 .card {
@@ -33,36 +37,22 @@
   box-shadow: 0 14px 34px -14px rgba(10, 108, 255, 0.28), var(--shadow-soft);
 }
 
+.card h3 {
+  font-size: 1.4rem;
+}
+
 .badge {
   align-self: flex-start;
   padding: 5px 14px;
   border-radius: var(--radius-pill);
   background: var(--color-brand-blue-soft);
   color: var(--color-blue-dark);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
-.card h3 {
-  font-size: 1.4rem;
-}
-
-.tagline {
-  color: var(--color-text-muted);
-  font-size: 0.92rem;
-  margin-top: -8px;
-}
-
-.frequency {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 5px 12px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  font-size: 0.8rem;
+.summary {
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text);
 }
@@ -71,6 +61,61 @@
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.6;
+}
+
+/* Calendrier des 12 mois : on voit d'un coup d'œil à quels mois tombent les passages. */
+.calendarWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 5px;
+}
+
+@media (max-width: 799px) {
+  .calendar {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.month {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text-faint);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.monthPassage {
+  background: var(--color-brand-blue);
+  border-color: var(--color-brand-blue);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 10px -4px rgba(10, 108, 255, 0.5);
+}
+
+.calendarLegend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--color-text-faint);
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--color-brand-blue);
+  flex: none;
 }
 
 .includesBlock {
@@ -87,44 +132,10 @@
   color: var(--color-text-faint);
 }
 
-.tierPrices {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
-}
-
-.tierPricesTitle {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-text-faint);
-  margin-bottom: 4px;
-}
-
-.tierPriceRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 0.88rem;
-  padding-block: 2px;
-  border-top: 1px solid var(--color-border);
-}
-
-.tierPriceRow:first-of-type {
-  border-top: none;
-}
-
-.tierPriceRow strong {
-  white-space: nowrap;
-}
-
 .includes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .includes li {
@@ -147,6 +158,180 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Comparatif des prix : une seule grille, lisible d'un coup d'œil. */
+.compare {
+  margin-top: 40px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.compareTitle {
+  font-size: 1.15rem;
+  margin-bottom: 16px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.compareTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.compareTable th,
+.compareTable td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.compareTable thead th {
+  font-size: 0.9rem;
+  vertical-align: bottom;
+}
+
+.compareTable td {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.compareTable tbody th {
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.compareTable tbody tr:last-child th,
+.compareTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.thSub {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-text-faint);
+}
+
+.onQuote {
+  text-align: right;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.compareNote {
+  margin-top: 16px;
+  font-size: 0.84rem;
+  color: var(--color-text-faint);
+}
+
+/* ---------- Mobile ---------- */
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.segment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.segment strong {
+  font-size: 0.95rem;
+}
+
+.segment span {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.segment[aria-pressed="true"] {
+  border-color: var(--color-brand-blue);
+  background: var(--color-brand-blue-soft);
+}
+
+.segment[aria-pressed="true"] strong {
+  color: var(--color-blue-dark);
+}
+
+.mobilePanel {
+  margin-top: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fieldLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-bottom: -8px;
+}
+
+/* 16px minimum : évite le zoom automatique sur iOS. */
+.select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.bigPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bigPrice strong {
+  font-family: var(--font-heading), sans-serif;
+  font-size: 2.2rem;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.bigPrice span {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.priceNote {
+  margin-top: -8px;
+  font-size: 0.84rem;
+  color: var(--color-text-faint);
+}
+
+.mobilePanel .includes {
+  gap: 9px;
 }
 
 .b2bNote {

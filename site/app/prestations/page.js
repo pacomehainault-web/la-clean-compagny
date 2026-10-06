@@ -25,7 +25,7 @@ import styles from './page.module.css'
 export const metadata = buildMetadata({
   title: 'Prestations & tarifs — Detailing automobile à Angers',
   description:
-    "Grille tarifaire complète par gabarit : Coup de Propre, Sortie de Concession, lavage, décontamination, lustrage, correction, rénovation optiques et Pass Entretien. Tarifs transparents, à partir de.",
+    "Grille tarifaire complète par gabarit : Coup de Propre, Sortie de Concession, lavage, décontamination, lustrage, correction, rénovation optiques et abonnements d’entretien. Tarifs transparents, à partir de.",
   path: '/prestations',
 })
 

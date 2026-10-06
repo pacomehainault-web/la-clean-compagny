@@ -142,26 +142,29 @@ export const PASS_TIERS = [
 ]
 
 const PASS_INCLUDES = [
-  'Remise au meilleur niveau esthétique comprise',
-  'Pas de supplément lié à l’état courant du véhicule',
-  'Suivi personnalisé du véhicule pendant 1 an',
-  'Historique des interventions',
-  'Photos et suivi de l’évolution du véhicule',
-  'Priorité de réservation',
+  'Remise au meilleur niveau esthétique incluse',
+  'Aucun supplément lié à l’état du véhicule',
+  'Historique de chaque intervention',
+  'Photos de l’évolution de votre véhicule',
+  'Suivi personnalisé pendant 12 mois',
+  'Réservation prioritaire',
   '-10 % sur les prestations complémentaires',
 ]
 
+// Chaque Pass est décrit par son rythme (passagesPerYear / everyMonths) : la
+// frise de 12 mois de l'interface se calcule directement à partir de ces deux
+// valeurs, pour que le texte et le dessin ne puissent jamais se contredire.
 export const PASS_6_MOIS = {
   id: 'pass-6-mois',
-  eyebrow: '🔵',
-  badge: '6 mois',
-  name: 'Pass Semestriel',
-  subtitle: 'Votre véhicule suivi pendant 1 an',
-  frequency: '2 passages sur 12 mois',
+  name: 'Entretien 2 fois par an',
+  segmentLabel: 'Tous les 6 mois',
+  passagesPerYear: 2,
+  everyMonths: 6,
+  summary: 'Votre véhicule nettoyé à intervalles réguliers, pendant 12 mois.',
   description:
-    'Une formule idéale pour conserver son véhicule propre et soigné toute l’année avec un suivi régulier par La Clean Compagny.',
-  includes: ['2 passages sur 12 mois', '1 passage tous les 6 mois', ...PASS_INCLUDES],
-  pricesLabel: 'Tarifs — contrat 12 mois (Pass 6 mois)',
+    'Votre véhicule est entretenu par nos soins 2 fois par an, à 6 mois d’intervalle, pendant 12 mois. Un rythme simple pour le garder propre toute l’année.',
+  includes: PASS_INCLUDES,
+  pricesLabel: 'Prix selon votre véhicule (contrat de 12 mois)',
   period: 'an',
   prices: {
     citadine: 299,
@@ -177,15 +180,15 @@ export const PASS_6_MOIS = {
 
 export const PASS_3_MOIS = {
   id: 'pass-3-mois',
-  eyebrow: '🔷',
-  badge: '3 mois',
-  name: 'Pass Trimestriel',
-  subtitle: 'Le suivi régulier de votre véhicule',
-  frequency: '4 passages sur 12 mois (1 passage tous les 3 mois)',
+  name: 'Entretien 4 fois par an',
+  segmentLabel: 'Tous les 3 mois',
+  passagesPerYear: 4,
+  everyMonths: 3,
+  summary: 'Votre véhicule nettoyé à intervalles réguliers, pendant 12 mois.',
   description:
-    'La formule idéale pour les clients qui souhaitent maintenir leur véhicule dans un excellent état toute l’année.',
-  includes: ['4 passages sur 12 mois', '1 passage tous les 3 mois', ...PASS_INCLUDES],
-  pricesLabel: 'Tarifs — contrat 12 mois (Pass 3 mois)',
+    'Votre véhicule est entretenu par nos soins 4 fois par an, tous les 3 mois, pendant 12 mois. Pour un véhicule qui reste impeccable en permanence.',
+  includes: PASS_INCLUDES,
+  pricesLabel: 'Prix selon votre véhicule (contrat de 12 mois)',
   period: 'an',
   prices: {
     citadine: 499,
@@ -215,7 +218,7 @@ export const PRICING_TERMS = [
   "Les prestations sont réalisées sur rendez-vous.",
   "Le véhicule doit être accessible et présenté dans des conditions permettant la réalisation de la prestation.",
   "Toute prestation ou demande supplémentaire non prévue dans la formule initiale fera l'objet d'une information et d'une validation préalable du client.",
-  "Les Pass Entretien (6 mois et 3 mois) sont souscrits pour une durée de 12 mois. Ils ne sont pas cumulables avec d'autres offres, ne sont pas cessibles et sont utilisables uniquement pour le véhicule concerné.",
+  "Les formules « Entretien 2 fois par an » et « Entretien 4 fois par an » sont souscrites pour une durée de 12 mois. Ils ne sont pas cumulables avec d'autres offres, ne sont pas cessibles et sont utilisables uniquement pour le véhicule concerné.",
 ]
 
 export function getTierPrice(service, tierId) {
