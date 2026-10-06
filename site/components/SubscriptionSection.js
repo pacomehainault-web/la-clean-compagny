@@ -10,33 +10,16 @@ import { whatsappLink } from '@/lib/constants'
 const PASSES = [PASS_6_MOIS, PASS_3_MOIS]
 const PRESTIGE_ID = 'prestige'
 
-// Calendrier des 12 mois de contrat : chaque case est un mois, les cases des
-// passages sont marquées. Calculé à partir de passagesPerYear / everyMonths,
-// donc il reste toujours cohérent avec le texte affiché au-dessus.
-function PassTimeline({ pass }) {
-  const passageMonths = new Set(
-    Array.from({ length: pass.passagesPerYear }, (_, k) => (k + 1) * pass.everyMonths)
-  )
-
+// Rythme en un coup d'œil : le nombre de passages en grand, puis la fréquence.
+// Les deux viennent du même objet que le texte, donc ils ne peuvent pas diverger.
+function PassRhythm({ pass }) {
   return (
-    <div className={styles.calendarWrap}>
-      <div
-        className={styles.calendar}
-        role="img"
-        aria-label={`${pass.passagesPerYear} passages sur 12 mois, un tous les ${pass.everyMonths} mois`}
-      >
-        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
-          const isPassage = passageMonths.has(month)
-          return (
-            <span key={month} className={`${styles.month} ${isPassage ? styles.monthPassage : ''}`}>
-              {month}
-            </span>
-          )
-        })}
+    <div className={styles.rhythm}>
+      <span className={styles.rhythmNumber}>{pass.passagesPerYear}</span>
+      <div className={styles.rhythmText}>
+        <strong>passages par an</strong>
+        <span>un passage tous les {pass.everyMonths} mois</span>
       </div>
-      <p className={styles.calendarLegend} aria-hidden="true">
-        <span className={styles.legendSwatch} /> Passage · mois 1 à 12 du contrat
-      </p>
     </div>
   )
 }
@@ -88,10 +71,9 @@ export default function SubscriptionSection() {
 
               return (
                 <article className={`${styles.card} ${featured ? styles.cardFeatured : ''}`} key={pass.id}>
-                  <span className={styles.badge}>{pass.passagesPerYear} passages par an</span>
                   <h3>{pass.name}</h3>
                   <p className={styles.summary}>{pass.summary}</p>
-                  <PassTimeline pass={pass} />
+                  <PassRhythm pass={pass} />
                   <p className={styles.description}>{pass.description}</p>
 
                   <div className={styles.includesBlock}>
@@ -174,7 +156,7 @@ export default function SubscriptionSection() {
 
           <div className={styles.mobilePanel}>
             <p className={styles.summary}>{mobilePass.summary}</p>
-            <PassTimeline pass={mobilePass} />
+            <PassRhythm pass={mobilePass} />
 
             <label htmlFor="pass-vehicle" className={styles.fieldLabel}>Votre véhicule</label>
             <select
