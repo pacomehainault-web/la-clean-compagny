@@ -6,6 +6,7 @@ import PricingMatrixTable from '@/components/PricingMatrixTable'
 import SubscriptionSection from '@/components/SubscriptionSection'
 import { IconArrowRight, IconCheck } from '@/components/Icons'
 import { OZONE_TREATMENT, ALL_SERVICES } from '@/lib/data/services'
+import { SERVICE_PAGES } from '@/lib/data/servicePages'
 import {
   FORMULAS_PRICING,
   EXTERIOR_PRICING,
@@ -42,6 +43,27 @@ export default function PrestationsPage() {
         lead="Nos tarifs dépendent du gabarit de votre véhicule et de son état initial. Voici l'intégralité de notre grille, prestation par prestation."
         breadcrumb={[{ label: 'Prestations' }]}
       />
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Le détail, prestation par prestation</span>
+            <h2>Une page dédiée pour chaque prestation</h2>
+          </div>
+          <div className={styles.serviceGrid}>
+            {SERVICE_PAGES.map((s) => (
+              <Link href={`/prestations/${s.slug}`} className={`card ${styles.hubCard}`} key={s.slug}>
+                <span className={styles.hubCardName}>{s.name}</span>
+                <span className={styles.hubCardPrice}>{s.priceLine}</span>
+                <span className={styles.hubCardLink}>
+                  Voir le détail de la prestation {s.name.toLowerCase()}
+                  <IconArrowRight size={14} />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="section">
         <div className="container">

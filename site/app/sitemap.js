@@ -1,10 +1,12 @@
 import { SITE } from '@/lib/constants'
 import { CITIES } from '@/lib/data/cities'
 import { ARTICLES } from '@/lib/data/articles'
+import { SERVICE_PAGES } from '@/lib/data/servicePages'
 
 const STATIC_ROUTES = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
   { path: '/prestations', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/pro', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/devis', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/galerie', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/evenements', changeFrequency: 'monthly', priority: 0.6 },
@@ -37,10 +39,17 @@ export default function sitemap() {
 
   const articleEntries = ARTICLES.map((article) => ({
     url: new URL(`/conseils/${article.slug}`, SITE.url).toString(),
-    lastModified: new Date(article.date),
+    lastModified: new Date(article.updatedDate || article.date),
     changeFrequency: 'monthly',
     priority: 0.5,
   }))
 
-  return [...staticEntries, ...cityEntries, ...articleEntries]
+  const serviceEntries = SERVICE_PAGES.map((service) => ({
+    url: new URL(`/prestations/${service.slug}`, SITE.url).toString(),
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }))
+
+  return [...staticEntries, ...serviceEntries, ...cityEntries, ...articleEntries]
 }

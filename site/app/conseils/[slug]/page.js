@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHero from '@/components/PageHero'
+import ContentBlocks, { TableOfContents } from '@/components/ContentBlocks'
 import JsonLd from '@/components/JsonLd'
 import { IconArrowRight } from '@/components/Icons'
 import { ARTICLES, getArticle } from '@/lib/data/articles'
@@ -33,6 +34,8 @@ export default async function ArticlePage({ params }) {
   const article = getArticle(slug)
   if (!article) notFound()
 
+  const isUpdated = article.updatedDate && article.updatedDate !== article.date
+
   return (
     <>
       <JsonLd data={articleSchema(article)} />
@@ -54,19 +57,28 @@ export default async function ArticlePage({ params }) {
         <div className="container">
           <article className={styles.article}>
             <div className={styles.meta}>
-              <span>{formatDate(article.date)}</span>
+              <span>Publié le {formatDate(article.date)}</span>
+              {isUpdated && (
+                <>
+                  <span>·</span>
+                  <span>Mis à jour le {formatDate(article.updatedDate)}</span>
+                </>
+              )}
               <span>·</span>
               <span>{article.readTime} de lecture</span>
             </div>
 
             <div className={styles.prose}>
-              {article.content.map((block, index) =>
-                block.type === 'h2' ? <h2 key={index}>{block.text}</h2> : <p key={index}>{block.text}</p>
-              )}
+              <TableOfContents blocks={article.content} />
+              <ContentBlocks blocks={article.content} />
             </div>
 
             <div className={styles.footer}>
-              <p className="lead">Une question, ou envie de prendre rendez-vous ?</p>
+              <p className={styles.footerTitle}>Besoin d&apos;un pro à Angers ?</p>
+              <p className="lead">
+                Nos équipes interviennent directement chez vous, à{' '}
+                <Link href="/zone-intervention/angers">Angers et dans un rayon de 30 km</Link>.
+              </p>
               <Link href="/devis" className="btn btn-cta" style={{ marginTop: 20 }}>
                 Voir les tarifs et réserver
                 <IconArrowRight size={18} />

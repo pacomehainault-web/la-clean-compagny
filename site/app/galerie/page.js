@@ -7,6 +7,7 @@ import { IconArrowRight } from '@/components/Icons'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
+import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
 import styles from './page.module.css'
 
 export const metadata = buildMetadata({
@@ -19,15 +20,6 @@ export const metadata = buildMetadata({
 // Régénère la page toutes les heures : suffisant pour suivre la rotation de
 // l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
 export const revalidate = 3600
-
-const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
-  const n = i + 1
-  return {
-    before: `/images/avant-apres/paire-${n}-avant.jpg`,
-    after: `/images/avant-apres/paire-${n}-apres.jpg`,
-    alt: `Detailing avant / après — véhicule ${n}`,
-  }
-})
 
 const EXTERIOR_PHOTOS = [
   { src: '/images/exterieur/porsche-911-gt3-polissage-showroom-angers.jpg', alt: 'Porsche 911 GT3 — polissage et brillance', caption: 'Porsche 911 GT3' },
@@ -48,15 +40,10 @@ const INTERIOR_PHOTOS = [
 ]
 
 const STATIC_RESULTS_IDS = [2, 5, 8, 11, 13]
-const STATIC_RESULTS = STATIC_RESULTS_IDS.map((n) => ({
-  id: n,
-  before: `/images/avant-apres/paire-${n}-avant.jpg`,
-  after: `/images/avant-apres/paire-${n}-apres.jpg`,
-  alt: `Detailing avant / après — véhicule ${n}`,
-}))
+const STATIC_RESULTS = STATIC_RESULTS_IDS.map((n) => BEFORE_AFTER_PAIRS.find((p) => p.id === n))
 
 export default function GaleriePage() {
-  const featuredBeforeAfter = ALL_BEFORE_AFTER[getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'galerie' })]
+  const featuredBeforeAfter = BEFORE_AFTER_PAIRS[getRotatingIndex(BEFORE_AFTER_PAIRS.length, { namespace: 'galerie' })]
 
   return (
     <>

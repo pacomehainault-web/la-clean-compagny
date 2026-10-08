@@ -72,6 +72,22 @@ const nextConfig = {
       },
     ]
   },
+  // Le site est servi sur www.lacleancompagny.com. Historiquement, tout le SEO
+  // technique pointait vers .fr (jamais servi), ce qui empêchait Google
+  // d'indexer la bonne version. Ces redirections 301 n'ont d'effet QUE si les
+  // domaines lacleancompagny.fr et lacleancompagny.com (sans www) sont
+  // effectivement rattachés à ce projet Vercel (Project Settings → Domains) —
+  // sinon les requêtes n'atteignent jamais ce code. Voir la checklist des
+  // actions manuelles.
+  async redirects() {
+    const toWww = (host) => ({
+      source: '/:path*',
+      has: [{ type: 'host', value: host }],
+      destination: 'https://www.lacleancompagny.com/:path*',
+      permanent: true,
+    })
+    return [toWww('lacleancompagny.fr'), toWww('www.lacleancompagny.fr'), toWww('lacleancompagny.com')]
+  },
 };
 
 export default nextConfig;

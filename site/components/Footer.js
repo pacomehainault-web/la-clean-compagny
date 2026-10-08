@@ -11,6 +11,7 @@ import {
   IconLinkedin,
 } from './Icons'
 import { SITE, CONTACT, SOCIALS, telLink, mailtoLink } from '@/lib/constants'
+import { SERVICE_PAGES } from '@/lib/data/servicePages'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -48,10 +49,21 @@ export default function Footer() {
             </div>
           </div>
 
+          <nav className={styles.col} aria-label="Prestations">
+            <div className={styles.colTitle}>Prestations</div>
+            <div className={styles.linkList}>
+              {SERVICE_PAGES.map((s) => (
+                <Link href={`/prestations/${s.slug}`} key={s.slug}>
+                  {s.name}
+                </Link>
+              ))}
+              <Link href="/prestations">Toutes les prestations</Link>
+            </div>
+          </nav>
+
           <nav className={styles.col} aria-label="Navigation">
             <div className={styles.colTitle}>Le site</div>
             <div className={styles.linkList}>
-              <Link href="/prestations">Prestations &amp; tarifs</Link>
               <Link href="/devis">Demander un devis</Link>
               <Link href="/galerie">Galerie avant / après</Link>
               <Link href="/evenements">Événements</Link>
@@ -60,6 +72,7 @@ export default function Footer() {
               <Link href="/conseils">Conseils d&apos;expert</Link>
               <Link href="/bons-cadeaux">Bons cadeaux</Link>
               <Link href="/faq">Questions fréquentes</Link>
+              <Link href="/pro">Espace Professionnels</Link>
             </div>
           </nav>
 

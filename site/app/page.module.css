@@ -32,6 +32,25 @@
   text-align: center;
 }
 
+.heroBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.heroBrand::before {
+  content: '';
+  width: 26px;
+  height: 2px;
+  background: var(--gradient-cta);
+  display: inline-block;
+}
+
 .heroTitle {
   color: #fff;
   font-size: clamp(2.6rem, 6vw + 1rem, 5.2rem);
@@ -42,6 +61,20 @@
   font-size: clamp(1.1rem, 1.4vw + 0.6rem, 1.5rem);
   color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
+}
+
+.heroDirect {
+  max-width: 620px;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.heroDirectLink {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
 }
 
 .heroActions {

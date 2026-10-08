@@ -13,7 +13,7 @@ import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import { VEHICLE_ICONS, IconArrowRight, IconCheck } from '@/components/Icons'
-import { COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT } from '@/lib/data/services'
+import { SERVICE_PAGES } from '@/lib/data/servicePages'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { REVIEWS } from '@/lib/data/reviews'
 import { FAQ_ITEMS } from '@/lib/data/faq'
@@ -21,27 +21,19 @@ import { CITIES } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
-import { LUSTRAGE_MINUTE_HIGHLIGHT, MOTO_PRICING } from '@/lib/data/pricing'
+import { LUSTRAGE_MINUTE_HIGHLIGHT, MOTO_PRICING, FORMULAS_PRICING } from '@/lib/data/pricing'
+import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
 
 export const metadata = buildMetadata({
-  title: 'Detailing automobile haut de gamme à Angers',
+  title: 'Nettoyage voiture à domicile à Angers',
   description:
-    "La Clean Compagny redonne à chaque véhicule l'éclat qu'il mérite : nettoyage intérieur/extérieur, polissage, traitement céramique, rénovation optiques. Intervention à Angers et dans un rayon de 30 km.",
+    'Nettoyage voiture à domicile à Angers : intérieur, extérieur, lustrage, céramique. Zone de 30 km, avis 5.0 ★ Google, devis rapide en ligne.',
   path: '/',
 })
 
 // Régénère la page toutes les heures : suffisant pour suivre la rotation de
 // l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
 export const revalidate = 3600
-
-const ALL_BEFORE_AFTER = Array.from({ length: 13 }, (_, i) => {
-  const n = i + 1
-  return {
-    before: `/images/avant-apres/paire-${n}-avant.jpg`,
-    after: `/images/avant-apres/paire-${n}-apres.jpg`,
-    alt: `Detailing avant / après — véhicule ${n}`,
-  }
-})
 
 // 3 modules sur desktop, 2 sur mobile (le 3e est masqué en CSS, cf. .sliderGrid
 // > *:nth-child(3) — DOM identique sur les deux versions, pas de rendu conditionnel).
@@ -67,10 +59,10 @@ const MOTO_SLIDER_IMAGES = [
 ]
 
 export default function HomePage() {
-  const baseIndex = getRotatingIndex(ALL_BEFORE_AFTER.length, { namespace: 'home' })
+  const baseIndex = getRotatingIndex(BEFORE_AFTER_PAIRS.length, { namespace: 'home' })
   const featuredBeforeAfters = Array.from(
     { length: FEATURED_COUNT },
-    (_, i) => ALL_BEFORE_AFTER[(baseIndex + i) % ALL_BEFORE_AFTER.length]
+    (_, i) => BEFORE_AFTER_PAIRS[(baseIndex + i) % BEFORE_AFTER_PAIRS.length]
   )
 
   return (
@@ -85,8 +77,18 @@ export default function HomePage() {
         <div className={styles.heroOverlay} aria-hidden="true" />
 
         <div className={`${styles.heroContent} reveal`}>
-          <h1 className={styles.heroTitle}>{SITE.name}</h1>
+          <span className={styles.heroBrand}>{SITE.name}</span>
+          <h1 className={styles.heroTitle}>Nettoyage et detailing de voiture à domicile à Angers</h1>
           <p className={styles.heroSlogan}>{SITE.slogan}</p>
+          <p className={styles.heroDirect}>
+            Nettoyage intérieur dès {FORMULAS_PRICING[0].prices.citadine} €, rénovation complète dès{' '}
+            {FORMULAS_PRICING[1].prices.citadine} €, lustrage dès {LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €.
+            Devis en ligne en quelques minutes, pour un{' '}
+            <Link href="/zone-intervention/angers" className={styles.heroDirectLink}>
+              nettoyage de voiture à Angers
+            </Link>{' '}
+            et {CONTACT.radiusKm} km alentour.
+          </p>
           <div className={styles.heroActions}>
             <Link href="/devis" className="btn btn-cta">
               Voir les tarifs et réserver
@@ -210,12 +212,12 @@ export default function HomePage() {
           </div>
 
           <div className={styles.complementaryNote} id="prestations-complementaires">
-            <span>Et aussi, sur devis :</span>
+            <span>Le détail de chaque prestation :</span>
             <div className={styles.chipRow}>
-              {[...COMPLEMENTARY_SERVICES, OPTICS_RENOVATION, OZONE_TREATMENT].map((s) => (
-                <span className={styles.chip} key={s.id}>
+              {SERVICE_PAGES.map((s) => (
+                <Link href={`/prestations/${s.slug}`} className={styles.chip} key={s.slug}>
                   {s.name}
-                </span>
+                </Link>
               ))}
             </div>
           </div>

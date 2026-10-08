@@ -40,7 +40,7 @@ export default function FormulaCard({ formula }) {
           Réserver cette formule
         </Link>
         <Link href="/prestations" className="btn btn-ghost btn-sm">
-          Voir le détail
+          Voir le détail de la formule {formula.name}
         </Link>
       </div>
     </div>

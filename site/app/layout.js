@@ -32,14 +32,8 @@ export const metadata = {
   },
   description:
     "Detailing automobile haut de gamme à Angers : nettoyage intérieur/extérieur, polissage, traitement céramique, rénovation optiques. Chaque véhicule, même exigence.",
-  keywords: [
-    'detailing automobile Angers',
-    'nettoyage auto Angers',
-    'polissage carrosserie',
-    'traitement céramique',
-    'rénovation optiques',
-    'lavage voiture prestige',
-  ],
+  // Pas de balise meta keywords : Google ne l'utilise plus depuis 2009, elle
+  // n'a donc aucun effet SEO et ne fait qu'ajouter du poids à chaque page.
   authors: [{ name: SITE.gerant }],
   creator: SITE.name,
   formatDetection: { telephone: true, email: true, address: true },

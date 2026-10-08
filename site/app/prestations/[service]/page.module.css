@@ -1,0 +1,137 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.prose {
+  max-width: 680px;
+}
+
+.prose h2 {
+  margin-top: 36px;
+  margin-bottom: 14px;
+  font-size: 1.5rem;
+}
+
+.prose p {
+  color: var(--color-text-muted);
+  font-size: 1.02rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: calc(var(--fixed-header-total) + 24px);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+  }
+}
+
+.sidebarCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.iconBadge {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-blue-soft);
+  color: var(--color-brand-blue);
+}
+
+.sidebarPrice {
+  font-family: var(--font-heading), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.sidebarTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-faint);
+}
+
+.sidebarLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebarLinks a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+
+.sidebarLinks a:hover {
+  background: var(--color-brand-blue-soft);
+  color: var(--color-blue-dark);
+}
+
+.sidebarLinks a span {
+  color: var(--color-text-faint);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+.sectionHead h2 {
+  margin-top: 14px;
+}
+
+.articleLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.articleCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.inlineLink {
+  color: var(--color-brand-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

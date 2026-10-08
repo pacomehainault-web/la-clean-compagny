@@ -8,9 +8,9 @@ import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
 
 export const metadata = buildMetadata({
-  title: 'Événements — La Clean Compagny sur les rassemblements automobiles',
+  title: 'Événements automobiles à Angers — stands et rassemblements',
   description:
-    "La Clean Compagny se déplace sur les rassemblements et expositions automobiles de la région angevine. Découvrez nos stands et nos interventions en images.",
+    'La Clean Compagny sur les rassemblements et expositions automobiles de la région angevine : stands, démonstrations, partenariats. Photos et rendez-vous.',
   path: '/evenements',
 })
 
@@ -101,6 +101,13 @@ export default function EvenementsPage() {
           </div>
 
           <PhotoGallery photos={EVENT_PHOTOS.slice(1)} masonry />
+
+          <p className={styles.placeholderNote}>
+            [À COMPLÉTER : nom, date et lieu précis des prochains événements ou salons auxquels
+            La Clean Compagny participe — ex. « Salon de l'auto d'Angers, 14-16 mars 2026 ». Une
+            fois ces informations fournies, chaque événement pourra avoir sa propre page, avec son
+            nom et sa ville dans le titre.]
+          </p>
         </div>
       </section>
 

@@ -1,9 +1,16 @@
+// Utilisée dans les titres d'articles qui citent une année (ex. « Combien
+// coûte... en 2026 ? ») — un seul endroit à mettre à jour chaque janvier.
+export const CURRENT_YEAR = 2026
+
 export const SITE = {
   name: 'La Clean Compagny',
   legalName: 'La Clean Compagny',
   slogan: 'Chaque véhicule, même exigence',
   foundedYear: 2023,
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lacleancompagny.fr',
+  // Source UNIQUE du domaine : lue ici par absoluteUrl()/buildMetadata() (canonical,
+  // OG, Twitter), par robots.js et sitemap.js. Ne jamais coder un domaine en dur
+  // ailleurs dans le projet — passer par SITE.url ou absoluteUrl().
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lacleancompagny.com',
   siren: '953 772 282 00018',
   gerant: 'Enzo Soldet',
   vatNote: 'TVA non applicable, art. 293 B du CGI',
@@ -18,6 +25,12 @@ export const CONTACT = {
   // le client, on communique uniquement la zone d'intervention (ville + rayon).
   city: 'Angers',
   radiusKm: 30,
+  // [À COMPLÉTER : remplacer par l'URL d'intégration (iframe "src") de la
+  // fiche Google Business de La Clean Compagny — Google Business Profile →
+  // Partager → Intégrer une carte. En attendant, cette URL n'affiche que la
+  // carte générique de la ville d'Angers, pas notre fiche. Variable déjà
+  // centralisée ici et lue uniquement par components/GoogleMapEmbed.js : un
+  // seul changement suffira pour se répercuter sur tout le site.]
   mapEmbedSrc: 'https://www.google.com/maps?q=Angers&output=embed',
   googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBE/review',
 }

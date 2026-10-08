@@ -6,6 +6,7 @@ import { VEHICLE_ICONS, IconMapPin, IconInvoice, IconPercent, IconArrowRight, Ic
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { whatsappLink, CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
+import { BTP_PAIRS } from '@/lib/data/beforeAfter'
 import styles from './page.module.css'
 
 export const metadata = buildMetadata({
@@ -56,15 +57,6 @@ const FLEET_CARS_PHOTOS = [
   },
 ]
 
-const BTP_RESULTS = Array.from({ length: 5 }, (_, i) => {
-  const n = i + 1
-  return {
-    id: n,
-    before: `/images/btp/btp-${n}-avant.jpg`,
-    after: `/images/btp/btp-${n}-apres.jpg`,
-    alt: `Cabine d'engin de chantier — intervention ${n}`,
-  }
-})
 
 export default function ProPage() {
   const whatsappMessage = "Bonjour, je gère une flotte de véhicules d'entreprise et je souhaiterais un devis. Pouvez-vous m'en dire plus ?"
@@ -75,7 +67,7 @@ export default function ProPage() {
         <video
           className={styles.heroVideo}
           src="/videos/tracteur-nettoyage-btp.mp4"
-          poster="/images/btp/btp-1-apres.jpg"
+          poster="/images/btp/nettoyage-cabine-pelleteuse-angers-apres.jpg"
           autoPlay
           loop
           muted
@@ -175,12 +167,13 @@ export default function ProPage() {
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">La preuve par l&apos;image</span>
-            <h2>Résultats sur engins de chantier</h2>
+            <h2>Résultats chez nos clients du BTP</h2>
             <p className="lead" style={{ marginTop: 14 }}>
-              Quelques interventions récentes, sur le terrain, chez nos clients professionnels.
+              Engins de chantier et utilitaires : quelques interventions récentes, sur le terrain,
+              chez nos clients professionnels.
             </p>
           </div>
-          <StaticBeforeAfterGallery pairs={BTP_RESULTS} />
+          <StaticBeforeAfterGallery pairs={BTP_PAIRS} />
         </div>
       </section>
 
