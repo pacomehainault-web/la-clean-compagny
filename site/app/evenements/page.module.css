@@ -71,13 +71,3 @@
   margin-top: 2px;
 }
 
-.placeholderNote {
-  margin-top: 28px;
-  padding: 16px 20px;
-  border: 1px dashed var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
-  color: var(--color-text-faint);
-  font-size: 0.86rem;
-  font-style: italic;
-}

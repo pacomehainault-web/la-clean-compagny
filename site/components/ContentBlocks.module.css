@@ -29,6 +29,19 @@
   margin: 0 0 28px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  /* Ombres de défilement (technique CSS pure, sans JS) : un dégradé apparaît
+     sur le bord droit/gauche tant qu'il reste du contenu à faire défiler dans
+     cette direction, et disparaît une fois arrivé au bout. Indispensable sur
+     petit écran : un tableau à 3 colonnes déborde souvent sans qu'on le
+     devine au premier coup d'œil. */
+  background:
+    linear-gradient(to right, var(--color-surface) 30%, rgba(255, 255, 255, 0)) 0 0,
+    linear-gradient(to left, var(--color-surface) 30%, rgba(255, 255, 255, 0)) 100% 0,
+    linear-gradient(to right, rgba(20, 20, 20, 0.12), rgba(0, 0, 0, 0)) 0 0,
+    linear-gradient(to left, rgba(20, 20, 20, 0.12), rgba(0, 0, 0, 0)) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 32px 100%, 32px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .table {
@@ -42,6 +55,10 @@
   padding: 12px 14px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
+  /* Pas de nowrap : un en-tête qui passe sur 2 lignes tient dans une colonne
+     plus étroite qu'un en-tête forcé sur une seule ligne — ça réduit d'autant
+     le débordement horizontal sur mobile. */
+  min-width: 92px;
 }
 
 .table thead th {
@@ -50,11 +67,22 @@
   letter-spacing: 0.04em;
   color: var(--color-text-muted);
   background: var(--color-surface-2);
-  white-space: nowrap;
 }
 
 .table tbody tr:last-child td {
   border-bottom: none;
+}
+
+@media (max-width: 480px) {
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    min-width: 80px;
+  }
+
+  .table {
+    font-size: 0.86rem;
+  }
 }
 
 .toc {

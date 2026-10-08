@@ -88,7 +88,7 @@ export default function Header() {
               width={280}
               height={188}
               priority
-              style={{ height: 44, width: 'auto' }}
+              className={styles.brandLogo}
             />
           </Link>
 
@@ -105,7 +105,7 @@ export default function Header() {
               <IconPhone size={17} />
               {CONTACT.phoneDisplay}
             </a>
-            <Link href="/devis" className="btn btn-cta btn-sm">
+            <Link href="/devis" className={`btn btn-cta btn-sm ${styles.headerCta}`}>
               Voir les tarifs et réserver
             </Link>
             <button

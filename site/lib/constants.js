@@ -25,14 +25,19 @@ export const CONTACT = {
   // le client, on communique uniquement la zone d'intervention (ville + rayon).
   city: 'Angers',
   radiusKm: 30,
-  // [À COMPLÉTER : remplacer par l'URL d'intégration (iframe "src") de la
-  // fiche Google Business de La Clean Compagny — Google Business Profile →
-  // Partager → Intégrer une carte. En attendant, cette URL n'affiche que la
-  // carte générique de la ville d'Angers, pas notre fiche. Variable déjà
-  // centralisée ici et lue uniquement par components/GoogleMapEmbed.js : un
-  // seul changement suffira pour se répercuter sur tout le site.]
-  mapEmbedSrc: 'https://www.google.com/maps?q=Angers&output=embed',
+  // Identifiant Google Maps réel de la fiche Google Business de La Clean
+  // Compagny, résolu à partir de googleReviewUrl ci-dessous (ce lien court
+  // redirige vers .../writereview?placeid=ChIJx9Gdg9C2eiERIW19sIjwZH4 — c'est
+  // Google lui-même qui associe ce Place ID à la fiche de l'entreprise, pas
+  // une valeur choisie ici). Utilisé à la fois pour la carte intégrée et pour
+  // le lien canonique de la fiche dans le JSON-LD (lib/schema.js → sameAs).
+  googlePlaceId: 'ChIJx9Gdg9C2eiERIW19sIjwZH4',
+  // Carte de la fiche réelle (plus la carte générique de la ville d'Angers).
+  mapEmbedSrc: 'https://www.google.com/maps?q=place_id:ChIJx9Gdg9C2eiERIW19sIjwZH4&output=embed',
   googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBE/review',
+  // Lien canonique de la fiche Google Business, construit à partir du même
+  // Place ID — c'est ce que lib/schema.js ajoute à `sameAs`.
+  googleBusinessUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJx9Gdg9C2eiERIW19sIjwZH4',
 }
 
 export const SOCIALS = {

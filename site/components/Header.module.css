@@ -79,9 +79,18 @@
   flex: none;
 }
 
-.brand img {
+.brandLogo {
   height: 44px;
   width: auto;
+}
+
+/* En dessous de 480px, le logo (format large, icône + texte) laisse trop peu
+   de place au bouton menu une fois réduit à côté. On le réduit légèrement
+   plutôt que de le laisser déborder. */
+@media (max-width: 479px) {
+  .brandLogo {
+    height: 34px;
+  }
 }
 
 .nav {
@@ -135,6 +144,17 @@
   box-shadow: var(--shadow-soft);
   position: relative;
   z-index: 210;
+}
+
+/* En dessous de 480px, le logo + le bouton + le bouton menu ne tiennent plus
+   côte à côte sans se chevaucher. Le menu mobile a déjà son propre bouton
+   "Voir les tarifs et réserver" en pleine largeur (cf. .drawerFooter) : on
+   masque simplement le doublon du header, plutôt que de le faire rétrécir
+   jusqu'à l'illisible. */
+@media (max-width: 479px) {
+  .headerCta {
+    display: none;
+  }
 }
 
 @media (min-width: 1000px) {

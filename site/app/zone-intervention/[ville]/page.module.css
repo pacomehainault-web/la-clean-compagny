@@ -172,40 +172,30 @@
   line-height: 1.6;
 }
 
-.placeholderGallery {
+.realisationsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
-@media (max-width: 800px) {
-  .placeholderGallery {
+@media (max-width: 900px) {
+  .realisationsGrid {
     grid-template-columns: 1fr;
+    max-width: 440px;
+    margin-inline: auto;
   }
 }
 
-.placeholderCard {
-  border: 1px dashed var(--color-border-strong);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+.realisationCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.placeholderImage {
-  aspect-ratio: 4 / 3;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+.realisationCaption {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
   text-align: center;
-  background: var(--color-surface-2);
-  color: var(--color-text-faint);
-  font-size: 0.82rem;
-}
-
-.placeholderCard p {
-  padding: 14px 16px;
-  font-size: 0.86rem;
-  color: var(--color-text-faint);
-  font-style: italic;
 }
 
 .reviewsFooter {

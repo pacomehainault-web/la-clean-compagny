@@ -5,6 +5,7 @@ import FormulaCard from '@/components/FormulaCard'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import FAQAccordion from '@/components/FAQAccordion'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
+import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 import JsonLd from '@/components/JsonLd'
 import { IconMapPin, IconClock, IconShield, IconArrowRight, IconPhone } from '@/components/Icons'
 import { CITIES, getCity } from '@/lib/data/cities'
@@ -12,10 +13,24 @@ import { FORMULAS } from '@/lib/data/services'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
 import { FAQ_ITEMS } from '@/lib/data/faq'
 import { REVIEWS } from '@/lib/data/reviews'
+import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { breadcrumbSchema, faqPageSchema } from '@/lib/schema'
 import styles from './page.module.css'
+
+// 3 réalisations réelles (parmi les paires avant/après du site), choisies
+// différentes de celles déjà mises en avant sur /galerie (ids 2, 5, 8, 11, 13)
+// pour varier les exemples montrés sur le site.
+const ANGERS_REALISATIONS = [4, 10, 12].map((id) => {
+  const pair = BEFORE_AFTER_PAIRS.find((p) => p.id === id)
+  const captions = {
+    4: 'Banquette arrière en tissu, nettoyée en profondeur à domicile.',
+    10: 'Habitacle cuir remis à neuf, sellerie et plastiques inclus.',
+    12: "Intérieur nettoyé de fond en comble, jusqu'aux moindres recoins.",
+  }
+  return { ...pair, caption: captions[id] }
+})
 
 export function generateStaticParams() {
   return CITIES.map((c) => ({ ville: c.slug }))
@@ -205,12 +220,16 @@ export default async function VillePage({ params }) {
             <div className={styles.sectionHead}>
               <span className="eyebrow">La preuve par l&apos;image</span>
               <h2>Réalisations à Angers</h2>
+              <p className="lead" style={{ marginTop: 14 }}>
+                Quelques exemples de nettoyages réalisés à domicile. Faites glisser le curseur
+                pour comparer l&apos;avant et l&apos;après.
+              </p>
             </div>
-            <div className={styles.placeholderGallery}>
-              {[1, 2, 3].map((i) => (
-                <div className={styles.placeholderCard} key={i}>
-                  <div className={styles.placeholderImage}>[À COMPLÉTER : photo de chantier {i} à Angers]</div>
-                  <p>[À COMPLÉTER : une phrase décrivant cette intervention à Angers]</p>
+            <div className={styles.realisationsGrid}>
+              {ANGERS_REALISATIONS.map((item) => (
+                <div className={styles.realisationCard} key={item.id}>
+                  <BeforeAfterSlider before={item.before} after={item.after} alt={item.alt} />
+                  <p className={styles.realisationCaption}>{item.caption}</p>
                 </div>
               ))}
             </div>

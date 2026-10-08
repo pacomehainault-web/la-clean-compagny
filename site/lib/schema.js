@@ -50,10 +50,7 @@ export function localBusinessSchema() {
       },
       ...CITIES.map((city) => ({ '@type': 'City', name: city.name })),
     ],
-    sameAs: [
-      ...Object.values(SOCIALS),
-      // [À COMPLÉTER : URL de la fiche Google Business de La Clean Compagny]
-    ],
+    sameAs: [...Object.values(SOCIALS), CONTACT.googleBusinessUrl],
   }
 }
 
