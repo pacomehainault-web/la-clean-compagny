@@ -101,18 +101,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className={styles.statsBar}>
+      <section className="section">
         <div className="container">
-          <StatsRow
-            stats={[
-              { value: `Depuis ${SITE.foundedYear}`, label: 'passionnés par l’automobile' },
-              { value: '5.0 ★', label: 'de moyenne sur Google' },
-              { value: `${CONTACT.radiusKm} km`, label: 'autour d’Angers, à domicile' },
-              { value: '100 %', label: 'sur-mesure, sur devis' },
-            ]}
-          />
+          <div className={`${styles.sectionHeadRow} reveal`}>
+            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
+              <span className="eyebrow">Nos formules</span>
+              <h2>Deux formules, un seul niveau d&apos;exigence</h2>
+            </div>
+            <Link href="/prestations" className="btn btn-ghost btn-sm">
+              Toutes les prestations
+              <IconArrowRight size={16} />
+            </Link>
+          </div>
+
+          <div className="reveal">
+            <PricingSelector />
+          </div>
+
+          <div className={styles.complementaryNote} id="prestations-complementaires">
+            <span>Le détail de chaque prestation :</span>
+            <div className={styles.chipRow}>
+              {SERVICE_PAGES.map((s) => (
+                <Link href={`/prestations/${s.slug}`} className={styles.chip} key={s.slug}>
+                  {s.name}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       <section className="section section-ink">
         <div className="container">
@@ -194,35 +211,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section">
+      <div className={styles.statsBar}>
         <div className="container">
-          <div className={`${styles.sectionHeadRow} reveal`}>
-            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
-              <span className="eyebrow">Nos formules</span>
-              <h2>Deux formules, un seul niveau d&apos;exigence</h2>
-            </div>
-            <Link href="/prestations" className="btn btn-ghost btn-sm">
-              Toutes les prestations
-              <IconArrowRight size={16} />
-            </Link>
-          </div>
-
-          <div className="reveal">
-            <PricingSelector />
-          </div>
-
-          <div className={styles.complementaryNote} id="prestations-complementaires">
-            <span>Le détail de chaque prestation :</span>
-            <div className={styles.chipRow}>
-              {SERVICE_PAGES.map((s) => (
-                <Link href={`/prestations/${s.slug}`} className={styles.chip} key={s.slug}>
-                  {s.name}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <StatsRow
+            stats={[
+              { value: `Depuis ${SITE.foundedYear}`, label: 'passionnés par l’automobile' },
+              { value: '5.0 ★', label: 'de moyenne sur Google' },
+              { value: `${CONTACT.radiusKm} km`, label: 'autour d’Angers, à domicile' },
+              { value: '100 %', label: 'sur-mesure, sur devis' },
+            ]}
+          />
         </div>
-      </section>
+      </div>
 
       <SubscriptionSection />
 
