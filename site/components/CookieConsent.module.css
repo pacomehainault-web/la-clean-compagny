@@ -19,6 +19,39 @@
   }
 }
 
+/* Mobile : bandeau compact posé AU-DESSUS de la barre « Appeler / Devis »
+   (MobileStickyCTA, ~64 px de haut) au lieu de la recouvrir, pour que le
+   visiteur garde ses deux boutons d'action visibles dès l'arrivée. */
+@media (max-width: 639px) {
+  .wrap {
+    left: 10px;
+    right: 10px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .text {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .actions :global(.btn) {
+    padding: 7px 14px;
+    font-size: 0.78rem;
+  }
+}
+
 .text {
   font-size: 0.86rem;
   color: var(--color-text-muted);

@@ -1,9 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
-import IntroSequence from '@/components/IntroSequence'
 import HeroMedia from '@/components/HeroMedia'
-import SpaceGateway from '@/components/SpaceGateway'
 import StatsRow from '@/components/StatsRow'
 import PricingSelector from '@/components/PricingSelector'
 import SubscriptionSection from '@/components/SubscriptionSection'
@@ -15,8 +13,8 @@ import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import JsonLd from '@/components/JsonLd'
 import { VEHICLE_ICONS, IconArrowRight, IconCheck, IconMapPin } from '@/components/Icons'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
-import { VEHICLE_TYPES } from '@/lib/data/vehicles'
-import { REVIEWS } from '@/lib/data/reviews'
+import { PRIVATE_VEHICLE_TYPES } from '@/lib/data/vehicles'
+import { REVIEWS, AGGREGATE_RATING } from '@/lib/data/reviews'
 import { CITIES, HOME_CITY_SLUG, getCity, cityHref } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
@@ -95,9 +93,13 @@ export default function HomePage() {
   )
 
   return (
-    <IntroSequence>
+    <>
+      {/* Plus d'écran de chargement ni de portail « Particulier / Pro » en
+          plein écran (supprimés en novembre 2026) : un visiteur qui arrive
+          depuis Google doit voir tout de suite le titre, les prix, la note et
+          les boutons d'action. L'Espace Pro reste accessible depuis la barre
+          du haut (Header) et la section abonnements. */}
       <JsonLd data={faqPageSchema(ANGERS.faq)} />
-      <SpaceGateway />
 
       <section className={styles.hero}>
         <HeroMedia
@@ -109,6 +111,14 @@ export default function HomePage() {
         <div className={`${styles.heroContent} reveal`}>
           <span className={styles.heroBrand}>{SITE.name}</span>
           <h1 className={styles.heroTitle}>Nettoyage et detailing de voiture à domicile à Angers</h1>
+          {/* Preuve sociale au-dessus de la ligne de flottaison : c'est le
+              premier argument d'un client qui compare les prestataires. */}
+          <Link href="/avis" className={styles.heroRating}>
+            <span className={styles.heroStars} aria-hidden="true">★★★★★</span>
+            <span>
+              <strong>{AGGREGATE_RATING.ratingValue.toFixed(1).replace('.', ',')}</strong> · {AGGREGATE_RATING.reviewCount} avis Google
+            </span>
+          </Link>
           <p className={styles.heroSlogan}>{SITE.slogan}</p>
           <p className={styles.heroDirect}>
             Nettoyage intérieur dès {FORMULAS_PRICING[0].prices.citadine} €, rénovation complète dès{' '}
@@ -263,7 +273,7 @@ export default function HomePage() {
             <h2>Un savoir-faire adapté à votre gabarit</h2>
           </div>
           <div className={`${styles.vehicleGrid} reveal`}>
-            {VEHICLE_TYPES.map((v) => {
+            {PRIVATE_VEHICLE_TYPES.map((v) => {
               const Icon = VEHICLE_ICONS[v.id]
               return (
                 <Link href={`/devis?vehicule=${v.id}`} className={styles.vehicleCard} key={v.id}>
@@ -273,6 +283,10 @@ export default function HomePage() {
               )
             })}
           </div>
+          <p className={styles.vehicleProNote}>
+            Poids lourds, engins agricoles ou de chantier ?{' '}
+            <Link href="/pro">Découvrez notre Espace Pro</Link>.
+          </p>
         </div>
       </section>
 
@@ -507,6 +521,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </IntroSequence>
+    </>
   )
 }

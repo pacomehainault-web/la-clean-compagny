@@ -25,10 +25,9 @@ export default function CookieConsent() {
   return (
     <div className={styles.wrap} role="dialog" aria-label="Gestion des cookies">
       <p className={styles.text}>
-        Nous utilisons des cookies de mesure d&apos;audience pour comprendre comment vous
-        utilisez le site. Vous pouvez les accepter ou les refuser — le site fonctionne dans
-        tous les cas. Plus d&apos;informations dans notre{' '}
-        <Link href="/politique-de-confidentialite">politique de confidentialité</Link>.
+        Cookies de mesure d&apos;audience : acceptez-les ou refusez-les, le site fonctionne
+        dans tous les cas.{' '}
+        <Link href="/politique-de-confidentialite">En savoir plus</Link>.
       </p>
       <div className={styles.actions}>
         <button type="button" className="btn btn-cta btn-sm" onClick={() => choose('accepted')}>

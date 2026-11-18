@@ -37,23 +37,32 @@ export const VEHICLE_TYPES = [
   },
   {
     id: 'camion',
+    proOnly: true,
     label: 'Camion',
     description: 'Camions et poids lourds',
     examples: 'Porteur, benne, semi-remorque…',
   },
   {
     id: 'tracteur',
+    proOnly: true,
     label: 'Tracteur',
     description: 'Tracteurs et engins agricoles',
     examples: 'Tracteur, moissonneuse, télescopique…',
   },
   {
     id: 'pelleteuse',
+    proOnly: true,
     label: 'Pelleteuse',
     description: 'Engins de chantier',
     examples: 'Pelleteuse, mini-pelle, chargeuse…',
   },
 ]
+
+// Gabarits affichés aux particuliers (page d'accueil) : les poids lourds,
+// engins agricoles et engins de chantier (`proOnly`) ne sont présentés que sur
+// /pro — sur l'accueil, ils brouillaient le message « nettoyage de voiture ».
+// Le configurateur de devis (QuoteWizard) continue de tous les proposer.
+export const PRIVATE_VEHICLE_TYPES = VEHICLE_TYPES.filter((v) => !v.proOnly)
 
 export function getVehicleType(id) {
   return VEHICLE_TYPES.find((v) => v.id === id)
