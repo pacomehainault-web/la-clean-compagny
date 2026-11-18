@@ -152,7 +152,7 @@ export const ARTICLES = [
       { type: 'p', text: "Une tache ancienne, déjà sèche, une odeur qui persiste malgré le nettoyage, ou une sellerie tissu entièrement grisée par l'usage : dans ces cas, les méthodes maison atteignent vite leurs limites. Un nettoyage professionnel permet une extraction en profondeur, avec des produits et un matériel que l'on ne trouve pas chez soi. Voir le détail de notre [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture), qui comprend le nettoyage complet des tapis et moquettes." },
       { type: 'p', text: "Si la tache est accompagnée d'une odeur tenace (tabac, humidité, animal), un nettoyage seul ne suffit parfois pas : associez-le à une [désinfection à l'ozone](/prestations/desinfection-ozone), qui traite la source de l'odeur en profondeur." },
       { type: 'h2', text: 'Et sur un canapé ou un matelas ?' },
-      { type: 'p', text: "Les mêmes principes s'appliquent à vos textiles d'intérieur. Pour une tache incrustée sur un canapé ou un matelas, notre prestation de [nettoyage de canapé et matelas à Angers](/prestations/nettoyage-canape-matelas) utilise les mêmes méthodes professionnelles que pour nos selleries automobiles, directement chez vous." },
+      { type: 'p', text: "Les mêmes principes s'appliquent à vos textiles d'intérieur. Pour une tache incrustée sur un canapé, un fauteuil, un matelas ou un tapis, notre prestation de [nettoyage de canapé, matelas et tapis à Angers](/prestations/nettoyage-canape-matelas) utilise les mêmes méthodes professionnelles que pour nos selleries automobiles, directement chez vous." },
     ],
   },
   {

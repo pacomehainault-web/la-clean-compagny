@@ -336,27 +336,27 @@ export const SERVICE_PAGES = [
   },
   {
     slug: 'nettoyage-canape-matelas',
-    name: 'Nettoyage canapé et matelas',
-    h1: 'Nettoyage de canapé et matelas à Angers',
-    metaTitle: 'Nettoyage de canapé et matelas à Angers',
+    name: 'Nettoyage canapé, fauteuil, matelas et tapis',
+    h1: 'Nettoyage de canapé, fauteuil, matelas et tapis à Angers',
+    metaTitle: 'Nettoyage canapé, fauteuil, matelas et tapis à Angers',
     metaDescription:
-      'Nettoyage professionnel de canapé et matelas à domicile à Angers : taches, odeurs, shampouinage textile. Sur devis. Devis rapide et gratuit.',
+      'Nettoyage de canapé, fauteuil, matelas et tapis à domicile à Angers : taches, odeurs, shampouinage textile. Sur devis, devis rapide et gratuit.',
     directAnswer:
-      "Le nettoyage professionnel de votre canapé ou matelas à domicile à Angers est établi sur devis, selon la taille, la matière et l'état du textile. Taches incrustées, odeurs, shampouinage complet : nous traitons vos textiles d'intérieur avec le même soin que nos selleries automobiles.",
+      "Le nettoyage professionnel de votre canapé, fauteuil, matelas ou tapis à domicile à Angers est établi sur devis, selon la taille, la matière et l'état du textile. Taches incrustées, odeurs, shampouinage complet : nous traitons vos textiles d'intérieur avec le même soin que nos selleries automobiles.",
     icon: 'IconStar',
     priceLine: 'sur devis',
     fromPrice: null,
     content: [
-      { type: 'p', text: "Fort de notre expertise sur les selleries automobiles, nous appliquons les mêmes méthodes professionnelles à vos textiles d'intérieur : canapés, matelas, fauteuils. Une prestation que plusieurs de nos clients ont découverte après nous avoir fait confiance pour leur véhicule, et qu'ils recommandent tout autant." },
+      { type: 'p', text: "Fort de notre expertise sur les selleries automobiles, nous appliquons les mêmes méthodes professionnelles à vos textiles d'intérieur : canapés, fauteuils, matelas et tapis. Une prestation que plusieurs de nos clients ont découverte après nous avoir fait confiance pour leur véhicule, et qu'ils recommandent tout autant." },
       { type: 'h2', text: 'Taches, odeurs et shampouinage en profondeur' },
       { type: 'p', text: "Nous intervenons sur les taches incrustées — vin, urine, graisse — comme sur un entretien de fond : shampouinage textile en profondeur, extraction de la saleté logée dans les fibres, et désodorisation si nécessaire. Chaque matière (tissu, microfibre, certains cuirs) demande une méthode et des produits adaptés, évalués lors du devis." },
       { type: 'h2', text: 'Un devis adapté à chaque textile' },
-      { type: 'p', text: "La taille du canapé ou du matelas, le type de tissu et l'ampleur des taches à traiter font varier le temps d'intervention et donc le tarif : cette prestation est systématiquement établie sur devis, sans mauvaise surprise le jour de l'intervention." },
+      { type: 'p', text: "La taille du canapé, du fauteuil, du matelas ou du tapis, le type de tissu et l'ampleur des taches à traiter font varier le temps d'intervention et donc le tarif : cette prestation est systématiquement établie sur devis, sans mauvaise surprise le jour de l'intervention." },
       { type: 'p', text: "Comme pour nos prestations automobiles, nous nous déplaçons directement chez vous, à Angers et dans un rayon de 30 km." },
     ],
     faq: [
       {
-        question: 'Nettoyez-vous vraiment les canapés et matelas, pas seulement les voitures ?',
+        question: 'Nettoyez-vous vraiment les canapés, fauteuils, matelas et tapis, pas seulement les voitures ?',
         answer: "Oui, c'est une prestation à part entière, réalisée avec les mêmes méthodes professionnelles que pour nos selleries automobiles. Plusieurs de nos avis clients en parlent directement.",
       },
       {
@@ -364,8 +364,8 @@ export const SERVICE_PAGES = [
         answer: "Dans la majorité des cas, oui : notre méthode d'extraction en profondeur permet de traiter des taches incrustées depuis un moment. Le résultat dépend toutefois de la nature de la tache et du textile — nous restons honnêtes sur ce point lors du devis.",
       },
       {
-        question: 'Combien coûte le nettoyage d’un canapé ou d’un matelas ?',
-        answer: "Le tarif est établi sur devis, selon la taille, la matière et l'état du textile à traiter. Contactez-nous avec quelques précisions (type de canapé/matelas, taches à traiter) pour recevoir une estimation rapide.",
+        question: 'Combien coûte le nettoyage d’un canapé, d’un fauteuil, d’un matelas ou d’un tapis ?',
+        answer: "Le tarif est établi sur devis, selon la taille, la matière et l'état du textile à traiter. Contactez-nous avec quelques précisions (type de canapé, fauteuil, matelas ou tapis, taches à traiter) pour recevoir une estimation rapide.",
       },
     ],
     relatedServices: ['nettoyage-interieur-voiture', 'desinfection-ozone'],
