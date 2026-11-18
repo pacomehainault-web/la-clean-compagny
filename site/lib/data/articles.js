@@ -3,7 +3,8 @@ import { CURRENT_YEAR } from '@/lib/constants'
 // `content` : blocs typés rendus par components/ContentBlocks.js
 // (h2 / p / ul / table), avec liens internes au format Markdown
 // `[ancre descriptive](/chemin)` et gras `**mot**` directement dans le texte.
-// Chaque article relie au minimum 2 pages services + la page Angers.
+// Chaque article relie au minimum 2 pages services + la page d'accueil, qui
+// porte la requête « nettoyage voiture Angers ».
 export const ARTICLES = [
   {
     slug: 'polissage-ou-lustrage-quelle-difference',
@@ -32,7 +33,7 @@ export const ARTICLES = [
       ] },
       { type: 'h2', text: 'Comment savoir ce dont votre véhicule a besoin ?' },
       { type: 'p', text: "Tout dépend de l'état réel de votre peinture : présence de micro-rayures visibles au soleil, aspect terne malgré un lavage récent, hologrammes en forme de toile d'araignée sous certains angles de lumière… Ces signes indiquent qu'un polissage sera nécessaire avant toute finition. Si votre carrosserie est simplement un peu fatiguée mais sans défaut marqué, un lustrage peut suffire à lui redonner tout son éclat." },
-      { type: 'p', text: "Dans le doute, le plus simple reste d'en discuter directement avec nous : lors de chaque devis, nous examinons votre véhicule à [Angers et dans toute notre zone d'intervention](/zone-intervention/angers) et vous orientons vers la prestation la plus adaptée — sans vous vendre plus que ce dont il a réellement besoin." },
+      { type: 'p', text: "Dans le doute, le plus simple reste d'en discuter directement avec nous : lors de chaque devis, nous examinons votre véhicule à [Angers et dans toute notre zone d'intervention](/) et vous orientons vers la prestation la plus adaptée — sans vous vendre plus que ce dont il a réellement besoin." },
     ],
   },
   {
@@ -52,7 +53,7 @@ export const ARTICLES = [
       { type: 'h2', text: 'Pourquoi préparer la carrosserie avant l’application ?' },
       { type: 'p', text: "Un traitement céramique appliqué sur une peinture non préparée fige tous les défauts existants sous la couche de protection — micro-rayures, hologrammes, résidus de pollution. C'est pour cela que nous ne l'appliquons jamais sans étape de décontamination, et de polissage si l'état de la carrosserie le justifie. Cette préparation conditionne directement la qualité et la durabilité du résultat final. Le détail complet de la prestation est sur notre page [traitement céramique à Angers](/prestations/traitement-ceramique)." },
       { type: 'h2', text: 'Un investissement, pas une dépense' },
-      { type: 'p', text: "Le traitement céramique demande un investissement plus important qu'une simple cire, mais sa durabilité change la donne : protection dans la durée, entretien facilité, et une brillance qui reste nette bien après l'application. C'est particulièrement pertinent pour les véhicules exposés en extérieur, les voitures de prestige, ou tout simplement pour qui veut garder sa voiture impeccable sans y consacrer un week-end par mois. Nous intervenons sur toute notre [zone d'intervention à Angers](/zone-intervention/angers) et dans un rayon de 30 km." },
+      { type: 'p', text: "Le traitement céramique demande un investissement plus important qu'une simple cire, mais sa durabilité change la donne : protection dans la durée, entretien facilité, et une brillance qui reste nette bien après l'application. C'est particulièrement pertinent pour les véhicules exposés en extérieur, les voitures de prestige, ou tout simplement pour qui veut garder sa voiture impeccable sans y consacrer un week-end par mois. Nous intervenons sur toute notre [zone d'intervention à Angers](/) et dans un rayon de 30 km." },
     ],
   },
   {
@@ -72,7 +73,7 @@ export const ARTICLES = [
       { type: 'p', text: "Un entretien du cuir digne de ce nom se fait en deux temps : un nettoyage en profondeur pour retirer la saleté incrustée dans le grain sans agresser la matière, suivi d'un traitement nourrissant et protecteur qui redonne de la souplesse et forme une barrière contre les UV et la transpiration. C'est cette étape de nourrissage, souvent négligée, qui fait toute la différence sur la durée de vie de votre sellerie. Le détail de notre prestation figure sur notre page [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture)." },
       { type: 'h2', text: 'À quelle fréquence ?' },
       { type: 'p', text: "Pour un usage quotidien, un traitement complet une à deux fois par an suffit généralement, en complément d'un dépoussiérage régulier. Les zones les plus exposées — siège conducteur, accoudoirs, volant — méritent une attention particulière car ce sont elles qui craquellent en premier." },
-      { type: 'p', text: "Si votre cuir montre déjà des signes de dessèchement, mieux vaut agir maintenant : plus l'intervention est précoce, plus les résultats sont durables. Notre traitement cuir associe nettoyage en profondeur et nourrissage protecteur, adaptés au type et à la couleur de votre sellerie, directement chez vous à [Angers et dans un rayon de 30 km](/zone-intervention/angers)." },
+      { type: 'p', text: "Si votre cuir montre déjà des signes de dessèchement, mieux vaut agir maintenant : plus l'intervention est précoce, plus les résultats sont durables. Notre traitement cuir associe nettoyage en profondeur et nourrissage protecteur, adaptés au type et à la couleur de votre sellerie, directement chez vous à [Angers et dans un rayon de 30 km](/)." },
     ],
   },
   {
@@ -90,7 +91,7 @@ export const ARTICLES = [
       { type: 'p', text: "L'ozone est un gaz oxydant naturellement instable, qui a la particularité de pénétrer partout où l'air circule : tissus, mousses des sièges, moquettes, mais aussi le circuit de ventilation et de climatisation, souvent le grand oublié du nettoyage automobile. En se décomposant, il neutralise bactéries, moisissures, acariens et les molécules responsables des odeurs, sans laisser de résidu chimique ni de parfum masquant. Le détail de la prestation est sur notre page [désinfection à l'ozone à Angers](/prestations/desinfection-ozone)." },
       { type: 'h2', text: 'Une étape recommandée après tout achat d’occasion' },
       { type: 'p', text: "Contrairement à un simple désodorisant qui masque temporairement une odeur, l'ozone s'attaque à sa source. C'est pour cette raison que nous recommandons systématiquement ce traitement après l'achat d'un véhicule d'occasion, en complément d'un [nettoyage intérieur complet](/prestations/nettoyage-interieur-voiture) — particulièrement utile en cas d'odeur de tabac, d'animaux ou d'humidité. Voir aussi notre article [comment enlever une mauvaise odeur dans une voiture](/conseils/enlever-mauvaise-odeur-voiture)." },
-      { type: 'p', text: "Le traitement est sans danger pour l'habitacle une fois le véhicule aéré, et le résultat se fait sentir (littéralement) dès la première utilisation. Un excellent moyen de vous approprier votre nouvelle voiture avant même son premier trajet, où que vous soyez dans notre [zone d'intervention autour d'Angers](/zone-intervention/angers)." },
+      { type: 'p', text: "Le traitement est sans danger pour l'habitacle une fois le véhicule aéré, et le résultat se fait sentir (littéralement) dès la première utilisation. Un excellent moyen de vous approprier votre nouvelle voiture avant même son premier trajet, où que vous soyez dans notre [zone d'intervention autour d'Angers](/)." },
     ],
   },
   {
@@ -124,7 +125,7 @@ export const ARTICLES = [
       { type: 'h2', text: 'Nos deux formules principales' },
       { type: 'p', text: "Le **Coup de Propre** (dès 109 €) est notre formule d'entretien régulier : aspiration complète, dépoussiérage, nettoyage des vitres et tapis, désodorisation. La **Sortie de Concession** (dès 179 €) y ajoute le nettoyage en profondeur des plastiques, le shampouinage des tapis, et inclut le lavage extérieur complet, offert. Tout le détail est sur notre page [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture)." },
       { type: 'h2', text: 'Un tarif confirmé avant intervention' },
-      { type: 'p', text: "Nos formules sont affichées « à partir de » car le tarif final dépend du gabarit et de l'état de votre véhicule. Pour toute prestation complémentaire (polissage, céramique, décontamination), un devis est systématiquement établi avant intervention — sans mauvaise surprise le jour J. Demandez le vôtre en ligne, pour un nettoyage à [Angers et dans un rayon de 30 km](/zone-intervention/angers)." },
+      { type: 'p', text: "Nos formules sont affichées « à partir de » car le tarif final dépend du gabarit et de l'état de votre véhicule. Pour toute prestation complémentaire (polissage, céramique, décontamination), un devis est systématiquement établi avant intervention — sans mauvaise surprise le jour J. Demandez le vôtre en ligne, pour un nettoyage à [Angers et dans un rayon de 30 km](/)." },
     ],
   },
   {
@@ -178,7 +179,7 @@ export const ARTICLES = [
       { type: 'p', text: "Une housse de protection sur la banquette arrière ou le coffre limite fortement l'accumulation de poils sur les textiles d'origine, plus difficiles à nettoyer en profondeur qu'une housse amovible lavable en machine." },
       { type: 'h2', text: 'Quand passer par un nettoyage professionnel' },
       { type: 'p', text: "Si les poils sont incrustés depuis longtemps, ou si votre véhicule accumule aussi des odeurs d'animal, un nettoyage professionnel permet une extraction bien plus complète. Notre formule [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture) comprend l'aspiration complète de l'habitacle, et nous recommandons souvent d'y associer une [désinfection à l'ozone](/prestations/desinfection-ozone) pour éliminer en même temps les allergènes et les odeurs liés aux poils d'animaux." },
-      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/zone-intervention/angers), avec tout le matériel nécessaire." },
+      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/), avec tout le matériel nécessaire." },
     ],
   },
   {
@@ -205,7 +206,7 @@ export const ARTICLES = [
       { type: 'p', text: "Un désodorisant masque une odeur en la recouvrant d'un parfum plus fort, sans jamais neutraliser les molécules qui en sont à l'origine. Résultat : l'odeur réapparaît dès que le parfum s'estompe, parfois mélangée à lui de façon encore moins agréable." },
       { type: 'h2', text: 'La solution qui traite la source : l’ozone' },
       { type: 'p', text: "Notre [désinfection à l'ozone à Angers](/prestations/desinfection-ozone) (dès 59 €) agit différemment : ce gaz oxydant pénètre dans les tissus, la moquette et le circuit de ventilation pour neutraliser bactéries, moisissures et les molécules responsables de l'odeur, sans laisser de résidu ni de parfum masquant. C'est le traitement que nous recommandons systématiquement après l'achat d'un véhicule d'occasion — voir notre article [pourquoi une désinfection à l'ozone change tout sur une occasion](/conseils/voiture-occasion-desinfection-ozone)." },
-      { type: 'p', text: "Pour une odeur liée à une tache ou une saleté visible, associez ce traitement à un [nettoyage intérieur complet](/prestations/nettoyage-interieur-voiture) : les deux prestations se complètent, à [Angers et dans un rayon de 30 km](/zone-intervention/angers)." },
+      { type: 'p', text: "Pour une odeur liée à une tache ou une saleté visible, associez ce traitement à un [nettoyage intérieur complet](/prestations/nettoyage-interieur-voiture) : les deux prestations se complètent, à [Angers et dans un rayon de 30 km](/)." },
     ],
   },
   {
@@ -231,7 +232,7 @@ export const ARTICLES = [
       { type: 'p', text: "Neige fondue, chaussures mouillées : l'habitacle encaisse beaucoup d'humidité en hiver. Des tapis adaptés et un nettoyage intérieur en amont de la saison limitent les odeurs de moisi qui s'installent vite dans un environnement humide. Voir notre [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture)." },
       { type: 'h2', text: '6. Contrôler les optiques avant les journées courtes' },
       { type: 'p', text: "Avec des journées plus courtes, un éclairage net devient encore plus important. Des optiques jaunies diffusent la lumière au lieu de la projeter : une rénovation avant l'hiver est un bon réflexe sécurité." },
-      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/zone-intervention/angers), pour préparer votre véhicule avant l'hiver." },
+      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/), pour préparer votre véhicule avant l'hiver." },
     ],
   },
   {
@@ -255,7 +256,7 @@ export const ARTICLES = [
       { type: 'p', text: "Une odeur de tabac ou d'animal peut faire fuir un acheteur en quelques secondes, même sur un véhicule par ailleurs en bon état. Une [désinfection à l'ozone](/prestations/desinfection-ozone) élimine la source de l'odeur plutôt que de la masquer le temps d'une visite." },
       { type: 'h2', text: 'Et pour les photos de l’annonce ?' },
       { type: 'p', text: "Un véhicule propre, lustré et sans odeur se photographie mieux et génère davantage de contacts sérieux. Faire réaliser ces prestations avant de publier votre annonce, plutôt qu'au moment de la visite, change souvent la donne sur le nombre et la qualité des demandes reçues." },
-      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/zone-intervention/angers), pour préparer votre véhicule avant une vente." },
+      { type: 'p', text: "Nous intervenons directement chez vous, à [Angers et dans un rayon de 30 km](/), pour préparer votre véhicule avant une vente." },
     ],
   },
   {
@@ -282,7 +283,7 @@ export const ARTICLES = [
       { type: 'h2', text: 'L’intérieur, le grand absent des stations de lavage' },
       { type: 'p', text: "La plupart des stations se concentrent sur l'extérieur ; l'intérieur reste à votre charge, ou nécessite un passage séparé à l'aspirateur en libre-service. Un [nettoyage intérieur voiture à domicile](/prestations/nettoyage-interieur-voiture) couvre en une seule intervention l'aspiration complète, les plastiques, les vitres et les tapis." },
       { type: 'h2', text: 'Dans quel cas choisir quoi ?' },
-      { type: 'p', text: "Pour un entretien très ponctuel et rapide entre deux rendez-vous plus complets, une station de lavage reste une solution pratique. Pour un résultat soigné, sans risque pour la peinture, et sans y consacrer votre temps, un nettoyage à domicile reste la solution la plus complète — surtout lorsqu'intérieur et extérieur sont traités en une seule intervention, chez vous, à [Angers et dans un rayon de 30 km](/zone-intervention/angers)." },
+      { type: 'p', text: "Pour un entretien très ponctuel et rapide entre deux rendez-vous plus complets, une station de lavage reste une solution pratique. Pour un résultat soigné, sans risque pour la peinture, et sans y consacrer votre temps, un nettoyage à domicile reste la solution la plus complète — surtout lorsqu'intérieur et extérieur sont traités en une seule intervention, chez vous, à [Angers et dans un rayon de 30 km](/)." },
     ],
   },
   {
@@ -309,7 +310,30 @@ export const ARTICLES = [
       { type: 'h2', text: 'Le traitement céramique : un investissement sur plusieurs années' },
       { type: 'p', text: "Notre [traitement céramique à Angers](/prestations/traitement-ceramique) consiste à faire se lier chimiquement une résine à base de silice au vernis, pour une protection dure et hydrophobe qui dure plusieurs années. Il nécessite en amont une préparation sérieuse — décontamination, et [polissage](/prestations/lustrage-polissage) si la carrosserie présente des défauts — ce qui explique un tarif toujours établi sur devis, après inspection." },
       { type: 'h2', text: 'Dans quel cas choisir quoi ?' },
-      { type: 'p', text: "La cire convient pour un entretien ponctuel, avant un événement ou entre deux prestations plus poussées. Le traitement céramique est un choix pertinent si vous gardez votre véhicule plusieurs années, s'il reste souvent garé en extérieur, ou si vous voulez simplement vous simplifier l'entretien sur la durée. Pour aller plus loin, notre article [traitement céramique : pourquoi et comment](/conseils/traitement-ceramique-pourquoi-comment) détaille tout le processus. Nous intervenons à [Angers et dans un rayon de 30 km](/zone-intervention/angers)." },
+      { type: 'p', text: "La cire convient pour un entretien ponctuel, avant un événement ou entre deux prestations plus poussées. Le traitement céramique est un choix pertinent si vous gardez votre véhicule plusieurs années, s'il reste souvent garé en extérieur, ou si vous voulez simplement vous simplifier l'entretien sur la durée. Pour aller plus loin, notre article [traitement céramique : pourquoi et comment](/conseils/traitement-ceramique-pourquoi-comment) détaille tout le processus. Nous intervenons à [Angers et dans un rayon de 30 km](/)." },
+    ],
+  },
+  {
+    slug: 'nettoyage-voiture-restitution-loa-lld',
+    title: 'Restitution LOA ou LLD : quel nettoyage avant de rendre sa voiture ?',
+    excerpt:
+      "Avant l'état des lieux de fin de contrat, un véhicule propre et sans odeur se présente sous son meilleur jour. Ce qu'il faut préparer, et dans quel ordre.",
+    date: '2026-11-18',
+    readTime: '5 min',
+    metaDescription:
+      'Restitution de voiture en LOA ou LLD à Angers : quel nettoyage prévoir avant l’état des lieux (intérieur, carrosserie, odeurs) ? Les conseils de La Clean Compagny.',
+    content: [
+      { type: 'p', text: "À la fin d'un contrat de location avec option d'achat (LOA) ou de location longue durée (LLD), le véhicule passe un état des lieux de restitution. Le loueur y compare l'état réel de la voiture à ce qu'il considère comme une usure normale, et peut facturer ce qui dépasse. Un véhicule rendu propre, sans odeur et à la carrosserie ravivée se présente sous son meilleur jour au moment de cette inspection." },
+      { type: 'h2', text: 'Commencez par lire le guide de restitution de votre loueur' },
+      { type: 'p', text: "Chaque loueur a ses propres règles : la plupart remettent un guide ou une grille d'usure qui précise ce qui est toléré (petites rayures superficielles, usure des sièges liée à l'âge…) et ce qui est facturé. Certains prévoient aussi des frais si le véhicule est rendu sale. Lisez ce document avant de prendre rendez-vous : il vous dira sur quoi concentrer vos efforts." },
+      { type: 'h2', text: 'L’intérieur : propreté, taches et odeurs' },
+      { type: 'p', text: "C'est le premier point visible à l'ouverture des portes. Notre [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture) traite l'aspiration complète, les plastiques, les vitres et les tapis dès 109 €. Pour un habitacle qui a beaucoup vécu, la formule Sortie de Concession (dès 179 €) ajoute le shampouinage des tapis et le nettoyage minutieux des recoins." },
+      { type: 'p', text: "Une odeur de tabac ou d'animal est souvent ce qui marque le plus lors d'une inspection, et un simple désodorisant ne fait que la masquer quelques heures. Une [désinfection à l'ozone](/prestations/desinfection-ozone) (dès 59 €) traite la source de l'odeur. Pour les poils d'animaux incrustés dans les tissus, voir aussi notre article [enlever les poils de chien dans une voiture](/conseils/enlever-poils-chien-voiture)." },
+      { type: 'h2', text: 'La carrosserie : raviver avant d’être inspectée' },
+      { type: 'p', text: "Un [lustrage minute](/prestations/lustrage-polissage) (dès 59 €) redonne de la brillance et atténue les micro-rayures et traces superficielles laissées par les lavages. Pour des défauts plus marqués, un polissage sur devis peut corriger davantage. En revanche, une rayure profonde qui a traversé le vernis ou un choc sur la tôle relèvent d'un carrossier : nous vous le dirons honnêtement lors du devis." },
+      { type: 'h2', text: 'Quand prévoir le nettoyage ?' },
+      { type: 'p', text: "Idéalement quelques jours avant la date de restitution, pour garder une marge si un point demande plus de travail que prévu. Pensez aussi à retirer vos effets personnels, à vider le coffre et à rassembler les doubles de clés et documents demandés par le loueur." },
+      { type: 'p', text: "Nous intervenons directement chez vous ou sur votre lieu de travail, à [Angers et dans un rayon de 30 km](/), pour préparer votre véhicule avant sa restitution. Indiquez simplement la date de l'état des lieux lors de votre [demande de devis](/devis)." },
     ],
   },
 ]

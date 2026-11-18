@@ -41,8 +41,37 @@ export const SERVICE_PAGES = [
         answer: "Oui, nous proposons un traitement cuir dédié (nettoyage, nourrissage, protection) à partir de 60 €, pensé pour préserver la souplesse du cuir et éviter le craquellement. Voir aussi nos conseils pour [entretenir un intérieur cuir](/conseils/entretenir-interieur-cuir-bons-gestes).",
       },
     ],
+    // Vraies réalisations (photos du site, cf. lib/data/beforeAfter.js et
+    // public/images/interieur/) affichées sous le contenu de la page.
+    realisations: {
+      pairs: [
+        {
+          before: '/images/avant-apres/nettoyage-interieur-peugeot-308-angers-avant.jpg',
+          after: '/images/avant-apres/nettoyage-interieur-peugeot-308-angers-apres.jpg',
+          alt: 'Habitacle de Peugeot 308 nettoyé à Angers',
+          caption: 'Peugeot 308 — habitacle complet',
+        },
+        {
+          before: '/images/avant-apres/nettoyage-interieur-alfa-romeo-angers-avant.jpg',
+          after: '/images/avant-apres/nettoyage-interieur-alfa-romeo-angers-apres.jpg',
+          alt: 'Habitacle cuir d’Alfa Romeo nettoyé à Angers',
+          caption: 'Alfa Romeo — habitacle cuir',
+        },
+        {
+          before: '/images/avant-apres/nettoyage-tapis-peugeot-angers-avant.jpg',
+          after: '/images/avant-apres/nettoyage-tapis-peugeot-angers-apres.jpg',
+          alt: 'Tapis de sol de Peugeot nettoyé en profondeur à Angers',
+          caption: 'Tapis de sol — nettoyage en profondeur',
+        },
+      ],
+      photos: [
+        { src: '/images/interieur/bmw-m3-nettoyage-interieur-angers.jpg', alt: 'Intérieur de BMW M3 après un nettoyage intérieur à Angers' },
+        { src: '/images/interieur/bmw-x7-nettoyage-interieur-angers.jpg', alt: 'Intérieur de BMW X7 après un nettoyage intérieur à Angers' },
+        { src: '/images/interieur/aston-martin-vantage-s-nettoyage-interieur-angers.jpg', alt: 'Intérieur d’Aston Martin Vantage S nettoyé à Angers' },
+      ],
+    },
     relatedServices: ['lavage-exterieur-domicile', 'desinfection-ozone'],
-    relatedArticles: ['entretenir-interieur-cuir-bons-gestes', 'enlever-tache-siege-tissu-voiture'],
+    relatedArticles: ['entretenir-interieur-cuir-bons-gestes', 'enlever-tache-siege-tissu-voiture', 'nettoyage-voiture-restitution-loa-lld'],
   },
   {
     slug: 'lavage-exterieur-domicile',
@@ -78,6 +107,13 @@ export const SERVICE_PAGES = [
         answer: "Oui, nous intervenons aussi bien chez les particuliers qu'en entreprise. Pour une flotte de véhicules, consultez notre espace Pro, avec facturation groupée et tarifs dégressifs.",
       },
     ],
+    realisations: {
+      photos: [
+        { src: '/images/exterieur/bmw-m3-lavage-exterieur-angers.jpg', alt: 'BMW M3 après un lavage extérieur à domicile à Angers' },
+        { src: '/images/exterieur/ferrari-california-lavage-prestige-angers.jpg', alt: 'Ferrari California après un lavage extérieur prestige à Angers' },
+        { src: '/images/exterieur/ferrari-jaune-lavage-mousse-angers.jpg', alt: 'Ferrari jaune pendant le prélavage à la mousse active à Angers' },
+      ],
+    },
     relatedServices: ['nettoyage-interieur-voiture', 'lustrage-polissage'],
     relatedArticles: ['nettoyage-domicile-vs-station-lavage', 'preparer-voiture-hiver'],
   },
@@ -119,6 +155,26 @@ export const SERVICE_PAGES = [
         answer: "Sans protection complémentaire, l'effet s'estompe progressivement avec les lavages et l'exposition aux UV, en général après quelques mois. Pour une protection qui dure plusieurs années, associez votre polissage à un traitement céramique.",
       },
     ],
+    realisations: {
+      pairs: [
+        {
+          before: '/images/lustrage/x1-lustrage-minute-avant.jpg',
+          after: '/images/lustrage/x1-lustrage-minute-apres.jpg',
+          alt: 'Rayure sur la portière d’un BMW X1 effacée par un lustrage à domicile',
+          caption: 'BMW X1 — rayure de poteau effacée à domicile',
+        },
+        {
+          before: '/images/lustrage/mini-cooper-lustrage-minute-avant.jpg',
+          after: '/images/lustrage/mini-cooper-lustrage-minute-apres.jpg',
+          alt: 'Carrosserie de Mini Cooper ravivée par un lustrage minute',
+          caption: 'Mini Cooper — micro-rayures et brillance',
+        },
+      ],
+      photos: [
+        { src: '/images/exterieur/porsche-911-gt3-polissage-showroom-angers.jpg', alt: 'Porsche 911 GT3 après polissage, finition showroom, à Angers' },
+        { src: '/images/lustrage/lustrage-showroom.jpg', alt: 'Carrosserie au fini miroir après un lustrage La Clean Compagny' },
+      ],
+    },
     relatedServices: ['traitement-ceramique', 'lavage-exterieur-domicile'],
     relatedArticles: ['polissage-ou-lustrage-quelle-difference'],
   },
@@ -194,6 +250,13 @@ export const SERVICE_PAGES = [
         answer: "La prestation moto est une exclusivité de notre espace Particuliers. Pour une flotte de véhicules professionnels (utilitaires, poids lourds, engins), consultez notre espace Pro.",
       },
     ],
+    realisations: {
+      photos: [
+        { src: '/images/moto/bmw-r12-detailing-moto-angers.jpg', alt: 'BMW R12 après un detailing complet à Angers' },
+        { src: '/images/moto/enzo-lustrage-moto-bmw-angers.jpg', alt: 'Enzo, gérant de La Clean Compagny, lustre une moto BMW' },
+        { src: '/images/moto/bmw-f900-detail-echappement-moto-angers.jpg', alt: 'Échappement carbone de BMW F900 après lustrage' },
+      ],
+    },
     relatedServices: ['lustrage-polissage', 'nettoyage-interieur-voiture'],
     relatedArticles: ['polissage-ou-lustrage-quelle-difference'],
   },

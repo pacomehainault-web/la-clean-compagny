@@ -86,7 +86,28 @@ const nextConfig = {
       destination: 'https://www.lacleancompagny.com/:path*',
       permanent: true,
     })
-    return [toWww('lacleancompagny.fr'), toWww('www.lacleancompagny.fr'), toWww('lacleancompagny.com')]
+    // Restructuration SEO de la zone d'intervention (novembre 2026) :
+    // - /zone-intervention/angers faisait concurrence à la page d'accueil sur
+    //   « nettoyage voiture Angers » : son contenu a été fusionné dans l'accueil.
+    // - Les petites communes (`grouped: true` dans lib/data/cities.js) sont
+    //   regroupées sur une seule page, plus solide que quatre pages minces.
+    //   ⚠️ Liste à garder alignée avec les communes `grouped: true` de
+    //   lib/data/cities.js (non importé ici : next.config.mjs est chargé par
+    //   Node en dehors du bundler, et lib/ est en syntaxe ESM sans "type": "module").
+    const groupedCommunes = ['murs-erigne', 'montreuil-juigne', 'ecouflant', 'sainte-gemmes-sur-loire'].map(
+      (slug) => ({
+        source: `/zone-intervention/${slug}`,
+        destination: '/zone-intervention/communes-voisines',
+        permanent: true,
+      })
+    )
+    return [
+      toWww('lacleancompagny.fr'),
+      toWww('www.lacleancompagny.fr'),
+      toWww('lacleancompagny.com'),
+      { source: '/zone-intervention/angers', destination: '/', permanent: true },
+      ...groupedCommunes,
+    ]
   },
 };
 

@@ -135,3 +135,31 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* Réalisations (avant/après + photos réelles) — cf. `realisations` dans
+   lib/data/servicePages.js. */
+.realisationsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .realisationsGrid {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    margin-inline: auto;
+  }
+}
+
+.realisationCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.realisationCaption {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}

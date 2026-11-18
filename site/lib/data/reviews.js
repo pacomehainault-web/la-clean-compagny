@@ -1,6 +1,6 @@
 // Vrais avis Google de La Clean Compagny.
 // Note moyenne et nombre total d'avis dans AGGREGATE_RATING ci-dessous
-// (37 avis au total sur la fiche Google ; les 23 les plus complets sont
+// (47 avis au total sur la fiche Google au 18/11/2026 ; les 23 les plus complets sont
 // affichés dans le carrousel).
 
 export const REVIEWS = [
@@ -125,5 +125,6 @@ export const REVIEWS = [
 
 export const AGGREGATE_RATING = {
   ratingValue: 5,
-  reviewCount: 37,
+  // À mettre à jour quand la fiche Google gagne des avis (relevé du 18/11/2026).
+  reviewCount: 47,
 }

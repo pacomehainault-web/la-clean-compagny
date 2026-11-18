@@ -2,8 +2,10 @@
 // TOUTES les pages ville. `extra` : paragraphe(s) complémentaire(s), propres à
 // chaque commune (jamais un simple gabarit avec le nom qui change), affichés
 // sous l'intro pour que chaque page dépasse la simple fiche générique.
-// `neighborhoods` et `faq` : réservés à Angers, notre page la plus importante
-// (cf. app/zone-intervention/[ville]/page.js).
+// `neighborhoods` et `faq` : réservés à Angers, affichés sur la page d'accueil
+// (cf. app/page.js), qui porte la requête « nettoyage voiture Angers ».
+// `grouped: true` : commune présentée sur la page commune
+// /zone-intervention/communes-voisines au lieu d'une page dédiée.
 export const CITIES = [
   {
     slug: 'angers',
@@ -129,6 +131,7 @@ export const CITIES = [
   },
   {
     slug: 'murs-erigne',
+    grouped: true,
     name: 'Mûrs-Érigné',
     distanceKm: 12,
     intro:
@@ -139,6 +142,7 @@ export const CITIES = [
   },
   {
     slug: 'montreuil-juigne',
+    grouped: true,
     name: 'Montreuil-Juigné',
     distanceKm: 10,
     intro:
@@ -149,6 +153,7 @@ export const CITIES = [
   },
   {
     slug: 'ecouflant',
+    grouped: true,
     name: 'Écouflant',
     distanceKm: 8,
     intro:
@@ -159,6 +164,7 @@ export const CITIES = [
   },
   {
     slug: 'sainte-gemmes-sur-loire',
+    grouped: true,
     name: 'Sainte-Gemmes-sur-Loire',
     distanceKm: 8,
     intro:
@@ -171,4 +177,31 @@ export const CITIES = [
 
 export function getCity(slug) {
   return CITIES.find((c) => c.slug === slug)
+}
+
+// Page qui regroupe les communes plus petites (`grouped: true`) : tant
+// qu'elles n'ont pas assez de contenu propre (réalisations, avis situés dans
+// la commune…), une page commune solide vaut mieux que quatre pages minces que
+// Google refuse d'explorer. Les anciennes URL redirigent ici en 308
+// (next.config.mjs).
+export const GROUPED_COMMUNES_PATH = '/zone-intervention/communes-voisines'
+
+// Angers n'a plus de page dédiée : c'est la page d'accueil qui porte la
+// requête « nettoyage voiture Angers » (l'ancienne /zone-intervention/angers
+// lui faisait concurrence et redirige désormais vers /).
+export const HOME_CITY_SLUG = 'angers'
+
+// Communes qui gardent leur propre page /zone-intervention/[ville].
+export const STANDALONE_CITIES = CITIES.filter(
+  (c) => !c.grouped && c.slug !== HOME_CITY_SLUG
+)
+
+export const GROUPED_CITIES = CITIES.filter((c) => c.grouped)
+
+// Lien canonique vers la page qui parle d'une commune — à utiliser partout
+// plutôt que de construire `/zone-intervention/${slug}` à la main.
+export function cityHref(city) {
+  if (city.slug === HOME_CITY_SLUG) return '/'
+  if (city.grouped) return `${GROUPED_COMMUNES_PATH}#${city.slug}`
+  return `/zone-intervention/${city.slug}`
 }

@@ -77,7 +77,7 @@ export default async function ArticlePage({ params }) {
               <p className={styles.footerTitle}>Besoin d&apos;un pro à Angers ?</p>
               <p className="lead">
                 Nos équipes interviennent directement chez vous, à{' '}
-                <Link href="/zone-intervention/angers">Angers et dans un rayon de 30 km</Link>.
+                <Link href="/">Angers et dans un rayon de 30 km</Link>.
               </p>
               <Link href="/devis" className="btn btn-cta" style={{ marginTop: 20 }}>
                 Voir les tarifs et réserver

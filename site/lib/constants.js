@@ -38,6 +38,10 @@ export const CONTACT = {
   // Lien canonique de la fiche Google Business, construit à partir du même
   // Place ID — c'est ce que lib/schema.js ajoute à `sameAs`.
   googleBusinessUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJx9Gdg9C2eiERIW19sIjwZH4',
+  // Même fiche, via son identifiant numérique (CID) relevé dans les résultats
+  // Google : c'est la forme d'URL que Google utilise lui-même pour une fiche,
+  // utile dans `sameAs` pour relier sans ambiguïté le site à la fiche.
+  googleMapsCidUrl: 'https://maps.google.com/?cid=9107668816317213985',
 }
 
 export const SOCIALS = {

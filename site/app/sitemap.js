@@ -1,7 +1,13 @@
 import { SITE } from '@/lib/constants'
-import { CITIES } from '@/lib/data/cities'
+import { STANDALONE_CITIES, GROUPED_COMMUNES_PATH } from '@/lib/data/cities'
 import { ARTICLES } from '@/lib/data/articles'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
+
+// Date de dernière modification réelle du contenu. Avant, chaque URL
+// recevait `new Date()` (la date du build) : toutes les pages semblaient
+// modifiées à chaque déploiement, et Google finit par ignorer un lastmod qui
+// ne veut rien dire. À mettre à jour quand le contenu change vraiment.
+const CONTENT_UPDATED = new Date('2026-11-18')
 
 const STATIC_ROUTES = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
@@ -12,6 +18,7 @@ const STATIC_ROUTES = [
   { path: '/evenements', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/notre-histoire', changeFrequency: 'yearly', priority: 0.6 },
   { path: '/zone-intervention', changeFrequency: 'monthly', priority: 0.7 },
+  { path: GROUPED_COMMUNES_PATH, changeFrequency: 'monthly', priority: 0.6 },
   { path: '/conseils', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/faq', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/avis', changeFrequency: 'weekly', priority: 0.5 },
@@ -25,14 +32,17 @@ const STATIC_ROUTES = [
 export default function sitemap() {
   const staticEntries = STATIC_ROUTES.map((route) => ({
     url: new URL(route.path, SITE.url).toString(),
-    lastModified: new Date(),
+    lastModified: CONTENT_UPDATED,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }))
 
-  const cityEntries = CITIES.map((city) => ({
+  // Uniquement les communes qui ont leur propre page : Angers est portée par
+  // l'accueil et les petites communes par GROUPED_COMMUNES_PATH (redirections
+  // dans next.config.mjs — une URL redirigée n'a rien à faire dans un sitemap).
+  const cityEntries = STANDALONE_CITIES.map((city) => ({
     url: new URL(`/zone-intervention/${city.slug}`, SITE.url).toString(),
-    lastModified: new Date(),
+    lastModified: CONTENT_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.6,
   }))
@@ -46,7 +56,7 @@ export default function sitemap() {
 
   const serviceEntries = SERVICE_PAGES.map((service) => ({
     url: new URL(`/prestations/${service.slug}`, SITE.url).toString(),
-    lastModified: new Date(),
+    lastModified: CONTENT_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.8,
   }))
