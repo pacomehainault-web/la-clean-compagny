@@ -13,9 +13,9 @@ const GIFT_CARD_TERMS = [
 ]
 
 export const metadata = buildMetadata({
-  title: 'Bons cadeaux — Offrez un detailing haut de gamme',
+  title: 'Bon cadeau nettoyage voiture à Angers — idée cadeau Noël',
   description:
-    "Offrez un bon cadeau La Clean Compagny : formule Coup de Propre, Sortie de Concession ou montant libre. L'idée cadeau parfaite pour tout passionné d'automobile.",
+    "Bon cadeau nettoyage de voiture à Angers : formule Coup de Propre, Sortie de Concession ou montant libre. L'idée cadeau de Noël ou d'anniversaire pour tout automobiliste.",
   path: '/bons-cadeaux',
 })
 

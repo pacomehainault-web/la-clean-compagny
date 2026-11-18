@@ -3,6 +3,8 @@ import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import ContentBlocks, { TableOfContents } from '@/components/ContentBlocks'
 import FAQAccordion from '@/components/FAQAccordion'
+import BeforeAfterSlider from '@/components/BeforeAfterSlider'
+import PhotoGallery from '@/components/PhotoGallery'
 import JsonLd from '@/components/JsonLd'
 import {
   IconArrowRight,
@@ -110,7 +112,33 @@ export default async function ServiceDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="section section-alt">
+      {service.realisations && (
+        <section className="section section-alt">
+          <div className="container">
+            <div className={styles.sectionHead}>
+              <span className="eyebrow">La preuve par l&apos;image</span>
+              <h2>Nos réalisations : {service.name.toLowerCase()}</h2>
+            </div>
+            {service.realisations.pairs?.length > 0 && (
+              <div className={styles.realisationsGrid}>
+                {service.realisations.pairs.map((pair) => (
+                  <div className={styles.realisationCard} key={pair.before}>
+                    <BeforeAfterSlider before={pair.before} after={pair.after} alt={pair.alt} />
+                    <p className={styles.realisationCaption}>{pair.caption}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {service.realisations.photos?.length > 0 && (
+              <div style={{ marginTop: service.realisations.pairs?.length ? 32 : 0 }}>
+                <PhotoGallery photos={service.realisations.photos} />
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <section className={`section ${service.realisations ? '' : 'section-alt'}`}>
         <div className="container" style={{ maxWidth: 820 }}>
           <div className={styles.sectionHead}>
             <span className="eyebrow">Questions fréquentes</span>
@@ -121,7 +149,7 @@ export default async function ServiceDetailPage({ params }) {
       </section>
 
       {relatedArticles.length > 0 && (
-        <section className="section">
+        <section className={`section ${service.realisations ? 'section-alt' : ''}`}>
           <div className="container">
             <div className={styles.sectionHead}>
               <span className="eyebrow">Pour aller plus loin</span>
@@ -139,12 +167,12 @@ export default async function ServiceDetailPage({ params }) {
         </section>
       )}
 
-      <section className="section section-alt">
+      <section className={`section ${service.realisations ? '' : 'section-alt'}`}>
         <div className="container" style={{ textAlign: 'center' }}>
           <span className="eyebrow">Angers et {CONTACT.radiusKm} km alentour</span>
           <h2 style={{ marginTop: 14 }}>
             Disponible sur toute notre{' '}
-            <Link href="/zone-intervention/angers" className={styles.inlineLink}>
+            <Link href="/zone-intervention" className={styles.inlineLink}>
               zone d&apos;intervention à Angers
             </Link>
           </h2>

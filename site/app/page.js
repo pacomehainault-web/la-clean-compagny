@@ -12,24 +12,53 @@ import MotoSlider from '@/components/MotoSlider'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
 import FAQAccordion from '@/components/FAQAccordion'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
-import { VEHICLE_ICONS, IconArrowRight, IconCheck } from '@/components/Icons'
+import JsonLd from '@/components/JsonLd'
+import { VEHICLE_ICONS, IconArrowRight, IconCheck, IconMapPin } from '@/components/Icons'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { REVIEWS } from '@/lib/data/reviews'
-import { FAQ_ITEMS } from '@/lib/data/faq'
-import { CITIES } from '@/lib/data/cities'
+import { CITIES, HOME_CITY_SLUG, getCity, cityHref } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
+import { faqPageSchema } from '@/lib/schema'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
 import { LUSTRAGE_MINUTE_HIGHLIGHT, MOTO_PRICING, FORMULAS_PRICING } from '@/lib/data/pricing'
 import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
 
+// La page d'accueil porte la requête « nettoyage voiture Angers » : c'est elle
+// que la fiche Google pointe et qui concentre les liens. L'ancienne page
+// /zone-intervention/angers (même cible, contenu proche) lui faisait
+// concurrence ; son contenu propre à Angers (quartiers, FAQ locale, méthode)
+// est désormais ici, et l'ancienne URL redirige vers / (next.config.mjs).
+// NB : le template de titre du layout ne s'applique pas à la page racine
+// (même segment), d'où la marque écrite en toutes lettres.
 export const metadata = buildMetadata({
-  title: 'Nettoyage voiture à domicile à Angers',
-  description:
-    'Nettoyage voiture à domicile à Angers : intérieur, extérieur, lustrage, céramique. Zone de 30 km, avis 5.0 ★ Google, devis rapide en ligne.',
+  title: 'Nettoyage voiture Angers à domicile | La Clean Compagny',
+  description: `Nettoyage voiture à domicile à Angers dès ${FORMULAS_PRICING[0].prices.citadine} € : intérieur, extérieur, lustrage, céramique. 30 km autour d'Angers, avis 5.0 ★ Google, devis en ligne.`,
   path: '/',
 })
+
+const ANGERS = getCity(HOME_CITY_SLUG)
+const NEARBY_CITIES = CITIES.filter((c) => c.slug !== HOME_CITY_SLUG)
+
+const HOW_IT_WORKS = [
+  {
+    title: 'Devis',
+    text: "Vous décrivez votre véhicule (gabarit, état, prestations souhaitées) et recevez une estimation en quelques minutes, en ligne ou par téléphone.",
+  },
+  {
+    title: 'Rendez-vous',
+    text: "Nous convenons ensemble d'un créneau à votre domicile, sur votre lieu de travail, ou tout autre endroit adapté.",
+  },
+  {
+    title: 'Intervention sur place',
+    text: "Nous intervenons avec notre propre matériel. Un accès à l'eau et à l'électricité est utile selon la prestation choisie.",
+  },
+  {
+    title: 'Contrôle qualité',
+    text: 'Chaque intervention se termine par une vérification minutieuse, pour un résultat conforme à ce qui a été convenu lors du devis.',
+  },
+]
 
 // Régénère la page toutes les heures : suffisant pour suivre la rotation de
 // l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
@@ -67,6 +96,7 @@ export default function HomePage() {
 
   return (
     <IntroSequence>
+      <JsonLd data={faqPageSchema(ANGERS.faq)} />
       <SpaceGateway />
 
       <section className={styles.hero}>
@@ -83,11 +113,11 @@ export default function HomePage() {
           <p className={styles.heroDirect}>
             Nettoyage intérieur dès {FORMULAS_PRICING[0].prices.citadine} €, rénovation complète dès{' '}
             {FORMULAS_PRICING[1].prices.citadine} €, lustrage dès {LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €.
-            Devis en ligne en quelques minutes, pour un{' '}
-            <Link href="/zone-intervention/angers" className={styles.heroDirectLink}>
-              nettoyage de voiture à Angers
-            </Link>{' '}
-            et {CONTACT.radiusKm} km alentour.
+            Devis en ligne en quelques minutes, pour un nettoyage de voiture à Angers et{' '}
+            <Link href="/zone-intervention" className={styles.heroDirectLink}>
+              {CONTACT.radiusKm} km alentour
+            </Link>
+            .
           </p>
           <div className={styles.heroActions}>
             <Link href="/devis" className="btn btn-cta">
@@ -376,13 +406,24 @@ export default function HomePage() {
             <div>
               <span className="eyebrow">Zone d&apos;intervention</span>
               <h2 style={{ marginTop: 14 }}>Angers et jusqu&apos;à {CONTACT.radiusKm} km alentour</h2>
-              <p className="lead" style={{ marginTop: 18 }}>
-                Nous nous déplaçons directement chez vous ou sur votre lieu de travail, à Angers
-                et dans les communes environnantes.
-              </p>
-              <div className={styles.chipRow} style={{ marginTop: 24 }}>
-                {CITIES.slice(0, 8).map((c) => (
-                  <Link href={`/zone-intervention/${c.slug}`} className={styles.chip} key={c.slug}>
+              {ANGERS.extra.map((p, i) => (
+                <p className={i === 0 ? 'lead' : styles.zoneText} style={{ marginTop: 18 }} key={i}>
+                  {p}
+                </p>
+              ))}
+              <h3 className={styles.zoneSubtitle}>Tous les quartiers d&apos;Angers</h3>
+              <div className={styles.neighborhoodGrid}>
+                {ANGERS.neighborhoods.map((n) => (
+                  <span className={styles.neighborhoodChip} key={n}>
+                    <IconMapPin size={14} />
+                    {n}
+                  </span>
+                ))}
+              </div>
+              <h3 className={styles.zoneSubtitle}>Et les communes voisines</h3>
+              <div className={styles.chipRow}>
+                {NEARBY_CITIES.map((c) => (
+                  <Link href={cityHref(c)} className={styles.chip} key={c.slug}>
                     {c.name}
                   </Link>
                 ))}
@@ -399,10 +440,28 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container">
+          <div className={`${styles.sectionHead} reveal`}>
+            <span className="eyebrow">Notre méthode</span>
+            <h2>Comment se passe une intervention ?</h2>
+          </div>
+          <div className={`${styles.stepsGrid} reveal`}>
+            {HOW_IT_WORKS.map((step, i) => (
+              <div className={styles.step} key={step.title}>
+                <span className={styles.stepNumber}>{i + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
           <div className={`${styles.faqGrid} reveal`}>
             <div>
               <span className="eyebrow">Questions fréquentes</span>
-              <h2 style={{ marginTop: 14 }}>Tout ce qu&apos;il faut savoir</h2>
+              <h2 style={{ marginTop: 14 }}>Nettoyage de voiture à Angers : vos questions</h2>
               <p className="lead" style={{ marginTop: 18 }}>
                 Une question sur nos prestations, nos délais ou nos tarifs ?
               </p>
@@ -411,7 +470,7 @@ export default function HomePage() {
                 <IconArrowRight size={16} />
               </Link>
             </div>
-            <FAQAccordion items={FAQ_ITEMS.slice(0, 4)} />
+            <FAQAccordion items={ANGERS.faq} />
           </div>
         </div>
       </section>

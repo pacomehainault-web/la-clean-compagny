@@ -12,9 +12,16 @@ import { absoluteUrl } from './seo'
 export function localBusinessSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'AutoDetailing',
+    // « AutoDetailing » n'existe pas dans schema.org : Google ignorait donc ce
+    // bloc. AutoWash (sous-type de AutomotiveBusiness → LocalBusiness) est le
+    // type officiel le plus proche d'une activité de nettoyage/detailing auto.
+    '@type': 'AutoWash',
     '@id': absoluteUrl('/#business'),
     name: SITE.name,
+    // Google corrige souvent « Compagny » en « Company » (et certains avis
+    // l'écrivent ainsi) : on déclare explicitement la variante pour qu'il la
+    // rattache à la même entreprise.
+    alternateName: 'La Clean Company',
     description:
       "Detailing automobile haut de gamme à Angers : rénovation esthétique, nettoyage intérieur/extérieur, polissage, traitement céramique, pour véhicules du quotidien, utilitaires et voitures de prestige.",
     slogan: SITE.slogan,
@@ -50,7 +57,7 @@ export function localBusinessSchema() {
       },
       ...CITIES.map((city) => ({ '@type': 'City', name: city.name })),
     ],
-    sameAs: [...Object.values(SOCIALS), CONTACT.googleBusinessUrl],
+    sameAs: [...Object.values(SOCIALS), CONTACT.googleBusinessUrl, CONTACT.googleMapsCidUrl],
   }
 }
 

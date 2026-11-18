@@ -2,7 +2,7 @@ import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import { IconMapPin, IconArrowRight } from '@/components/Icons'
-import { CITIES } from '@/lib/data/cities'
+import { CITIES, cityHref } from '@/lib/data/cities'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import styles from './page.module.css'
@@ -30,7 +30,7 @@ export default function ZoneInterventionPage() {
             <div>
               <div className={styles.cityGrid}>
                 {CITIES.map((c) => (
-                  <Link href={`/zone-intervention/${c.slug}`} className={styles.cityCard} key={c.slug}>
+                  <Link href={cityHref(c)} className={styles.cityCard} key={c.slug}>
                     <span className={styles.cityName}>
                       <IconMapPin size={14} style={{ marginRight: 8, verticalAlign: '-2px', color: 'var(--color-brand-blue)' }} />
                       {c.name}
