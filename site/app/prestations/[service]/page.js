@@ -6,6 +6,10 @@ import FAQAccordion from '@/components/FAQAccordion'
 import BeforeAfterSlider from '@/components/BeforeAfterSlider'
 import PhotoGallery from '@/components/PhotoGallery'
 import JsonLd from '@/components/JsonLd'
+import LeadForm from '@/components/LeadForm'
+import ComparisonTable from '@/components/ComparisonTable'
+import ReviewCards from '@/components/ReviewCards'
+import PricingMatrixTable from '@/components/PricingMatrixTable'
 import {
   IconArrowRight,
   IconDroplet,
@@ -15,7 +19,9 @@ import {
   IconEye,
   IconLeaf,
   IconStar,
+  IconCheck,
 } from '@/components/Icons'
+import { FORMULAS_PRICING, EXTERIOR_PRICING, CORRECTION_PRICING } from '@/lib/data/pricing'
 import { SERVICE_PAGES, getServicePage } from '@/lib/data/servicePages'
 import { getArticle } from '@/lib/data/articles'
 import { CITIES, cityHref } from '@/lib/data/cities'
@@ -25,6 +31,21 @@ import { serviceSchema, faqPageSchema, breadcrumbSchema } from '@/lib/schema'
 import styles from './page.module.css'
 
 const ICONS = { IconDroplet, IconSparkle, IconShield, IconMoto, IconEye, IconLeaf, IconStar }
+
+// Grille de prix par gabarit affichée sur la page de la prestation (mêmes
+// données que /prestations : rien n'est dupliqué).
+const PRICE_GRIDS = {
+  'nettoyage-interieur-voiture': { title: 'Nos formules de nettoyage intérieur', rows: FORMULAS_PRICING },
+  'lavage-exterieur-domicile': { title: 'Nos formules de lavage extérieur', rows: EXTERIOR_PRICING },
+  'lustrage-polissage': { title: 'Nos formules de lustrage et polissage', rows: CORRECTION_PRICING },
+}
+
+const QUICK_CHECKS = [
+  `Chez vous ou au travail, jusqu'à ${CONTACT.radiusKm} km d'Angers`,
+  'Sans frais de déplacement',
+  'Réponse sous 24h ouvrées',
+  'Prix fixé au devis, sans surprise',
+]
 
 export function generateStaticParams() {
   return SERVICE_PAGES.map((s) => ({ service: s.slug }))
@@ -50,6 +71,8 @@ export default async function ServiceDetailPage({ params }) {
   const Icon = ICONS[service.icon]
   const related = (service.relatedServices || []).map(getServicePage).filter(Boolean)
   const relatedArticles = (service.relatedArticles || []).map(getArticle).filter(Boolean)
+  const priceGrid = PRICE_GRIDS[service.slug]
+  const serviceIndex = SERVICE_PAGES.findIndex((s) => s.slug === service.slug)
 
   return (
     <>
@@ -69,6 +92,36 @@ export default async function ServiceDetailPage({ params }) {
         lead={service.directAnswer}
         breadcrumb={[{ label: 'Prestations', href: '/prestations' }, { label: service.name }]}
       />
+
+      {/* Formulaire de rappel tout de suite sous le titre, comme sur les
+          sites les mieux classés : le visiteur pressé laisse son numéro. */}
+      <section className={`section-tight ${styles.formBand}`}>
+        <div className={`container ${styles.formBandInner}`}>
+          <div className={styles.formBandText}>
+            <span className={styles.formBandPrice}>{service.name} · {service.priceLine}</span>
+            <ul className={styles.quickChecks}>
+              {QUICK_CHECKS.map((c) => (
+                <li key={c}>
+                  <IconCheck size={18} />
+                  {c}
+                </li>
+              ))}
+            </ul>
+            <div className={styles.formBandCtas}>
+              <Link href="/devis" className="btn btn-cta">
+                Réserver en ligne
+                <IconArrowRight size={18} />
+              </Link>
+              <a href={telLink()} className="btn btn-outline">
+                {CONTACT.phoneDisplay}
+              </a>
+            </div>
+          </div>
+          <div className={styles.formBandForm}>
+            <LeadForm source={`prestation-${service.slug}`} title={`${service.name} : être rappelé`} />
+          </div>
+        </div>
+      </section>
 
       <section className="section">
         <div className="container">
@@ -113,8 +166,24 @@ export default async function ServiceDetailPage({ params }) {
         </div>
       </section>
 
-      {service.realisations && (
+      {priceGrid && (
         <section className="section section-alt">
+          <div className="container">
+            <div className={styles.sectionHead}>
+              <span className="eyebrow">Tarifs {service.name.toLowerCase()} à Angers</span>
+              <h2>{priceGrid.title}</h2>
+            </div>
+            <PricingMatrixTable services={priceGrid.rows} />
+            <p className={styles.priceNote}>
+              Prix de départ selon le gabarit du véhicule, déplacement inclus jusqu&apos;à {CONTACT.radiusKm} km
+              d&apos;Angers. Le prix exact est confirmé au devis selon l&apos;état du véhicule.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {service.realisations && (
+        <section className="section">
           <div className="container">
             <div className={styles.sectionHead}>
               <span className="eyebrow">La preuve par l&apos;image</span>
@@ -139,7 +208,27 @@ export default async function ServiceDetailPage({ params }) {
         </section>
       )}
 
-      <section className={`section ${service.realisations ? '' : 'section-alt'}`}>
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Avis clients</span>
+            <h2>Ils nous ont confié leur voiture</h2>
+          </div>
+          <ReviewCards offset={serviceIndex * 3} />
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container" style={{ maxWidth: 1000 }}>
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Comparer avant de choisir</span>
+            <h2>{service.name} : à domicile, en station ou vous-même ?</h2>
+          </div>
+          <ComparisonTable />
+        </div>
+      </section>
+
+      <section className="section section-alt">
         <div className="container" style={{ maxWidth: 820 }}>
           <div className={styles.sectionHead}>
             <span className="eyebrow">Questions fréquentes</span>
@@ -150,7 +239,7 @@ export default async function ServiceDetailPage({ params }) {
       </section>
 
       {relatedArticles.length > 0 && (
-        <section className={`section ${service.realisations ? 'section-alt' : ''}`}>
+        <section className="section">
           <div className="container">
             <div className={styles.sectionHead}>
               <span className="eyebrow">Pour aller plus loin</span>
@@ -168,8 +257,9 @@ export default async function ServiceDetailPage({ params }) {
         </section>
       )}
 
-      <section className={`section ${service.realisations ? '' : 'section-alt'}`}>
-        <div className="container" style={{ textAlign: 'center' }}>
+      <section className="section section-alt">
+        <div className={`container ${styles.finalGrid}`}>
+        <div className={styles.finalText}>
           <span className="eyebrow">Angers et {CONTACT.radiusKm} km alentour</span>
           <h2 style={{ marginTop: 14 }}>
             Disponible sur toute notre{' '}
@@ -189,7 +279,7 @@ export default async function ServiceDetailPage({ params }) {
               </Link>
             ))}
           </div>
-          <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ marginTop: 28, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
             <Link href="/devis" className="btn btn-cta">
               Voir les tarifs et réserver
               <IconArrowRight size={18} />
@@ -198,6 +288,16 @@ export default async function ServiceDetailPage({ params }) {
               {CONTACT.phoneDisplay}
             </a>
           </div>
+        </div>
+        <div className={styles.finalForm}>
+          <LeadForm
+            variant="dark"
+            source={`prestation-${service.slug}-bas`}
+            title="Recevoir mon prix"
+            subtitle="Laissez votre numéro, Enzo vous rappelle sous 24h ouvrées."
+            withVehicle
+          />
+        </div>
         </div>
       </section>
     </>

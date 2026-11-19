@@ -256,7 +256,7 @@ export default function AdminPage() {
                   {[lead.service, lead.city].filter(Boolean).join(' · ') || 'Demande de rappel'}
                 </span>
                 <span className={styles.when}>
-                  {timeAgo(lead.created_at)} · {SOURCE_LABEL[lead.source] || lead.source}
+                  {timeAgo(lead.created_at)} · {SOURCE_LABEL[lead.source] || lead.source.replace(/^prestation-/, 'Page ').replace(/-bas$/, ' (bas)')}
                 </span>
               </button>
 
