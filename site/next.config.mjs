@@ -29,7 +29,7 @@ const cspDirectives = [
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data: blob:`,
   `font-src 'self'`,
-  `connect-src 'self' https://api.cloudinary.com https://api.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com`,
+  `connect-src 'self' https://ibeejsvztajwploqmnkh.supabase.co https://api.cloudinary.com https://api.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com`,
   `frame-src https://www.google.com`,
   `object-src 'none'`,
   `base-uri 'self'`,
