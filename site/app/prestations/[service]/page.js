@@ -18,6 +18,7 @@ import {
 } from '@/components/Icons'
 import { SERVICE_PAGES, getServicePage } from '@/lib/data/servicePages'
 import { getArticle } from '@/lib/data/articles'
+import { CITIES, cityHref } from '@/lib/data/cities'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { serviceSchema, faqPageSchema, breadcrumbSchema } from '@/lib/schema'
@@ -176,6 +177,18 @@ export default async function ServiceDetailPage({ params }) {
               zone d&apos;intervention à Angers
             </Link>
           </h2>
+          {/* Maillage interne prestation → communes : chaque commune desservie a
+              un lien, pour que Google relie la prestation à toute la zone. */}
+          <p style={{ marginTop: 18, color: 'var(--color-text-muted)' }}>
+            {service.name} à domicile à :
+          </p>
+          <div className={styles.cityLinks}>
+            {CITIES.map((c) => (
+              <Link href={cityHref(c)} className={styles.cityLink} key={c.slug}>
+                {c.name}
+              </Link>
+            ))}
+          </div>
           <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
             <Link href="/devis" className="btn btn-cta">
               Voir les tarifs et réserver
