@@ -1,794 +1,451 @@
+/* Page d'accueil « conversion » (novembre 2026). L'ancienne feuille de style
+   est sauvegardée sur la branche `sauvegarde/accueil-ancienne-version`. */
+
+/* ---------- Hero ---------- */
 .hero {
   position: relative;
-  height: 100vh;
-  min-height: 560px;
-  max-height: 1080px;
   margin-top: calc(-1 * var(--fixed-header-total));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  padding-top: calc(var(--fixed-header-total) + 48px);
+  padding-bottom: 64px;
   background: var(--color-ink);
+  color: #fff;
+  overflow: hidden;
 }
 
 .heroOverlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.55);
-  pointer-events: none;
+  background: linear-gradient(90deg, rgba(10, 12, 16, 0.92) 0%, rgba(10, 12, 16, 0.8) 50%, rgba(10, 12, 16, 0.5) 100%);
 }
 
-.heroContent {
+.heroInner {
   position: relative;
   z-index: 2;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 22px;
-  max-width: 760px;
-  padding-inline: 24px;
-  padding-top: var(--fixed-header-total);
-  text-align: center;
+  gap: 40px 56px;
 }
 
-.heroBrand {
+.heroText {
+  flex: 1 1 440px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.heroRating {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.82);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.heroBrand::before {
-  content: '';
-  width: 26px;
-  height: 2px;
-  background: var(--gradient-cta);
-  display: inline-block;
+.stars {
+  color: #f5b301;
+  letter-spacing: 1px;
 }
 
 .heroTitle {
+  margin: 0;
   color: #fff;
-  font-size: clamp(2.6rem, 6vw + 1rem, 5.2rem);
-  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+  font-size: clamp(2.3rem, 5vw, 3.8rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
 }
 
-.heroSlogan {
-  font-size: clamp(1.1rem, 1.4vw + 0.6rem, 1.5rem);
-  color: rgba(255, 255, 255, 0.88);
-  font-weight: 500;
-}
-
-.heroDirect {
-  max-width: 620px;
-  font-size: 0.98rem;
+.heroLead {
+  margin: 0;
+  max-width: 560px;
+  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.86);
 }
 
-.heroDirectLink {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  font-weight: 600;
-}
-
-.heroActions {
-  margin-top: 8px;
+.heroChecks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
+  gap: 10px 22px;
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.heroActions :global(.btn-outline) {
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #fff;
-}
-
-.heroActions :global(.btn-outline:hover) {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.statsBar {
-  padding-block: 36px;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.sectionHead {
-  max-width: 640px;
-  margin-bottom: 48px;
-}
-
-.sectionHead h2 {
-  margin-top: 14px;
-}
-
-.sectionHeadRow {
+.heroChecks li {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 48px;
-}
-
-.complementaryNote {
-  margin-top: 28px;
-  display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  color: var(--color-text-muted);
-  font-size: 0.92rem;
+  gap: 8px;
 }
 
-.chipRow {
+.heroChecks svg {
+  color: var(--color-blue-light);
+  flex: none;
+}
+
+.heroForm {
+  flex: 0 1 400px;
+  min-width: min(100%, 300px);
+  scroll-margin-top: calc(var(--fixed-header-total) + 16px);
+}
+
+/* ---------- Boutons ---------- */
+.ctaPair {
   display: flex;
   flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btnWhite {
+  background: var(--color-brand-blue);
+  color: #fff;
+  min-height: 52px;
+}
+
+.btnWhite:hover {
+  background: var(--color-brand-blue-dark);
+  color: #fff;
+}
+
+.btnLine {
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  color: #fff;
+  background: transparent;
+  min-height: 52px;
+}
+
+.btnLine:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ---------- Bandeau de confiance ---------- */
+.trust {
+  background: var(--color-ink-elevated);
+  color: #fff;
+  border-top: 1px solid var(--color-on-ink-border);
+}
+
+.trustInner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 12px 32px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+.trustInner span {
+  display: inline-flex;
+  align-items: center;
   gap: 10px;
 }
 
-.chip {
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
-  padding: 8px 16px;
-  font-size: 0.86rem;
-  color: var(--color-text-muted);
-}
-
-.vehicleGrid {
-  display: grid;
-  /* 6 gabarits particuliers (cf. PRIVATE_VEHICLE_TYPES) : 3 × 2 */
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-@media (max-width: 900px) {
-  .vehicleGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 560px) {
-  .vehicleGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.vehicleCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 26px 14px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  text-align: center;
-  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
-}
-
-.vehicleCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-border-strong);
-}
-
-.vehicleCard svg {
-  color: var(--color-text);
-  width: 52px;
-  height: auto;
-}
-
-.vehicleCard span {
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.sliderSingle {
-  max-width: 460px;
-  margin-inline: auto;
-}
-
-/* 3 modules Avant/Après sur ordinateur. */
-.sliderGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-/* Mobile (et tablette) : repli à 2 colonnes, 3e module masqué en CSS pour ne
-   pas surcharger le défilement — le DOM reste identique, seul l'affichage
-   change selon la largeur d'écran. */
-@media (max-width: 900px) {
-  .sliderGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .sliderGrid > *:nth-child(3) {
-    display: none;
-  }
-}
-
-.storyGrid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 56px;
-  align-items: center;
-}
-
-@media (max-width: 900px) {
-  .storyGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.storyImage {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  aspect-ratio: 4 / 5;
-  border: 1px solid var(--color-border-strong);
-  box-shadow: var(--shadow-elevated);
-}
-
-.storyImage img {
-  object-fit: cover;
-  object-position: top center;
-}
-
-.storyQuote {
-  margin-top: 20px;
-  padding-left: 18px;
-  border-left: 2px solid var(--color-brand-blue);
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-
-.reviewsFooter {
-  margin-top: 32px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  align-items: center;
-}
-
-.zoneGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-}
-
-@media (max-width: 900px) {
-  .zoneGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.faqGrid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 48px;
-}
-
-@media (max-width: 900px) {
-  .faqGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ctaBanner {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  padding: clamp(48px, 7vw, 80px);
-  text-align: center;
-  background: var(--color-ink);
-  color: var(--color-bg);
-}
-
-.ctaBannerImage {
-  z-index: 0;
-  object-fit: cover;
-  object-position: center 30%;
-  opacity: 0.55;
-}
-
-.ctaBannerOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(135deg, rgba(10, 14, 26, 0.88) 0%, rgba(20, 32, 58, 0.82) 55%, rgba(10, 60, 130, 0.8) 100%);
-}
-
-.ctaBanner :global(.eyebrow) {
-  color: var(--color-blue-light);
-}
-
-.ctaBanner :global(.eyebrow)::before {
+.trustInner span::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: var(--color-blue-light);
 }
 
-.ctaBanner h2 {
-  color: var(--color-bg);
+/* ---------- En-têtes de section ---------- */
+.sectionHead {
+  max-width: 700px;
+  margin-bottom: 36px;
 }
 
-.ctaBanner :global(.lead) {
-  color: var(--color-on-ink-muted);
+.sectionHead h2 {
+  margin-top: 12px;
 }
 
-.ctaBannerInner {
+/* ---------- Prestations ---------- */
+.serviceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.serviceCard {
   position: relative;
-  z-index: 2;
-  max-width: 640px;
-  margin-inline: auto;
-}
-
-.ctaBannerInner p {
-  margin-top: 16px;
-}
-
-.ctaBannerActions {
-  margin-top: 32px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-
-.ctaBannerActions :global(.btn-outline) {
-  border-color: rgba(255, 255, 255, 0.5);
+  display: block;
+  height: 380px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-ink);
   color: #fff;
 }
 
-.ctaBannerActions :global(.btn-outline:hover) {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+.serviceImg {
+  object-fit: cover;
+  transition: transform 0.4s ease;
 }
 
-.ctaBannerActions :global(.btn-cta) {
+.serviceCard:hover .serviceImg {
+  transform: scale(1.04);
+}
+
+.serviceShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.serviceBody {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.servicePrice {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
   background: #fff;
-  color: var(--color-blue-dark);
-  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.3);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: 0.88rem;
 }
 
-.ctaBannerActions :global(.btn-cta:hover) {
-  background: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.35);
+.serviceTitle {
+  font-family: var(--font-heading), 'Archivo', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.45rem;
+  line-height: 1.1;
 }
 
-.lustrageGrid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 56px;
+.serviceText {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.chips {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 10px;
 }
 
-@media (max-width: 900px) {
-  .lustrageGrid {
-    grid-template-columns: 1fr;
-    gap: 36px;
-  }
+.chips > span {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 4px;
 }
 
-.lustrageVisual {
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.chip:hover {
+  border-color: var(--color-brand-blue);
+  color: var(--color-brand-blue);
+}
+
+.chipLink {
+  font-weight: 700;
+  color: var(--color-brand-blue);
+  padding: 0 8px;
+}
+
+/* ---------- Bandeaux d'appel à l'action ---------- */
+.ctaBand {
+  background: var(--color-brand-blue);
+  color: #fff;
+}
+
+.ctaBand .btnWhite {
+  background: #fff;
+  color: var(--color-brand-blue-dark);
+}
+
+.ctaBandDark {
+  background: var(--color-ink);
+}
+
+.ctaBandDark .btnWhite {
+  background: var(--color-brand-blue);
+  color: #fff;
+}
+
+.ctaBandInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 32px;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.ctaBandTitle {
+  margin: 0;
+  font-family: var(--font-heading), 'Archivo', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  line-height: 1.15;
+}
+
+.ctaBandSub {
+  margin: 6px 0 0;
+  color: var(--color-on-ink-muted);
+}
+
+/* ---------- Qui vient chez vous ---------- */
+.about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px 56px;
+}
+
+.aboutImg {
   position: relative;
-}
-
-.lustrageMainImage {
-  position: relative;
+  flex: 1 1 320px;
+  max-width: 440px;
   aspect-ratio: 4 / 5;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-elevated);
 }
 
-.lustrageMainImage img {
+.aboutImg img {
   object-fit: cover;
 }
 
-.lustrageAccentImage {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-  width: 40%;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 3px solid var(--color-bg);
-  box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.55);
-}
-
-.lustrageAccentImage img {
-  object-fit: cover;
-}
-
-.lustrageBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  background: rgba(79, 195, 255, 0.12);
-  border: 1px solid rgba(79, 195, 255, 0.35);
-  color: var(--color-blue-light);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-bottom: 18px;
-}
-
-.lustragePrice {
-  margin-top: 14px;
+.aboutText {
+  flex: 1 1 420px;
+  min-width: 0;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  color: var(--color-on-ink-muted);
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.lustragePrice strong {
-  font-family: var(--font-heading), serif;
-  font-size: 1.8rem;
-  color: var(--color-bg);
+.aboutText h2 {
+  margin: 0;
 }
 
-.lustrageLead {
-  margin-top: 16px;
-  font-size: clamp(1.1rem, 0.4vw + 1rem, 1.35rem);
-  font-weight: 700;
-  color: var(--color-bg);
-  line-height: 1.5;
-}
-
-.lustrageText {
-  margin-top: 14px;
-  color: var(--color-on-ink-muted);
+.aboutText p {
+  margin: 0;
+  font-size: 1.05rem;
   line-height: 1.7;
+  color: var(--color-text-muted);
 }
 
-.lustrageFeatures {
+.promises {
   list-style: none;
-  margin: 24px 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.lustrageFeatures li {
+.promises li {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--color-bg);
-  font-size: 0.96rem;
-  font-weight: 600;
-}
-
-.lustrageFeatures li svg {
-  flex: none;
-  color: var(--color-blue-light);
-}
-
-.lustrageContent :global(.btn-cta) {
-  margin-top: 32px;
-}
-
-/* Grille à 2 colonnes strictes (50/50) : la zone "visual" (slider) s'étend sur
-   les 2 lignes de la colonne de droite (header + body), ce qui l'oblige à
-   occuper exactement la même hauteur que le texte — son haut colle au badge,
-   son bas colle au bouton, sans le moindre calcul manuel. Sur mobile, les 3
-   zones repassent en une seule colonne, réordonnées : header → visual → body.
-   `min-height: 0` sur chaque zone évite qu'une image ne fasse "déborder" sa
-   piste de grille (comportement par défaut de Grid avec du contenu remplaçable). */
-.motoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    'visual header'
-    'visual body';
-  column-gap: 56px;
-  row-gap: 0;
-  align-items: stretch;
-}
-
-@media (max-width: 900px) {
-  .motoGrid {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'header'
-      'visual'
-      'body';
-    row-gap: 28px;
-  }
-}
-
-.motoHeader {
-  grid-area: header;
-  min-height: 0;
-}
-
-.motoVisual {
-  grid-area: visual;
-  min-height: 0;
-  height: 100%;
-}
-
-@media (max-width: 900px) {
-  .motoVisual {
-    /* Les photos sources sont en format portrait (prises au téléphone) : une
-       hauteur trop courte les recadrait beaucoup trop (à peine plus d'un
-       tiers de l'image visible). Hauteur fixe plus généreuse pour montrer
-       l'essentiel de chaque photo sans occuper tout l'écran.
-       (Note : `aspect-ratio` seul ne fonctionne pas ici — les images en
-       `fill` de next/image sont position:absolute et ne donnent donc aucune
-       taille intrinsèque à ce conteneur, qui s'effondre à 0 dans cette
-       rangée de grille en hauteur "auto".) */
-    height: 480px;
-  }
-}
-
-.motoBody {
-  grid-area: body;
-  min-height: 0;
-}
-
-.motoBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  background: rgba(79, 195, 255, 0.12);
-  border: 1px solid rgba(79, 195, 255, 0.35);
-  color: var(--color-blue-light);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-bottom: 18px;
-}
-
-.motoHeader h2 {
-  color: var(--color-bg);
-}
-
-.motoPrice {
-  margin-top: 14px;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  color: var(--color-on-ink-muted);
-  font-size: 0.9rem;
-}
-
-.motoPrice strong {
-  font-family: var(--font-heading), serif;
-  font-size: 1.8rem;
-  color: var(--color-bg);
-}
-
-.motoLead {
-  margin-top: 16px;
-  font-size: clamp(1.1rem, 0.4vw + 1rem, 1.35rem);
-  font-weight: 700;
-  color: var(--color-bg);
-  line-height: 1.5;
-}
-
-.motoText {
-  margin-top: 14px;
-  color: var(--color-on-ink-muted);
-  line-height: 1.7;
-}
-
-.motoFeatures {
-  list-style: none;
-  margin: 24px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
   gap: 12px;
+  align-items: flex-start;
 }
 
-.motoFeatures li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--color-bg);
-  font-size: 0.96rem;
-  font-weight: 600;
-}
-
-.motoFeatures li svg {
+.promises svg {
   flex: none;
-  color: var(--color-blue-light);
+  margin-top: 2px;
+  color: var(--color-brand-blue);
 }
 
-.motoBody :global(.btn-cta) {
-  margin-top: 32px;
-}
-
-.caseStudy {
-  margin-top: 56px;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: clamp(28px, 4vw, 44px);
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 40px;
-  align-items: center;
-  box-shadow: var(--shadow-elevated);
-}
-
-@media (max-width: 800px) {
-  .caseStudy {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-}
-
-.caseStudyBadge {
+.textLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--color-brand-blue-soft);
-  color: var(--color-blue-dark);
-  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  margin-bottom: 16px;
+  color: var(--color-brand-blue);
 }
 
-.caseStudyText p {
-  color: var(--color-text-muted);
-  font-size: 0.98rem;
-  line-height: 1.7;
-}
-
-.caseStudyText p + p {
-  margin-top: 14px;
-}
-
-.caseStudyText strong {
-  color: var(--color-text);
-}
-
-.caseStudyVisual {
-  max-width: 320px;
-  width: 100%;
-  margin-inline: auto;
-}
-
-.caseStudyCaption {
-  display: block;
-  margin-top: 12px;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-text-faint);
-}
-
-/* Zone d'intervention : contenu Angers fusionné depuis l'ancienne page
-   /zone-intervention/angers (quartiers + communes voisines). */
-.zoneText {
-  color: var(--color-text-muted);
-}
-
-.zoneSubtitle {
-  font-size: 1rem;
-  margin-top: 28px;
-  margin-bottom: 12px;
-}
-
-.neighborhoodGrid {
+/* ---------- Avis ---------- */
+.reviewLinks {
+  margin-top: 26px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 14px 22px;
 }
 
-.neighborhoodChip {
+/* ---------- Zone + formulaire final ---------- */
+.final {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 40px 56px;
+}
+
+.finalText {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.finalText h2 {
+  margin: 0;
+}
+
+.finalText p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.zoneChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bigPhone {
+  margin-top: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  font-size: 0.88rem;
+  gap: 12px;
+  font-family: var(--font-heading), 'Archivo', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.9rem;
   color: var(--color-text);
 }
 
-.neighborhoodChip svg {
+.bigPhone svg {
   color: var(--color-brand-blue);
 }
 
-/* Méthode d'intervention (4 étapes) */
-.stepsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-@media (max-width: 900px) {
-  .stepsGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 560px) {
-  .stepsGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.step {
-  padding: 24px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-}
-
-.stepNumber {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--color-brand-blue);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 14px;
-}
-
-.step h3 {
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
-
-.vehicleProNote {
-  margin-top: 24px;
+.phoneNote {
+  margin-top: -10px !important;
   font-size: 0.92rem;
-  color: var(--color-text-muted);
 }
 
-.vehicleProNote a {
-  color: var(--color-brand-blue);
-  font-weight: 600;
-}
-
-/* Note Google dans le hero (preuve sociale au-dessus de la ligne de flottaison) */
-.heroRating {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  background: rgba(20, 22, 26, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 0.95rem;
-  transition: background 0.2s var(--ease);
-}
-
-.heroRating:hover {
-  background: rgba(20, 22, 26, 0.75);
-}
-
-.heroStars {
-  color: #fbbc04;
-  letter-spacing: 1px;
+.finalForm {
+  flex: 0 1 400px;
+  min-width: min(100%, 300px);
 }

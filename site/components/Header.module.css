@@ -77,10 +77,15 @@
   align-items: center;
   gap: 10px;
   flex: none;
+  /* Le logo (traits clairs, conçu pour un fond sombre) est posé sur un
+     badge sombre : sinon il disparaît sur le header clair. */
+  background: var(--color-ink);
+  border-radius: 14px;
+  padding: 3px 12px;
 }
 
 .brandLogo {
-  height: 44px;
+  height: 62px;
   width: auto;
 }
 
@@ -89,7 +94,7 @@
    plutôt que de le laisser déborder. */
 @media (max-width: 479px) {
   .brandLogo {
-    height: 34px;
+    height: 50px;
   }
 }
 
@@ -216,7 +221,7 @@
 }
 
 .drawerLogo {
-  height: 34px;
+  height: 56px;
   width: auto;
 }
 
