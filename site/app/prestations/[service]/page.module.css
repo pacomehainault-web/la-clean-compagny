@@ -184,3 +184,96 @@
   border-color: var(--color-brand-blue);
   color: var(--color-brand-blue);
 }
+
+/* ---- Formulaire de rappel sous le titre ---- */
+.formBand {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.formBandInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px 56px;
+}
+
+.formBandText {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formBandPrice {
+  font-family: var(--font-heading), 'Archivo', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  line-height: 1.15;
+}
+
+.quickChecks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.quickChecks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quickChecks svg {
+  color: var(--color-blue-light);
+  flex: none;
+}
+
+.formBandCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.formBandCtas :global(.btn-outline) {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.formBandForm {
+  flex: 0 1 400px;
+  min-width: min(100%, 300px);
+}
+
+.priceNote {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* ---- Dernier bloc : zone + formulaire ---- */
+.finalGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 40px 56px;
+}
+
+.finalText {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.finalText .cityLinks {
+  justify-content: flex-start;
+}
+
+.finalForm {
+  flex: 0 1 400px;
+  min-width: min(100%, 300px);
+}
