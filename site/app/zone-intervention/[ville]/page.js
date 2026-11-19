@@ -74,7 +74,8 @@ export default async function VillePage({ params }) {
     ...focus.map((slug) => SERVICE_PAGES.find((s) => s.slug === slug)).filter(Boolean),
     ...SERVICE_PAGES.filter((s) => !focus.includes(s.slug)),
   ]
-  const pairs = pick(BEFORE_AFTER_PAIRS, 4, cityIndex * 4)
+  // 5 paires : remplit exactement la grille (1 grande carte + 4)
+  const pairs = pick(BEFORE_AFTER_PAIRS, 5, cityIndex * 5)
   const reviews = pick(
     // Avis de clients uniquement (pas ceux de la famille du gérant).
     REVIEWS.filter((r) => r.text.length > 90 && !r.author.includes('Soldet')),
