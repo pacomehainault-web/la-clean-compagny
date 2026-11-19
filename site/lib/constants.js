@@ -34,7 +34,7 @@ export const CONTACT = {
   googlePlaceId: 'ChIJx9Gdg9C2eiERIW19sIjwZH4',
   // Carte de la fiche réelle (plus la carte générique de la ville d'Angers).
   mapEmbedSrc: 'https://www.google.com/maps?q=place_id:ChIJx9Gdg9C2eiERIW19sIjwZH4&output=embed',
-  googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBE/review',
+  googleReviewUrl: 'https://g.page/r/CSFtfbCI8GR-EBM/review',
   // Lien canonique de la fiche Google Business, construit à partir du même
   // Place ID — c'est ce que lib/schema.js ajoute à `sameAs`.
   googleBusinessUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJx9Gdg9C2eiERIW19sIjwZH4',
@@ -66,4 +66,15 @@ export function mailtoLink({ subject, body }) {
 
 export function telLink() {
   return `tel:${CONTACT.phoneTel}`
+}
+
+// Base de données des prospects (Supabase, projet « la-clean-compagny »), lue
+// par le futur dashboard. La clé ci-dessous est la clé PUBLIQUE du projet : elle
+// est faite pour être dans le navigateur. La sécurité vient des règles de la
+// base (RLS) : avec cette clé, on peut uniquement AJOUTER un prospect au statut
+// « nouveau » — impossible de lire, modifier ou supprimer quoi que ce soit.
+export const LEADS_DB = {
+  url: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ibeejsvztajwploqmnkh.supabase.co',
+  publishableKey:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_CuKd1nYk8S-txm_nDgWICg_criAYA9u',
 }

@@ -2,522 +2,324 @@ import Image from 'next/image'
 import Link from 'next/link'
 import styles from './page.module.css'
 import HeroMedia from '@/components/HeroMedia'
-import StatsRow from '@/components/StatsRow'
-import PricingSelector from '@/components/PricingSelector'
-import SubscriptionSection from '@/components/SubscriptionSection'
-import BeforeAfterSlider from '@/components/BeforeAfterSlider'
-import MotoSlider from '@/components/MotoSlider'
+import LeadForm from '@/components/LeadForm'
 import ReviewsCarousel from '@/components/ReviewsCarousel'
+import StaticBeforeAfterGallery from '@/components/StaticBeforeAfterGallery'
+import ComparisonTable from '@/components/ComparisonTable'
 import FAQAccordion from '@/components/FAQAccordion'
-import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import JsonLd from '@/components/JsonLd'
-import { VEHICLE_ICONS, IconArrowRight, IconCheck, IconMapPin } from '@/components/Icons'
+import { IconArrowRight, IconCheck, IconPhone } from '@/components/Icons'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
-import { PRIVATE_VEHICLE_TYPES } from '@/lib/data/vehicles'
 import { REVIEWS, AGGREGATE_RATING } from '@/lib/data/reviews'
 import { CITIES, HOME_CITY_SLUG, getCity, cityHref } from '@/lib/data/cities'
 import { CONTACT, SITE, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { faqPageSchema } from '@/lib/schema'
 import { getRotatingIndex } from '@/lib/rotatingSelection'
-import { LUSTRAGE_MINUTE_HIGHLIGHT, MOTO_PRICING, FORMULAS_PRICING } from '@/lib/data/pricing'
+import { FORMULAS_PRICING } from '@/lib/data/pricing'
 import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
 
-// La page d'accueil porte la requête « nettoyage voiture Angers » : c'est elle
-// que la fiche Google pointe et qui concentre les liens. L'ancienne page
-// /zone-intervention/angers (même cible, contenu proche) lui faisait
-// concurrence ; son contenu propre à Angers (quartiers, FAQ locale, méthode)
-// est désormais ici, et l'ancienne URL redirige vers / (next.config.mjs).
-// NB : le template de titre du layout ne s'applique pas à la page racine
-// (même segment), d'où la marque écrite en toutes lettres.
+// Page d'accueil « conversion » (refonte de novembre 2026, sur le modèle des
+// sites les mieux classés à Angers) : un seul objectif, faire appeler, réserver
+// ou laisser son numéro. Ordre volontaire : promesse + formulaire court →
+// preuves (note, prestations en photo, gérant, avis, avant/après) → objections
+// (comparatif, FAQ) → dernier appel à l'action. Les boutons « Réserver /
+// Appeler » reviennent après chaque bloc de preuve.
+// L'ancienne version (formules détaillées, lustrage minute, Pass Entretien,
+// gabarits, moto…) est sauvegardée sur la branche Git
+// `sauvegarde/accueil-ancienne-version` ; ces contenus vivent sur leurs pages
+// dédiées (/prestations, /pro…).
+//
+// La page porte la requête « nettoyage voiture Angers » : elle garde un
+// texte local (quartiers, communes, FAQ Angers) et le balisage FAQPage.
+// NB : le template de titre du layout ne s'applique pas à la page racine.
+const FROM_PRICE = FORMULAS_PRICING[0].prices.citadine
+
 export const metadata = buildMetadata({
   title: 'Nettoyage voiture Angers à domicile | La Clean Compagny',
-  description: `Nettoyage voiture à domicile à Angers dès ${FORMULAS_PRICING[0].prices.citadine} € : intérieur, extérieur, lustrage, céramique. 30 km autour d'Angers, avis 5.0 ★ Google, devis en ligne.`,
+  description: `Nettoyage voiture à domicile à Angers dès ${FROM_PRICE} € : intérieur, extérieur, lustrage, céramique. 30 km autour d'Angers, avis 5.0 ★ Google, rappel sous 24h.`,
   path: '/',
 })
 
-const ANGERS = getCity(HOME_CITY_SLUG)
-const NEARBY_CITIES = CITIES.filter((c) => c.slug !== HOME_CITY_SLUG)
-
-const HOW_IT_WORKS = [
-  {
-    title: 'Devis',
-    text: "Vous décrivez votre véhicule (gabarit, état, prestations souhaitées) et recevez une estimation en quelques minutes, en ligne ou par téléphone.",
-  },
-  {
-    title: 'Rendez-vous',
-    text: "Nous convenons ensemble d'un créneau à votre domicile, sur votre lieu de travail, ou tout autre endroit adapté.",
-  },
-  {
-    title: 'Intervention sur place',
-    text: "Nous intervenons avec notre propre matériel. Un accès à l'eau et à l'électricité est utile selon la prestation choisie.",
-  },
-  {
-    title: 'Contrôle qualité',
-    text: 'Chaque intervention se termine par une vérification minutieuse, pour un résultat conforme à ce qui a été convenu lors du devis.',
-  },
-]
-
-// Régénère la page toutes les heures : suffisant pour suivre la rotation de
-// l'avant/après en vedette (qui change tous les 2 jours, cf. lib/rotatingSelection).
+// Régénère la page toutes les heures (rotation des avant/après).
 export const revalidate = 3600
 
-// 3 modules sur desktop, 2 sur mobile (le 3e est masqué en CSS, cf. .sliderGrid
-// > *:nth-child(3) — DOM identique sur les deux versions, pas de rendu conditionnel).
-const FEATURED_COUNT = 3
+const ANGERS = getCity(HOME_CITY_SLUG)
+const RATING = AGGREGATE_RATING.ratingValue.toFixed(1).replace('.', ',')
 
-const MOTO_SLIDER_IMAGES = [
-  {
-    src: '/images/moto/bmw-r12-detailing-moto-angers.jpg',
-    alt: 'BMW R12 après un detailing complet — finition showroom',
-  },
-  {
-    src: '/images/moto/enzo-lustrage-moto-bmw-angers.jpg',
-    alt: 'Enzo, gérant de La Clean Compagny, lustre une moto sur pont',
-  },
-  {
-    src: '/images/moto/bmw-ce04-nettoyage-moto-angers.jpg',
-    alt: 'BMW CE 04 nettoyée, en atelier',
-  },
-  {
-    src: '/images/moto/bmw-f900-detail-echappement-moto-angers.jpg',
-    alt: 'Détail échappement carbone BMW F900 après lustrage',
-  },
+const MAIN_SERVICES = [
+  { slug: 'nettoyage-interieur-voiture', title: 'Nettoyage intérieur', text: 'Aspiration, plastiques, vitres, tapis, odeurs', img: '/images/interieur/bmw-x7-nettoyage-interieur-angers.jpg', alt: 'Habitacle de BMW X7 nettoyé à domicile à Angers' },
+  { slug: 'lavage-exterieur-domicile', title: 'Lavage extérieur', text: 'Lavage manuel, jantes, séchage, devant chez vous', img: '/images/exterieur/bmw-m3-lavage-exterieur-angers.jpg', alt: 'BMW M3 lavée à domicile à Angers' },
+  { slug: 'lustrage-polissage', title: 'Lustrage et polissage', text: 'Brillance retrouvée, micro-rayures effacées', img: '/images/lustrage/x1-lustrage-minute-apres.jpg', alt: 'Carrosserie de BMW X1 après un lustrage' },
+  { slug: 'renovation-optiques', title: 'Rénovation des phares', text: 'Phares jaunis rendus transparents', img: '/images/lustrage/lustrage-reflet-phare.jpg', alt: 'Reflet sur un phare rénové' },
+].map((s) => ({ ...s, priceLine: SERVICE_PAGES.find((p) => p.slug === s.slug)?.priceLine }))
+
+const OTHER_SERVICES = [
+  ...SERVICE_PAGES.filter((s) => !MAIN_SERVICES.some((m) => m.slug === s.slug)).map((s) => ({
+    href: `/prestations/${s.slug}`,
+    label: s.name,
+  })),
+  { href: '/pro', label: 'Flottes et professionnels' },
 ]
+
+const HERO_CHECKS = [
+  `Sans frais de déplacement (${CONTACT.radiusKm} km)`,
+  'Réponse sous 24h ouvrées',
+  'Particuliers et professionnels',
+]
+
+const TRUST = [
+  `${RATING}/5 sur Google (${AGGREGATE_RATING.reviewCount} avis)`,
+  `À domicile depuis ${SITE.foundedYear}`,
+  `${CITIES.length} communes autour d'Angers`,
+  'Contrôle qualité avec vous',
+]
+
+const PROMISES = [
+  { title: 'Un seul interlocuteur.', text: "Du devis à la fin de l'intervention, c'est Enzo." },
+  { title: 'Le prix annoncé avant de venir.', text: 'Fixé au devis selon votre véhicule, sans surprise le jour J.' },
+  { title: 'Rien à préparer.', text: "Vous confiez les clés, on s'occupe du reste." },
+]
+
+function CtaPair({ dark = false }) {
+  return (
+    <div className={styles.ctaPair}>
+      <Link href="/devis" className={`btn ${dark ? 'btn-cta' : styles.btnWhite}`}>
+        Réserver en ligne
+        <IconArrowRight size={18} />
+      </Link>
+      <a href={telLink()} className={`btn ${styles.btnLine}`}>
+        <IconPhone size={17} />
+        {CONTACT.phoneDisplay}
+      </a>
+    </div>
+  )
+}
 
 export default function HomePage() {
   const baseIndex = getRotatingIndex(BEFORE_AFTER_PAIRS.length, { namespace: 'home' })
-  const featuredBeforeAfters = Array.from(
-    { length: FEATURED_COUNT },
-    (_, i) => BEFORE_AFTER_PAIRS[(baseIndex + i) % BEFORE_AFTER_PAIRS.length]
-  )
+  const pairs = Array.from({ length: 5 }, (_, i) => BEFORE_AFTER_PAIRS[(baseIndex + i) % BEFORE_AFTER_PAIRS.length])
 
   return (
     <>
-      {/* Plus d'écran de chargement ni de portail « Particulier / Pro » en
-          plein écran (supprimés en novembre 2026) : un visiteur qui arrive
-          depuis Google doit voir tout de suite le titre, les prix, la note et
-          les boutons d'action. L'Espace Pro reste accessible depuis la barre
-          du haut (Header) et la section abonnements. */}
       <JsonLd data={faqPageSchema(ANGERS.faq)} />
 
+      {/* 1. Promesse + preuve + 3 façons de nous contacter */}
       <section className={styles.hero}>
         <HeroMedia
           src="/images/hero/ferrari-lavage-mousse-hero.jpg"
           alt="Ferrari recouverte de mousse active lors d'un lavage La Clean Compagny"
         />
         <div className={styles.heroOverlay} aria-hidden="true" />
-
-        <div className={`${styles.heroContent} reveal`}>
-          <span className={styles.heroBrand}>{SITE.name}</span>
-          <h1 className={styles.heroTitle}>Nettoyage et detailing de voiture à domicile à Angers</h1>
-          {/* Preuve sociale au-dessus de la ligne de flottaison : c'est le
-              premier argument d'un client qui compare les prestataires. */}
-          <Link href="/avis" className={styles.heroRating}>
-            <span className={styles.heroStars} aria-hidden="true">★★★★★</span>
-            <span>
-              <strong>{AGGREGATE_RATING.ratingValue.toFixed(1).replace('.', ',')}</strong> · {AGGREGATE_RATING.reviewCount} avis Google
-            </span>
-          </Link>
-          <p className={styles.heroSlogan}>{SITE.slogan}</p>
-          <p className={styles.heroDirect}>
-            Nettoyage intérieur dès {FORMULAS_PRICING[0].prices.citadine} €, rénovation complète dès{' '}
-            {FORMULAS_PRICING[1].prices.citadine} €, lustrage dès {LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €.
-            Devis en ligne en quelques minutes, pour un nettoyage de voiture à Angers et{' '}
-            <Link href="/zone-intervention" className={styles.heroDirectLink}>
-              {CONTACT.radiusKm} km alentour
+        <div className={`container ${styles.heroInner}`}>
+          <div className={styles.heroText}>
+            <Link href="/avis" className={styles.heroRating}>
+              <span className={styles.stars} aria-hidden="true">★★★★★</span>
+              <span>
+                <strong>{RATING}</strong> sur Google · {AGGREGATE_RATING.reviewCount} avis
+              </span>
             </Link>
-            .
-          </p>
-          <div className={styles.heroActions}>
-            <Link href="/devis" className="btn btn-cta">
-              Voir les tarifs et réserver
-              <IconArrowRight size={18} />
-            </Link>
-            <Link href="/prestations" className="btn btn-outline">
-              Découvrir nos prestations
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className={`${styles.sectionHeadRow} reveal`}>
-            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
-              <span className="eyebrow">Nos formules</span>
-              <h2>Deux formules, un seul niveau d&apos;exigence</h2>
-            </div>
-            <Link href="/prestations" className="btn btn-ghost btn-sm">
-              Toutes les prestations
-              <IconArrowRight size={16} />
-            </Link>
-          </div>
-
-          <div className="reveal">
-            <PricingSelector />
-          </div>
-
-          <div className={styles.complementaryNote} id="prestations-complementaires">
-            <span>Le détail de chaque prestation :</span>
-            <div className={styles.chipRow}>
-              {SERVICE_PAGES.map((s) => (
-                <Link href={`/prestations/${s.slug}`} className={styles.chip} key={s.slug}>
-                  {s.name}
-                </Link>
+            <h1 className={styles.heroTitle}>Nettoyage de voiture à domicile à Angers</h1>
+            <p className={styles.heroLead}>
+              On vient chez vous ou au travail avec tout le matériel. Vous récupérez une voiture propre
+              comme au premier jour, sans bouger. Nettoyage intérieur dès {FROM_PRICE} €.
+            </p>
+            <CtaPair />
+            <ul className={styles.heroChecks}>
+              {HERO_CHECKS.map((c) => (
+                <li key={c}>
+                  <IconCheck size={18} />
+                  {c}
+                </li>
               ))}
-            </div>
+            </ul>
+          </div>
+          <div className={styles.heroForm} id="rappel">
+            <LeadForm source="accueil-haut" />
           </div>
         </div>
       </section>
 
-      <section className="section section-ink">
-        <div className="container">
-          <div className={`${styles.lustrageGrid} reveal`}>
-            <div className={styles.lustrageVisual}>
-              <div className={styles.lustrageMainImage}>
-                <Image
-                  src="/images/lustrage/mini-cooper-lustrage-minute-apres.jpg"
-                  alt="Mini Cooper au fini miroir après un lustrage minute"
-                  fill
-                  sizes="(max-width: 900px) 90vw, 480px"
-                />
-              </div>
-              <div className={styles.lustrageAccentImage}>
-                <Image
-                  src="/images/lustrage/mini-cooper-lustrage-minute-avant.jpg"
-                  alt="Micro-rayures sur la carrosserie de la Mini Cooper avant le lustrage minute"
-                  fill
-                  sizes="220px"
-                />
-              </div>
-            </div>
-
-            <div className={styles.lustrageContent}>
-              <span className={styles.lustrageBadge}>🌟 Notre spécialité</span>
-              <h2>Lustrage minute</h2>
-              <div className={styles.lustragePrice}>
-                <span>à partir de</span>
-                <strong>{LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice} €</strong>
-              </div>
-              <p className={styles.lustrageLead}>
-                Redonnez l&apos;éclat du neuf à votre carrosserie en un temps record.
-              </p>
-              <p className={styles.lustrageText}>
-                Notre prestation phare : une finition brillance haute performance qui ravive la
-                peinture, efface les micro-ternissures et sublime chaque reflet, sans les heures
-                que demande un polissage complet.
-              </p>
-              <ul className={styles.lustrageFeatures}>
-                <li>
-                  <IconCheck size={18} />
-                  Brillance miroir immédiate
-                </li>
-                <li>
-                  <IconCheck size={18} />
-                  Intervention rapide, directement à domicile
-                </li>
-              </ul>
-              <Link href="/devis?extra=lustrage-minute" className="btn btn-cta">
-                Réserver mon lustrage minute
-                <IconArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
-
-          <div className={`${styles.caseStudy} reveal`}>
-            <div className={styles.caseStudyText}>
-              <span className={styles.caseStudyBadge}>📍 Étude de cas</span>
-              <p>
-                Une rayure ciblée sur votre carrosserie ? Inutile de passer par la case
-                carrosserie. Chez La Clean Compagny, nous intervenons directement chez vous pour
-                effacer les éraflures.
-              </p>
-              <p>
-                <strong>Exemple avec ce client</strong> : après avoir frotté un poteau dans un
-                parking, il a fait appel à nos services. Intervention réalisée en bas de chez lui
-                pour un résultat impeccable, sans immobiliser son véhicule (BMW X1).
-              </p>
-            </div>
-            <div className={styles.caseStudyVisual}>
-              <BeforeAfterSlider
-                before="/images/lustrage/x1-lustrage-minute-avant.jpg"
-                after="/images/lustrage/x1-lustrage-minute-apres.jpg"
-                alt="Rayure sur la portière d'un BMW X1 effacée par un lustrage minute à domicile"
-              />
-              <span className={styles.caseStudyCaption}>BMW X1 — rayure de poteau effacée à domicile</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className={styles.statsBar}>
-        <div className="container">
-          <StatsRow
-            stats={[
-              { value: `Depuis ${SITE.foundedYear}`, label: 'passionnés par l’automobile' },
-              { value: '5.0 ★', label: 'de moyenne sur Google' },
-              { value: `${CONTACT.radiusKm} km`, label: 'autour d’Angers, à domicile' },
-              { value: '100 %', label: 'sur-mesure, sur devis' },
-            ]}
-          />
+      {/* 2. Bandeau de confiance : uniquement des chiffres vrais */}
+      <div className={styles.trust}>
+        <div className={`container ${styles.trustInner}`}>
+          {TRUST.map((t) => (
+            <span key={t}>{t}</span>
+          ))}
         </div>
       </div>
 
-      <SubscriptionSection />
-
-      <section className="section section-alt">
-        <div className="container">
-          <div className={`${styles.sectionHead} reveal`}>
-            <span className="eyebrow">Pour chaque véhicule</span>
-            <h2>Un savoir-faire adapté à votre gabarit</h2>
-          </div>
-          <div className={`${styles.vehicleGrid} reveal`}>
-            {PRIVATE_VEHICLE_TYPES.map((v) => {
-              const Icon = VEHICLE_ICONS[v.id]
-              return (
-                <Link href={`/devis?vehicule=${v.id}`} className={styles.vehicleCard} key={v.id}>
-                  <Icon />
-                  <span>{v.label}</span>
-                </Link>
-              )
-            })}
-          </div>
-          <p className={styles.vehicleProNote}>
-            Poids lourds, engins agricoles ou de chantier ?{' '}
-            <Link href="/pro">Découvrez notre Espace Pro</Link>.
-          </p>
-        </div>
-      </section>
-
-      {/* Section Moto — exclusivité Espace Particulier. La page d'accueil n'a pas
-          de variante Pro (contrairement à /devis?pro=1), donc aucune condition
-          d'affichage supplémentaire n'est nécessaire ici : elle n'existe tout
-          simplement pas côté Pro. */}
-      <section className="section section-ink">
-        <div className="container">
-          <div className={`${styles.motoGrid} reveal`}>
-            <div className={styles.motoHeader}>
-              <span className={styles.motoBadge}>🏍️ Exclusivité Particuliers</span>
-              <h2>Votre moto, prête à briller</h2>
-            </div>
-
-            <div className={styles.motoVisual}>
-              <MotoSlider images={MOTO_SLIDER_IMAGES} sizes="(max-width: 900px) 100vw, 50vw" />
-            </div>
-
-            <div className={styles.motoBody}>
-              <div className={styles.motoPrice}>
-                <span>à partir de</span>
-                <strong>{MOTO_PRICING.fromPrice} €</strong>
-              </div>
-              <p className={styles.motoLead}>
-                De la citadine électrique au roadster de caractère, chaque moto reçoit le même
-                soin méticuleux que nos plus belles voitures.
-              </p>
-              <p className={styles.motoText}>
-                Nettoyage complet, décontamination, lustrage de la carrosserie, des pièces
-                chromées et carbone, protection longue durée : on prend soin de chaque détail,
-                du réservoir aux jantes.
-              </p>
-              <ul className={styles.motoFeatures}>
-                <li>
-                  <IconCheck size={18} />
-                  Nettoyage minutieux, jusqu&apos;au moindre recoin
-                </li>
-                <li>
-                  <IconCheck size={18} />
-                  Lustrage carrosserie, échappement &amp; pièces carbone
-                </li>
-                <li>
-                  <IconCheck size={18} />
-                  Intervention à domicile, devis rapide
-                </li>
-              </ul>
-              <Link href="/devis?vehicule=moto" className="btn btn-cta">
-                Prendre soin de ma moto
-                <IconArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      {/* 3. Prestations : grandes photos, un prix, un clic */}
       <section className="section">
         <div className="container">
-          <div className={`${styles.sectionHeadRow} reveal`}>
-            <div className={styles.sectionHead} style={{ marginBottom: 0 }}>
-              <span className="eyebrow">Avant / Après</span>
-              <h2>Le résultat parle de lui-même</h2>
-            </div>
-            <Link href="/galerie" className="btn btn-ghost btn-sm">
-              Voir toute la galerie
-              <IconArrowRight size={16} />
-            </Link>
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Nos prestations</span>
+            <h2>Ce qu&apos;on fait pour votre voiture, à Angers et alentour</h2>
           </div>
-          <div className={`${styles.sliderGrid} reveal`}>
-            {featuredBeforeAfters.map((pair) => (
-              <BeforeAfterSlider key={pair.before} {...pair} />
+          <div className={styles.serviceGrid}>
+            {MAIN_SERVICES.map((s) => (
+              <Link href={`/prestations/${s.slug}`} className={styles.serviceCard} key={s.slug}>
+                <Image src={s.img} alt={s.alt} fill sizes="(max-width: 700px) 100vw, 300px" className={styles.serviceImg} />
+                <span className={styles.serviceShade} aria-hidden="true" />
+                <span className={styles.serviceBody}>
+                  <span className={styles.servicePrice}>{s.priceLine}</span>
+                  <span className={styles.serviceTitle}>{s.title}</span>
+                  <span className={styles.serviceText}>{s.text}</span>
+                </span>
+              </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="section section-alt">
-        <div className="container">
-          <div className={`${styles.storyGrid} reveal`}>
-            <div className={styles.storyImage}>
-              <Image
-                src="/images/equipe/enzo-soldet-gerant-la-clean-compagny.jpg"
-                alt="Enzo Soldet, gérant et fondateur de La Clean Compagny"
-                fill
-                sizes="(max-width: 900px) 90vw, 380px"
-              />
-            </div>
-            <div>
-              <span className="eyebrow">Notre histoire</span>
-              <h2 style={{ marginTop: 14 }}>Une entreprise née d&apos;une passion, pas d&apos;un plan de carrière</h2>
-              <p className="lead" style={{ marginTop: 18 }}>
-                Ancien électricien, Enzo Soldet a dû tout arrêter après un accident de voiture.
-                De cette épreuve est née La Clean Compagny, en {SITE.foundedYear} : une entreprise
-                fondée du jour au lendemain, portée par la passion de l&apos;automobile et un sens
-                du détail qui ne transige jamais.
-              </p>
-              <p className={styles.storyQuote}>
-                « Chaque véhicule mérite le même soin, qu&apos;il s&apos;agisse d&apos;une citadine
-                de tous les jours ou d&apos;une voiture de collection. »
-              </p>
-              <Link href="/notre-histoire" className="btn btn-outline" style={{ marginTop: 28 }}>
-                Découvrir notre histoire
-                <IconArrowRight size={16} />
+          <div className={styles.chips}>
+            <span>Et aussi :</span>
+            {OTHER_SERVICES.map((o) => (
+              <Link href={o.href} className={styles.chip} key={o.href}>
+                {o.label}
               </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className={`${styles.sectionHead} reveal`}>
-            <span className="eyebrow">Avis clients</span>
-            <h2>Ce que nos clients en disent</h2>
-          </div>
-          <ReviewsCarousel reviews={REVIEWS} />
-          <div className={styles.reviewsFooter}>
-            <a href={CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer" className="btn btn-cta btn-sm">
-              Voir tous nos avis Google
-            </a>
-            <Link href="/avis" className="btn btn-ghost btn-sm">
-              Toute la page avis
+            ))}
+            <Link href="/prestations" className={styles.chipLink}>
+              Tous les tarifs
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="section section-alt">
-        <div className="container">
-          <div className={`${styles.zoneGrid} reveal`}>
-            <div>
-              <span className="eyebrow">Zone d&apos;intervention</span>
-              <h2 style={{ marginTop: 14 }}>Angers et jusqu&apos;à {CONTACT.radiusKm} km alentour</h2>
-              {ANGERS.extra.map((p, i) => (
-                <p className={i === 0 ? 'lead' : styles.zoneText} style={{ marginTop: 18 }} key={i}>
-                  {p}
-                </p>
-              ))}
-              <h3 className={styles.zoneSubtitle}>Tous les quartiers d&apos;Angers</h3>
-              <div className={styles.neighborhoodGrid}>
-                {ANGERS.neighborhoods.map((n) => (
-                  <span className={styles.neighborhoodChip} key={n}>
-                    <IconMapPin size={14} />
-                    {n}
-                  </span>
-                ))}
-              </div>
-              <h3 className={styles.zoneSubtitle}>Et les communes voisines</h3>
-              <div className={styles.chipRow}>
-                {NEARBY_CITIES.map((c) => (
-                  <Link href={cityHref(c)} className={styles.chip} key={c.slug}>
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-              <Link href="/zone-intervention" className="btn btn-outline" style={{ marginTop: 28 }}>
-                Toute la zone d&apos;intervention
-                <IconArrowRight size={16} />
-              </Link>
-            </div>
-            <GoogleMapEmbed height={360} />
-          </div>
+      <section className={styles.ctaBand}>
+        <div className={`container ${styles.ctaBandInner}`}>
+          <p className={styles.ctaBandTitle}>Un créneau cette semaine ? Réponse sous 24h.</p>
+          <CtaPair />
         </div>
       </section>
 
+      {/* 4. Qui vient chez vous */}
       <section className="section">
-        <div className="container">
-          <div className={`${styles.sectionHead} reveal`}>
-            <span className="eyebrow">Notre méthode</span>
-            <h2>Comment se passe une intervention ?</h2>
-          </div>
-          <div className={`${styles.stepsGrid} reveal`}>
-            {HOW_IT_WORKS.map((step, i) => (
-              <div className={styles.step} key={step.title}>
-                <span className={styles.stepNumber}>{i + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-alt">
-        <div className="container">
-          <div className={`${styles.faqGrid} reveal`}>
-            <div>
-              <span className="eyebrow">Questions fréquentes</span>
-              <h2 style={{ marginTop: 14 }}>Nettoyage de voiture à Angers : vos questions</h2>
-              <p className="lead" style={{ marginTop: 18 }}>
-                Une question sur nos prestations, nos délais ou nos tarifs ?
-              </p>
-              <Link href="/faq" className="btn btn-ghost btn-sm" style={{ marginTop: 20 }}>
-                Toutes les questions
-                <IconArrowRight size={16} />
-              </Link>
-            </div>
-            <FAQAccordion items={ANGERS.faq} />
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className={`${styles.ctaBanner} reveal`}>
+        <div className={`container ${styles.about}`}>
+          <div className={styles.aboutImg}>
             <Image
-              className={styles.ctaBannerImage}
-              src="/images/lustrage/lustrage-reflet-phare.jpg"
-              alt=""
-              aria-hidden="true"
+              src="/images/equipe/enzo-soldet-gerant-la-clean-compagny.jpg"
+              alt={`${SITE.gerant}, fondateur de La Clean Compagny`}
               fill
-              sizes="(max-width: 900px) 100vw, 1200px"
+              sizes="(max-width: 900px) 100vw, 440px"
             />
-            <div className={styles.ctaBannerOverlay} aria-hidden="true" />
-            <div className={styles.ctaBannerInner}>
-              <span className="eyebrow">Prêt à commencer ?</span>
-              <h2>Offrez à votre véhicule le traitement qu&apos;il mérite</h2>
-              <p className="lead">
-                Choisissez votre véhicule, votre prestation, et recevez votre devis en quelques
-                minutes.
-              </p>
-              <div className={styles.ctaBannerActions}>
-                <Link href="/devis" className="btn btn-cta">
-                  Voir les tarifs et réserver
-                  <IconArrowRight size={18} />
+          </div>
+          <div className={styles.aboutText}>
+            <span className="eyebrow">Qui vient chez vous</span>
+            <h2>Enzo, fondateur de La Clean Compagny</h2>
+            <p>
+              Depuis {SITE.foundedYear}, Enzo nettoie les voitures des Angevins à domicile, de la citadine du
+              quotidien à la voiture de prestige. C&apos;est lui qui fait votre devis, lui qui vient, lui qui
+              vérifie le résultat avec vous avant de partir.
+            </p>
+            <ul className={styles.promises}>
+              {PROMISES.map((p) => (
+                <li key={p.title}>
+                  <IconCheck size={20} />
+                  <span>
+                    <strong>{p.title}</strong> {p.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/notre-histoire" className={styles.textLink}>
+              Notre histoire <IconArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Avis Google */}
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Avis clients</span>
+            <h2>
+              {RATING}/5 sur Google, {AGGREGATE_RATING.reviewCount} avis
+            </h2>
+          </div>
+          <ReviewsCarousel reviews={REVIEWS.filter((r) => !r.author.includes('Soldet'))} />
+          <div className={styles.reviewLinks}>
+            <a href={CONTACT.googleMapsCidUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+              Lire tous les avis sur Google
+            </a>
+            <a href={CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer" className={styles.textLink}>
+              Déjà client ? Laisser un avis
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Avant / après */}
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Nos réalisations</span>
+            <h2>Avant / après, sans retouche</h2>
+          </div>
+          <StaticBeforeAfterGallery pairs={pairs} />
+          <Link href="/galerie" className={styles.textLink} style={{ marginTop: 22 }}>
+            Voir toute la galerie <IconArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      <section className={`${styles.ctaBand} ${styles.ctaBandDark}`}>
+        <div className={`container ${styles.ctaBandInner}`}>
+          <div>
+            <p className={styles.ctaBandTitle}>La même chose pour votre voiture ?</p>
+            <p className={styles.ctaBandSub}>
+              Nettoyage intérieur dès {FROM_PRICE} €, déplacement compris jusqu&apos;à {CONTACT.radiusKm} km d&apos;Angers.
+            </p>
+          </div>
+          <CtaPair dark />
+        </div>
+      </section>
+
+      {/* 7. Comparatif */}
+      <section className="section">
+        <div className="container" style={{ maxWidth: 1000 }}>
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Comparer avant de choisir</span>
+            <h2>À domicile, en station ou vous-même ?</h2>
+          </div>
+          <ComparisonTable />
+        </div>
+      </section>
+
+      {/* 8. FAQ (objections + requête locale) */}
+      <section className="section section-alt">
+        <div className="container" style={{ maxWidth: 860 }}>
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Questions fréquentes</span>
+            <h2>Nettoyage de voiture à Angers : vos questions</h2>
+          </div>
+          <FAQAccordion items={ANGERS.faq} />
+        </div>
+      </section>
+
+      {/* 9. Zone + dernier formulaire */}
+      <section className="section">
+        <div className={`container ${styles.final}`}>
+          <div className={styles.finalText}>
+            <span className="eyebrow">Zone d&apos;intervention</span>
+            <h2>On vient chez vous, à Angers et jusqu&apos;à {CONTACT.radiusKm} km</h2>
+            <p>
+              Tous les quartiers d&apos;Angers ({ANGERS.neighborhoods.join(', ')}) et les communes voisines, sans
+              frais de déplacement :
+            </p>
+            <div className={styles.zoneChips}>
+              {CITIES.filter((c) => c.slug !== HOME_CITY_SLUG).map((c) => (
+                <Link href={cityHref(c)} className={styles.chip} key={c.slug}>
+                  {c.name}
                 </Link>
-                <a href={telLink()} className="btn btn-outline">
-                  {CONTACT.phoneDisplay}
-                </a>
-              </div>
+              ))}
             </div>
+            <a href={telLink()} className={styles.bigPhone}>
+              <IconPhone size={26} />
+              {CONTACT.phoneDisplay}
+            </a>
+            <p className={styles.phoneNote}>Appel, SMS ou WhatsApp</p>
+          </div>
+          <div className={styles.finalForm}>
+            <LeadForm variant="dark" source="accueil-bas" title="Recevoir mon prix" subtitle="Laissez votre numéro, Enzo vous rappelle sous 24h ouvrées." withVehicle />
           </div>
         </div>
       </section>

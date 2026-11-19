@@ -6,6 +6,7 @@ import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import FAQAccordion from '@/components/FAQAccordion'
 import JsonLd from '@/components/JsonLd'
 import StaticBeforeAfterGallery from '@/components/StaticBeforeAfterGallery'
+import ComparisonTable from '@/components/ComparisonTable'
 import { IconMapPin, IconClock, IconShield, IconArrowRight, IconPhone, IconStar, IconGoogleG } from '@/components/Icons'
 import { CITIES, STANDALONE_CITIES, HOME_CITY_SLUG, getCity, cityHref } from '@/lib/data/cities'
 import { getCityContent, SERVICE_CITY_PITCH } from '@/lib/data/cityContent'
@@ -19,16 +20,6 @@ import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { breadcrumbSchema, faqPageSchema, cityServiceSchema } from '@/lib/schema'
 import styles from './page.module.css'
-
-// Comparatif affiché sur chaque page commune : ce qui distingue un nettoyage
-// à domicile d'un passage en station ou d'un nettoyage fait soi-même.
-const COMPARISON_ROWS = [
-  { label: 'Déplacement', us: 'Nous venons chez vous ou au travail', station: 'Vous vous déplacez', diy: 'Aucun' },
-  { label: 'Votre temps', us: 'Aucun : vous nous confiez les clés', station: "30 min à 1h d'attente et de travail", diy: 'Une demi-journée' },
-  { label: 'Intérieur', us: 'Aspiration, plastiques, vitres, tapis, recoins', station: 'Aspirateur à jetons', diy: 'Selon votre matériel' },
-  { label: 'Produits et méthode', us: 'Produits pro adaptés à chaque surface', station: 'Rouleaux et haute pression', diy: 'Produits grand public' },
-  { label: 'Résultat garanti', us: 'Contrôle qualité avant de partir', station: 'Non', diy: 'Non' },
-]
 
 // Décale les sélections (réalisations, avis) d'une commune à l'autre pour que
 // deux pages voisines n'affichent pas exactement les mêmes éléments.
@@ -211,28 +202,7 @@ export default async function VillePage({ params }) {
             <span className="eyebrow">Comparer avant de choisir</span>
             <h2>À domicile, en station ou vous-même ?</h2>
           </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.compareTable}>
-              <thead>
-                <tr>
-                  <th scope="col"></th>
-                  <th scope="col">La Clean Compagny à {city.name}</th>
-                  <th scope="col">Station de lavage</th>
-                  <th scope="col">Vous-même</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARISON_ROWS.map((row) => (
-                  <tr key={row.label}>
-                    <th scope="row">{row.label}</th>
-                    <td className={styles.us}>{row.us}</td>
-                    <td>{row.station}</td>
-                    <td>{row.diy}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ComparisonTable usLabel={`La Clean Compagny à ${city.name}`} />
         </div>
       </section>
 

@@ -419,3 +419,16 @@ ul {
   background: rgba(10, 108, 255, 0.08);
   border-color: rgba(10, 108, 255, 0.65);
 }
+
+/* Texte lu par les lecteurs d'écran mais invisible à l'écran. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
+import { recordLead } from '@/lib/leads'
 import styles from './QuoteWizard.module.css'
 import { VEHICLE_ICONS, IconCheck, IconArrowRight, IconWhatsapp, IconMail, IconUpload, IconClose } from './Icons'
 import { VEHICLE_TYPES } from '@/lib/data/vehicles'
@@ -466,6 +467,17 @@ export default function QuoteWizard({ initialVehicleId, initialFormulaId, initia
     }
 
     console.log('[EmailJS] Paramètres envoyés :', templateParams)
+
+    // Copie du prospect dans la base du dashboard (sans bloquer l'envoi).
+    recordLead({
+      firstName: sanitizedContact.name,
+      phone: sanitizedContact.phone,
+      email: sanitizedContact.email,
+      service: [formulaLabel, extrasLabel].filter(Boolean).join(' + '),
+      vehicle: vehicleLabel,
+      message: recapAvecPhotos,
+      source: isPro ? 'devis-en-ligne-pro' : 'devis-en-ligne',
+    })
 
     // --- 3. Envoi EmailJS ---------------------------------------------------
     setEmailStatus('sending')
