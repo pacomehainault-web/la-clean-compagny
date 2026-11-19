@@ -5,15 +5,36 @@ import FormulaCard from '@/components/FormulaCard'
 import GoogleMapEmbed from '@/components/GoogleMapEmbed'
 import FAQAccordion from '@/components/FAQAccordion'
 import JsonLd from '@/components/JsonLd'
-import { IconMapPin, IconClock, IconShield, IconArrowRight, IconPhone } from '@/components/Icons'
+import StaticBeforeAfterGallery from '@/components/StaticBeforeAfterGallery'
+import { IconMapPin, IconClock, IconShield, IconArrowRight, IconPhone, IconStar, IconGoogleG } from '@/components/Icons'
 import { CITIES, STANDALONE_CITIES, HOME_CITY_SLUG, getCity, cityHref } from '@/lib/data/cities'
+import { getCityContent, SERVICE_CITY_PITCH } from '@/lib/data/cityContent'
 import { FORMULAS } from '@/lib/data/services'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
 import { FAQ_ITEMS } from '@/lib/data/faq'
+import { BEFORE_AFTER_PAIRS } from '@/lib/data/beforeAfter'
+import { REVIEWS, AGGREGATE_RATING } from '@/lib/data/reviews'
+import { FORMULAS_PRICING } from '@/lib/data/pricing'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
-import { breadcrumbSchema, faqPageSchema } from '@/lib/schema'
+import { breadcrumbSchema, faqPageSchema, cityServiceSchema } from '@/lib/schema'
 import styles from './page.module.css'
+
+// Comparatif affiché sur chaque page commune : ce qui distingue un nettoyage
+// à domicile d'un passage en station ou d'un nettoyage fait soi-même.
+const COMPARISON_ROWS = [
+  { label: 'Déplacement', us: 'Nous venons chez vous ou au travail', station: 'Vous vous déplacez', diy: 'Aucun' },
+  { label: 'Votre temps', us: 'Aucun : vous nous confiez les clés', station: "30 min à 1h d'attente et de travail", diy: 'Une demi-journée' },
+  { label: 'Intérieur', us: 'Aspiration, plastiques, vitres, tapis, recoins', station: 'Aspirateur à jetons', diy: 'Selon votre matériel' },
+  { label: 'Produits et méthode', us: 'Produits pro adaptés à chaque surface', station: 'Rouleaux et haute pression', diy: 'Produits grand public' },
+  { label: 'Résultat garanti', us: 'Contrôle qualité avant de partir', station: 'Non', diy: 'Non' },
+]
+
+// Décale les sélections (réalisations, avis) d'une commune à l'autre pour que
+// deux pages voisines n'affichent pas exactement les mêmes éléments.
+function pick(list, count, offset) {
+  return Array.from({ length: Math.min(count, list.length) }, (_, i) => list[(offset + i) % list.length])
+}
 
 // Seules les communes avec une page dédiée sont générées. Angers (portée par la
 // page d'accueil) et les communes regroupées sur /zone-intervention/communes-voisines
@@ -29,9 +50,10 @@ export async function generateMetadata({ params }) {
   const city = getCity(ville)
   if (!city) return {}
 
+  const fromPrice = FORMULAS_PRICING[0].prices.citadine
   return buildMetadata({
-    title: `Nettoyage voiture à domicile à ${city.name}`,
-    description: `Nettoyage voiture à domicile à ${city.name} : intérieur, extérieur, lustrage, décontamination. Devis rapide, intervention directement chez vous.`,
+    title: `Nettoyage voiture à domicile à ${city.name} dès ${fromPrice} €`,
+    description: `Nettoyage voiture à domicile à ${city.name} : intérieur dès ${fromPrice} €, extérieur, lustrage, phares, céramique. Sans frais de déplacement, avis ${AGGREGATE_RATING.ratingValue}/5 sur Google, devis en ligne.`,
     path: `/zone-intervention/${city.slug}`,
   })
 }
@@ -42,7 +64,24 @@ export default async function VillePage({ params }) {
   if (!city || city.grouped || city.slug === HOME_CITY_SLUG) notFound()
 
   const otherCities = CITIES.filter((c) => c.slug !== city.slug)
-  const faqItems = FAQ_ITEMS.slice(0, 4)
+  const local = getCityContent(city.slug)
+  const cityIndex = STANDALONE_CITIES.findIndex((c) => c.slug === city.slug)
+  // FAQ propre à la commune d'abord, puis 2 questions générales.
+  const faqItems = [...(local?.faq ?? []), ...FAQ_ITEMS.slice(3, 4), ...FAQ_ITEMS.slice(5, 6)]
+  // Prestations mises en avant pour cette commune d'abord, puis toutes les autres.
+  const focus = local?.focus ?? []
+  const services = [
+    ...focus.map((slug) => SERVICE_PAGES.find((s) => s.slug === slug)).filter(Boolean),
+    ...SERVICE_PAGES.filter((s) => !focus.includes(s.slug)),
+  ]
+  // 5 paires : remplit exactement la grille (1 grande carte + 4)
+  const pairs = pick(BEFORE_AFTER_PAIRS, 5, cityIndex * 5)
+  const reviews = pick(
+    // Avis de clients uniquement (pas ceux de la famille du gérant).
+    REVIEWS.filter((r) => r.text.length > 90 && !r.author.includes('Soldet')),
+    3,
+    cityIndex * 3
+  )
 
   return (
     <>
@@ -54,6 +93,7 @@ export default async function VillePage({ params }) {
         ])}
       />
       <JsonLd data={faqPageSchema(faqItems)} />
+      <JsonLd data={cityServiceSchema(city, services)} />
 
       <PageHero
         eyebrow={`Detailing automobile à ${city.name}`}
@@ -82,9 +122,18 @@ export default async function VillePage({ params }) {
                 <IconMapPin size={18} />
                 <span>
                   Intervention directement à votre domicile ou sur votre lieu de travail à{' '}
-                  {city.name}, sans surcoût de déplacement dans notre zone habituelle.
+                  {city.name}, sans surcoût de déplacement dans notre zone habituelle
+                  {city.distanceKm ? ` (${city.distanceKm} km d'Angers)` : ''}.
                 </span>
               </div>
+              {local?.sectors?.length > 0 && (
+                <div className={styles.point}>
+                  <IconMapPin size={18} />
+                  <span>
+                    Secteurs couverts à {city.name} : {local.sectors.join(', ')}.
+                  </span>
+                </div>
+              )}
               <div className={styles.point}>
                 <IconClock size={18} />
                 <span>Devis rapide et sans engagement, avec une réponse sous 24h ouvrées.</span>
@@ -106,24 +155,116 @@ export default async function VillePage({ params }) {
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">Nos prestations à {city.name}</span>
-            <h2>Nos formules habitacle</h2>
+            <h2>Tout l&apos;entretien de votre voiture, sans bouger de {city.name}</h2>
+            <p className={styles.sectionLead}>
+              Mêmes prestations et mêmes tarifs qu&apos;à Angers, déplacement inclus.
+            </p>
+          </div>
+          <div className={styles.serviceGrid}>
+            {services.map((s) => (
+              <Link href={`/prestations/${s.slug}`} className={styles.serviceCard} key={s.slug}>
+                <h3>
+                  {s.name} à {city.name}
+                </h3>
+                <span className={styles.servicePrice}>{s.priceLine}</span>
+                <p>{SERVICE_CITY_PITCH[s.slug]}</p>
+                <span className={styles.serviceMore}>
+                  En savoir plus <IconArrowRight size={14} />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Nettoyage intérieur à {city.name}</span>
+            <h2>Nos deux formules habitacle</h2>
           </div>
           <div className={styles.formulaGrid}>
             {FORMULAS.map((f) => (
               <FormulaCard formula={f} key={f.id} />
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className={styles.servicesNote}>
-            <span>Et aussi, le détail de chaque prestation :</span>
-            <div className={styles.chipRow}>
-              {SERVICE_PAGES.map((s) => (
-                <Link href={`/prestations/${s.slug}`} className={styles.chip} key={s.slug}>
-                  {s.name}
-                </Link>
-              ))}
-            </div>
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Nos réalisations</span>
+            <h2>Avant / après : le résultat d&apos;un nettoyage La Clean Compagny</h2>
+            <p className={styles.sectionLead}>
+              Quelques véhicules nettoyés récemment dans l&apos;agglomération angevine.{' '}
+              <Link href="/galerie">Voir toute la galerie</Link>
+            </p>
           </div>
+          <StaticBeforeAfterGallery pairs={pairs} />
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Comparer avant de choisir</span>
+            <h2>À domicile, en station ou vous-même ?</h2>
+          </div>
+          <div className={styles.tableWrap}>
+            <table className={styles.compareTable}>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">La Clean Compagny à {city.name}</th>
+                  <th scope="col">Station de lavage</th>
+                  <th scope="col">Vous-même</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON_ROWS.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    <td className={styles.us}>{row.us}</td>
+                    <td>{row.station}</td>
+                    <td>{row.diy}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Avis clients</span>
+            <h2>
+              {AGGREGATE_RATING.ratingValue}/5 sur Google, {AGGREGATE_RATING.reviewCount} avis
+            </h2>
+          </div>
+          <div className={styles.reviewGrid}>
+            {reviews.map((r) => (
+              <figure className={styles.review} key={r.author}>
+                <div className={styles.reviewStars} aria-label={`${r.rating} étoiles sur 5`}>
+                  {Array.from({ length: r.rating }, (_, i) => (
+                    <IconStar size={14} key={i} />
+                  ))}
+                </div>
+                <blockquote>{r.text}</blockquote>
+                <figcaption>{r.author}</figcaption>
+              </figure>
+            ))}
+          </div>
+          <a
+            href={CONTACT.googleMapsCidUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.reviewLink}
+          >
+            <IconGoogleG size={16} /> Lire tous les avis sur Google
+          </a>
         </div>
       </section>
 

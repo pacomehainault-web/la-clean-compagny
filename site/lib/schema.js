@@ -69,7 +69,9 @@ export function serviceSchema(service) {
     description: service.metaDescription,
     url: absoluteUrl(`/prestations/${service.slug}`),
     provider: { '@id': absoluteUrl('/#business') },
-    areaServed: { '@type': 'City', name: CONTACT.city },
+    // Toute la zone d'intervention, pas seulement Angers : chaque prestation
+    // est proposée à l'identique dans toutes les communes de lib/data/cities.js.
+    areaServed: CITIES.map((city) => ({ '@type': 'City', name: city.name })),
     ...(service.fromPrice
       ? {
           offers: {
@@ -87,6 +89,44 @@ export function serviceSchema(service) {
           },
         }
       : {}),
+  }
+}
+
+// Bloc Service d'une page commune (/zone-intervention/[ville]) : relie
+// explicitement « nettoyage de voiture à domicile » + la commune + l'entreprise,
+// avec la liste des prestations proposées sur place et leur prix plancher.
+export function cityServiceSchema(city, services) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Nettoyage de voiture à domicile à ${city.name}`,
+    serviceType: 'Nettoyage et detailing automobile à domicile',
+    url: absoluteUrl(`/zone-intervention/${city.slug}`),
+    provider: { '@id': absoluteUrl('/#business') },
+    areaServed: { '@type': 'City', name: city.name },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `Prestations à ${city.name}`,
+      itemListElement: services.map((service) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: `${service.name} à ${city.name}`,
+          url: absoluteUrl(`/prestations/${service.slug}`),
+        },
+        ...(service.fromPrice
+          ? {
+              priceCurrency: 'EUR',
+              priceSpecification: {
+                '@type': 'UnitPriceSpecification',
+                price: service.fromPrice,
+                priceCurrency: 'EUR',
+                minPrice: service.fromPrice,
+              },
+            }
+          : {}),
+      })),
+    },
   }
 }
 

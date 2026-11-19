@@ -7,7 +7,7 @@ import { SERVICE_PAGES } from '@/lib/data/servicePages'
 // recevait `new Date()` (la date du build) : toutes les pages semblaient
 // modifiées à chaque déploiement, et Google finit par ignorer un lastmod qui
 // ne veut rien dire. À mettre à jour quand le contenu change vraiment.
-const CONTENT_UPDATED = new Date('2026-11-18')
+const CONTENT_UPDATED = new Date('2026-11-19')
 
 const STATIC_ROUTES = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
