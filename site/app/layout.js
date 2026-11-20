@@ -1,6 +1,7 @@
 import { Inter, Archivo } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
+import HideOnAdmin from '@/components/HideOnAdmin'
 import Footer from '@/components/Footer'
 import { WhatsAppFloat, MobileStickyCTA } from '@/components/FloatingCTAs'
 import CookieConsent from '@/components/CookieConsent'
@@ -56,15 +57,21 @@ export default function RootLayout({ children }) {
         <a href="#main-content" className="skip-link">
           Aller au contenu
         </a>
-        <CustomCursor />
+        <HideOnAdmin>
+          <CustomCursor />
+        </HideOnAdmin>
         <ScrollRevealInit />
-        <Header />
+        <HideOnAdmin>
+          <Header />
+        </HideOnAdmin>
         <main id="main-content">{children}</main>
-        <Footer />
-        <WhatsAppFloat />
-        <MobileStickyCTA />
-        <CookieConsent />
-        <Analytics />
+        <HideOnAdmin>
+          <Footer />
+          <WhatsAppFloat />
+          <MobileStickyCTA />
+          <CookieConsent />
+          <Analytics />
+        </HideOnAdmin>
       </body>
     </html>
   )
