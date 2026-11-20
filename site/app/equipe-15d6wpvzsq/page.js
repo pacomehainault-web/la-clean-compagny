@@ -1060,7 +1060,7 @@ export default function TeamDashboard() {
               onAdd={openQuick}
               onComplete={setCompleting}
               onToggleTask={toggleTask}
-              onGo={(l) => setGoing({ lead: l })}
+              onStage={setStage}
               onVisit={(l) => setVisitingId(l.id)}
             />
           )}
@@ -1243,6 +1243,9 @@ export default function TeamDashboard() {
           }}
           onAddSub={addSub}
           onUpdateSub={updateSub}
+          onGo={(l) => setGoing({ lead: l })}
+          onComplete={setCompleting}
+          onPhotos={onPhotos}
           supabase={supabase}
           onClose={() => setOpenId(null)}
           updateLead={updateLead}
