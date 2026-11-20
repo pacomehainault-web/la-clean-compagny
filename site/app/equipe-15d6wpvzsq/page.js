@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './admin.module.css'
 import { getSupabase } from '@/lib/supabaseClient'
-import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime, defaultMinutes, stockCategory, setTravelBuffer } from './_lib/crm'
+import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime, defaultMinutes, stockCategory, setTravelBuffer, setReferralGoal } from './_lib/crm'
 import Overview from './_components/Overview'
 import Pipeline from './_components/Pipeline'
 import Planning from './_components/Planning'
@@ -17,7 +17,7 @@ import AddLead from './_components/AddLead'
 import QuickAdd from './_components/QuickAdd'
 import Tasks from './_components/Tasks'
 import Cash from './_components/Cash'
-import { CompleteRdv, MoveRdv, GoRdv } from './_components/RdvActions'
+import { CompleteRdv, MoveRdv, GoRdv, AskReview } from './_components/RdvActions'
 import Visit from './_components/Visit'
 import Fidelite from './_components/Fidelite'
 import Partners from './_components/Partners'
@@ -26,6 +26,7 @@ import Content from './_components/Content'
 import { useForecast } from './_lib/geo'
 import { Icon } from './_components/Icon'
 import { pushState, syncPush } from './_lib/push'
+import { compressImage } from './_lib/media'
 
 // Espace équipe La Clean Compagny : prospects, planning, devis/factures, avis,
 // statistiques (site + Google) et réglages. Connexion par mot de passe commun
@@ -83,12 +84,14 @@ export default function TeamDashboard() {
   const [photos, setPhotos] = useState([])
   const [products, setProducts] = useState([])
   const [subs, setSubs] = useState([])
+  const [cars, setCars] = useState([])
   const [going, setGoing] = useState(null)
   const [visitingId, setVisitingId] = useState(null)
   const fc = useForecast()
   const [quick, setQuick] = useState(null)
   const [completing, setCompleting] = useState(null)
   const [moving, setMoving] = useState(null)
+  const [reviewingId, setReviewingId] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [toast, setToast] = useState('')
@@ -116,7 +119,7 @@ export default function TeamDashboard() {
   const load = useCallback(async () => {
     setLoading(true)
     const since = toDateInput(addDays(new Date(), -120).toISOString())
-    const [l, j, d, r, st, pv, se, tk, ex, ph, pr, sb, sl] = await Promise.all([
+    const [l, j, d, r, st, pv, se, tk, ex, ph, pr, sb, sl, gc] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(2000),
       supabase.from('jobs').select('*').order('done_at', { ascending: false }).limit(5000),
       supabase.from('documents').select('*').order('created_at', { ascending: false }).limit(2000),
@@ -130,6 +133,7 @@ export default function TeamDashboard() {
       supabase.from('products').select('*').order('name').limit(500),
       supabase.from('subscriptions').select('*').order('created_at', { ascending: false }).limit(1000),
       supabase.from('sync_log').select('*').order('at', { ascending: false }).limit(1),
+      supabase.from('garage_cars').select('*').order('done_on', { ascending: false }).limit(10000),
     ])
     setLoading(false)
     if (l.error || j.error) {
@@ -150,6 +154,7 @@ export default function TeamDashboard() {
     setProducts(pr.data || [])
     setSubs(sb.data || [])
     setSyncInfo(sl.data?.[0] || null)
+    setCars(gc.data || [])
     setLastSync(new Date())
   }, [supabase])
 
@@ -533,6 +538,7 @@ export default function TeamDashboard() {
   const deleteDoc = useCallback(
     async (doc) => {
       setDocs((prev) => prev.filter((d) => d.id !== doc.id))
+      setCars((prev) => prev.map((c) => (c.doc_id === doc.id ? { ...c, doc_id: null } : c)))
       setOpenDocId(null)
       const { error: err } = await supabase.from('documents').delete().eq('id', doc.id)
       if (err) {
@@ -562,16 +568,79 @@ export default function TeamDashboard() {
     load()
   }, [supabase, load])
 
-  const createPartnerInvoice = useCallback(
-    async (partner, lines, notes) => {
-      const doc = await createDoc('facture', null, { lines, client: { name: partner }, notes })
-      if (doc) {
-        setOpenDocId(doc.id)
-        setView('documents')
-        window.scrollTo({ top: 0 })
+  // ---------- Garages partenaires : voitures scannées ----------
+  const addCar = useCallback(
+    async (row, file) => {
+      let photo_path = null
+      if (file) {
+        try {
+          const blob = await compressImage(file, 1400, 0.8)
+          const slug = row.partner.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'garage'
+          const rand = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(36).slice(2)).replace(/-/g, '')
+          const path = `garages/${slug}/${row.done_on}/${rand}.jpg`
+          const up = await supabase.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false })
+          if (!up.error) photo_path = path
+        } catch {}
       }
+      const { data, error: err } = await supabase
+        .from('garage_cars')
+        .insert({ ...row, photo_path, author })
+        .select()
+        .single()
+      if (err) {
+        setError("La voiture n'a pas pu être enregistrée. Réessayez.")
+        return null
+      }
+      setCars((prev) => [data, ...prev])
+      return data
     },
-    [createDoc]
+    [supabase, author]
+  )
+
+  const updateCar = useCallback(
+    async (car, changes) => {
+      const { data, error: err } = await supabase.from('garage_cars').update(changes).eq('id', car.id).select().single()
+      if (err) {
+        setError("La modification n'a pas été enregistrée.")
+        return false
+      }
+      setCars((prev) => prev.map((c) => (c.id === car.id ? data : c)))
+      flash('Enregistré')
+      return true
+    },
+    [supabase]
+  )
+
+  const deleteCar = useCallback(
+    async (car) => {
+      const { error: err } = await supabase.from('garage_cars').delete().eq('id', car.id)
+      if (err) {
+        setError("La voiture n'a pas pu être supprimée.")
+        return false
+      }
+      if (car.photo_path) supabase.storage.from('photos').remove([car.photo_path]).then(() => {})
+      setCars((prev) => prev.filter((c) => c.id !== car.id))
+      flash('Voiture supprimée')
+      return true
+    },
+    [supabase]
+  )
+
+  // Devis ou facture d'un garage à partir des voitures de la période (la facture marque les voitures comme facturées).
+  const makeGarageDoc = useCallback(
+    async (kind, partner, list, lines, notes) => {
+      const doc = await createDoc(kind, null, { lines, client: { name: partner }, notes })
+      if (!doc) return
+      if (kind === 'facture') {
+        const ids = list.map((c) => c.id)
+        const { error: err } = await supabase.from('garage_cars').update({ doc_id: doc.id }).in('id', ids)
+        if (!err) setCars((prev) => prev.map((c) => (ids.includes(c.id) ? { ...c, doc_id: doc.id } : c)))
+      }
+      setOpenDocId(doc.id)
+      setView('documents')
+      window.scrollTo({ top: 0 })
+    },
+    [createDoc, supabase]
   )
 
   const markPaid = useCallback(
@@ -612,6 +681,15 @@ export default function TeamDashboard() {
         return null
       }
       setJobs((prev) => [row, ...prev])
+      // RDV garage : la voiture rejoint la liste du garage (facture groupée).
+      if (lead.partner) {
+        const { data: car } = await supabase
+          .from('garage_cars')
+          .insert({ partner: lead.partner, plate: plate || lead.plate || 'SANS PLAQUE', model: lead.vehicle || null, prep: 'autre', price: Number(amount) || 0, done_on: done_at, notes: service, author })
+          .select()
+          .single()
+        if (car) setCars((prev) => [car, ...prev])
+      }
       await logActivity(lead.id, 'prestation', `${row.service} – ${amount} €${discount ? ` (remise fidélité ${discount} €)` : ''}`)
       const leadChanges = { status: lead.review_done ? 'avis_recu' : 'fait', track_stage: 'termine', eta_at: null }
       if (plate && plate !== lead.plate) leadChanges.plate = plate
@@ -653,7 +731,7 @@ export default function TeamDashboard() {
       flash('Prestation enregistrée')
       return { lead: { ...lead, ...leadChanges }, invoiceNumber, stockAlerts }
     },
-    [supabase, logActivity, updateLead, createDoc, updateDoc, products, subs]
+    [supabase, logActivity, updateLead, createDoc, updateDoc, products, subs, author]
   )
 
   // « Je pars » / « Sur place » : met à jour la page de suivi du client.
@@ -883,6 +961,7 @@ export default function TeamDashboard() {
 
   // ---------- Dashboard ----------
   setTravelBuffer(settings?.business?.travel_buffer_min ?? 30)
+  setReferralGoal(settings?.business?.referral_goal ?? 10)
   const visibleLeads = hideTests ? leads.filter((l) => l.source !== 'test') : leads
   const visiting = leads.find((l) => l.id === visitingId) || null
   const lowCount = lowStock(products).length
@@ -891,7 +970,7 @@ export default function TeamDashboard() {
   const unreplied = reviews.filter((r) => !r.replied).length
   const tasksDue = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t))).length
   const openQuick = (opts = {}) => setQuick(opts)
-  const shared = { leads: visibleLeads, jobs, onOpen: setOpenId, updateLead, logActivity }
+  const shared = { leads: visibleLeads, jobs, onOpen: setOpenId, updateLead, logActivity, onReview: (l) => setReviewingId(l.id) }
   const badge = (id) => (id === 'prospects' ? newCount : id === 'avis' ? unreplied : id === 'taches' ? tasksDue : id === 'stock' ? lowCount : 0)
   const current = VIEWS.find((v) => v.id === view)
 
@@ -966,6 +1045,7 @@ export default function TeamDashboard() {
           {view === 'accueil' && (
             <Overview
               {...shared}
+              cars={cars}
               who={memberName}
               docs={docs}
               reviews={reviews}
@@ -1002,6 +1082,8 @@ export default function TeamDashboard() {
           {view === 'caisse' && (
             <Cash
               jobs={jobs}
+              cars={cars}
+              onOpenGarages={() => goTo('partenaires')}
               leads={leads}
               expenses={expenses}
               docs={docs}
@@ -1050,13 +1132,19 @@ export default function TeamDashboard() {
           {view === 'partenaires' && (
             <Partners
               leads={leads}
-              jobs={jobs}
               docs={docs}
+              cars={cars}
               settings={settings}
               onSaveSettings={saveSettings}
-              onCreateInvoice={createPartnerInvoice}
-              onAddVehicle={(partner) => openQuick({ partner })}
-              onOpen={setOpenId}
+              onAddCar={addCar}
+              onUpdateCar={updateCar}
+              onDeleteCar={deleteCar}
+              onMakeDoc={makeGarageDoc}
+              onOpenDoc={(id) => {
+                setOpenDocId(id)
+                goTo('documents')
+              }}
+              flash={flash}
             />
           )}
           {view === 'stock' && (
@@ -1143,6 +1231,7 @@ export default function TeamDashboard() {
           key={openLead.id}
           lead={openLead}
           jobs={jobs.filter((j) => j.lead_id === openLead.id)}
+          allJobs={jobs}
           docs={docs.filter((d) => d.lead_id === openLead.id)}
           allLeads={leads}
           photos={photos.filter((p) => p.lead_id === openLead.id).slice().reverse()}
@@ -1207,6 +1296,9 @@ export default function TeamDashboard() {
           visits={jobs.filter((j) => j.lead_id === completing.id).length}
           settings={settings}
           subscription={subs.find((x) => x.lead_id === completing.id && x.active) || null}
+          photos={photos}
+          supabase={supabase}
+          onPhotos={onPhotos}
           onClose={() => setCompleting(null)}
           onComplete={completeRdv}
           onAskedReview={askedReview}
@@ -1247,6 +1339,21 @@ export default function TeamDashboard() {
           }}
           flash={flash}
           logActivity={logActivity}
+        />
+      )}
+
+      {reviewingId && leads.find((l) => l.id === reviewingId) && (
+        <AskReview
+          lead={leads.find((l) => l.id === reviewingId)}
+          photos={photos}
+          supabase={supabase}
+          onPhotos={onPhotos}
+          onClose={() => setReviewingId(null)}
+          onSent={(ch) => {
+            const l = leads.find((x) => x.id === reviewingId)
+            askedReview(l)
+            logActivity(l.id, ch === 'partage' ? 'whatsapp' : ch, 'Demande d’avis envoyée')
+          }}
         />
       )}
 

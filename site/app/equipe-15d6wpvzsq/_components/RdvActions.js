@@ -5,6 +5,8 @@ import styles from '../admin.module.css'
 import v2 from '../v2.module.css'
 import { Icon } from './Icon'
 import SlotPicker from './SlotPicker'
+import ReviewSend, { lastAfterPhoto } from './ReviewSend'
+import { uploadPhoto, photoUrl } from '../_lib/media'
 import {
   PAYMENT_METHODS,
   atTime,
@@ -24,7 +26,7 @@ import {
   addDays,
 } from '../_lib/crm'
 
-function Sheet({ title, sub, onClose, wide = false, children }) {
+export function Sheet({ title, sub, onClose, wide = false, children }) {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={title}>
       <button type="button" className={styles.backdrop} onClick={onClose} aria-label="Fermer" />
@@ -58,7 +60,7 @@ function SendRow({ lead, text, onSent }) {
 }
 
 // « Terminé » : prestation, encaissement, fidélité, facture, stock, puis récap au client.
-export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose, onComplete, onAskedReview, onOpenVisit, onAddSubscription, logActivity }) {
+export function CompleteRdv({ lead, visits = 0, settings, subscription, photos = [], supabase, onPhotos, onClose, onComplete, onAskedReview, onOpenVisit, onAddSubscription, logActivity }) {
   const biz = settings?.business || {}
   const loy = loyalty(visits, biz.loyalty_every)
   const pct = Number(biz.loyalty_discount) || 20
@@ -72,6 +74,21 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose,
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(null)
   const [subForm, setSubForm] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const afterPhoto = lastAfterPhoto(photos, lead.id)
+
+  // Photo « après » : prise ici, elle part ensuite avec la demande d'avis.
+  async function addAfterPhoto(file) {
+    if (!file || !supabase) return
+    setUploading(true)
+    try {
+      const row = await uploadPhoto(supabase, { leadId: lead.id, kind: 'apres', file })
+      onPhotos?.({ add: [row] })
+    } catch {
+      window.alert("La photo n'a pas pu être envoyée. Réessayez.")
+    }
+    setUploading(false)
+  }
 
   function toggleLoyalty() {
     const next = !applyLoyalty
@@ -94,7 +111,6 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose,
   }
 
   const after = done?.lead || lead
-  const recap = templates(after).find((t) => t.id === 'avis')
   const parrain = templates(after).find((t) => t.id === 'parrainage')
 
   return (
@@ -107,14 +123,20 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose,
               {done.invoiceNumber ? ` · facture ${done.invoiceNumber} créée` : ''}
               {done.stockAlerts?.length ? ` · stock bas : ${done.stockAlerts.join(', ')}` : ''}.
             </p>
-            <h3>Envoyer le récap au client</h3>
-            <p className={styles.hint}>Sa page de suivi contient les photos avant/après, la facture et le bouton d&apos;avis Google.</p>
-            <SendRow
+            <h3>Demander l&apos;avis Google</h3>
+            <p className={styles.hint}>Le message contient le lien de l&apos;avis Google et sa page (photos avant/après, facture).</p>
+            {!afterPhoto && supabase && (
+              <label className={`${styles.btnSecondary} ${styles.btnBlock}`} style={{ marginBottom: 10 }}>
+                <Icon name="camera" size={16} /> {uploading ? 'Envoi de la photo…' : 'Ajouter la photo « après »'}
+                <input type="file" accept="image/*" capture="environment" hidden disabled={uploading} onChange={(e) => addAfterPhoto(e.target.files?.[0])} />
+              </label>
+            )}
+            <ReviewSend
               lead={after}
-              text={recap.text}
+              photo={afterPhoto}
               onSent={(ch) => {
                 onAskedReview?.(after)
-                logActivity?.(after.id, ch, 'Récap + demande d’avis envoyés')
+                logActivity?.(after.id, ch === 'partage' ? 'whatsapp' : ch, afterPhoto ? 'Demande d’avis envoyée avec la photo après' : 'Récap + demande d’avis envoyés')
               }}
             />
             <div className={v2.inlineLinks}>
@@ -219,7 +241,7 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose,
                 )}
               </div>
             )}
-            {lead.ref_code && visits === 0 && <p className={styles.hint}>🎁 Client parrainé (code {lead.ref_code}) : pensez à sa réduction de bienvenue.</p>}
+            {lead.ref_code && visits === 0 && <p className={styles.hint}>🎁 Client parrainé (code {lead.ref_code}) : cette prestation compte pour son parrain.</p>}
             <label className={styles.field}>
               Montant encaissé (€)
               <input type="number" min="0" step="0.01" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required autoFocus />
@@ -237,6 +259,22 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, onClose,
                 Plaque ({lead.partner})
                 <input value={plate} onChange={(e) => setPlate(e.target.value.toUpperCase())} placeholder="AB-123-CD" maxLength={20} />
               </label>
+            )}
+            {supabase && !lead.partner && (
+              <div className={v2.reviewPhoto}>
+                {afterPhoto ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photoUrl(afterPhoto.path)} alt="Photo après" />
+                    <span>Photo « après » prête : elle partira avec la demande d&apos;avis.</span>
+                  </>
+                ) : (
+                  <label className={styles.btnSecondary}>
+                    <Icon name="camera" size={16} /> {uploading ? 'Envoi…' : 'Photo « après » de la voiture'}
+                    <input type="file" accept="image/*" capture="environment" hidden disabled={uploading} onChange={(e) => addAfterPhoto(e.target.files?.[0])} />
+                  </label>
+                )}
+              </div>
             )}
             <label className={styles.toggle}>
               <input type="checkbox" checked={invoice} onChange={(e) => setInvoice(e.target.checked)} />
@@ -386,6 +424,38 @@ export function MoveRdv({ lead, leads, onClose, onMove }) {
           </div>
         </form>
       )}
+    </Sheet>
+  )
+}
+
+// Demande d'avis depuis l'accueil ou l'écran Avis : photo « après » + message.
+export function AskReview({ lead, photos = [], supabase, onPhotos, onClose, onSent }) {
+  const photo = lastAfterPhoto(photos, lead.id)
+  const [uploading, setUploading] = useState(false)
+
+  async function add(file) {
+    if (!file || !supabase) return
+    setUploading(true)
+    try {
+      const row = await uploadPhoto(supabase, { leadId: lead.id, kind: 'apres', file })
+      onPhotos?.({ add: [row] })
+    } catch {
+      window.alert("La photo n'a pas pu être envoyée. Réessayez.")
+    }
+    setUploading(false)
+  }
+
+  return (
+    <Sheet title="Demande d’avis" sub={`${lead.first_name}${lead.vehicle ? ` · ${lead.vehicle}` : ''}`} onClose={onClose}>
+      <section className={styles.sheetSection}>
+        {!photo && supabase && (
+          <label className={`${styles.btnSecondary} ${styles.btnBlock}`} style={{ marginBottom: 10 }}>
+            <Icon name="camera" size={16} /> {uploading ? 'Envoi de la photo…' : 'Ajouter la photo « après »'}
+            <input type="file" accept="image/*" hidden disabled={uploading} onChange={(e) => add(e.target.files?.[0])} />
+          </label>
+        )}
+        <ReviewSend lead={lead} photo={photo} onSent={onSent} />
+      </section>
     </Sheet>
   )
 }

@@ -160,7 +160,12 @@ export default function Tracking({ token }) {
   // Sur place : eta_at = heure de fin estimée (posée par Enzo à son arrivée).
   const endAt = stage === 'sur_place' ? (eta || (start ? new Date(start.getTime() + minutes * 60000) : null)) : null
   const progress = endAt ? Math.min(96, Math.max(4, Math.round((1 - (endAt - now) / (minutes * 60000)) * 100))) : null
-  const shareUrl = `${SITE.url}/reserver?parrain=${t.referral_code}`
+  const shareUrl = `${SITE.url}/p/${t.referral_code}`
+  const refGoal = Math.max(1, Number(biz.referral_goal) || 10)
+  const refDone = Number(t.filleuls) || 0
+  const refEarned = Math.floor(refDone / refGoal)
+  const refAvailable = Math.max(0, refEarned - (Number(t.rewards_used) || 0))
+  const refInCycle = refAvailable > 0 && refDone - refEarned * refGoal === 0 ? refGoal : refDone - refEarned * refGoal
   const payLink = biz.payment_link && /^https:\/\//.test(biz.payment_link) ? biz.payment_link : null
   const depositPct = Number(biz.deposit_pct) || 0
   const unpaid = invoice && invoice.status !== 'paye'
@@ -210,7 +215,7 @@ export default function Tracking({ token }) {
   }
 
   async function share() {
-    const text = `Je te recommande La Clean Compagny pour le nettoyage de ta voiture (à domicile autour d'Angers). Avec mon code ${t.referral_code} on a tous les deux une réduction : ${shareUrl}`
+    const text = `Je te recommande La Clean Compagny pour le nettoyage de ta voiture, à domicile autour d'Angers. Réserve avec mon lien : ${shareUrl}`
     try {
       if (navigator.share) return await navigator.share({ title: 'La Clean Compagny', text, url: shareUrl })
     } catch {
@@ -492,17 +497,22 @@ export default function Tracking({ token }) {
       {/* Parrainage */}
       {t.referral_code && (stage === 'termine' || visits > 0) && (
         <section className={`${styles.card} ${styles.referral} ${styles.noPrint}`}>
-          <h2>Parrainez un proche</h2>
-          <p className={styles.muted}>{biz.referral_reward || 'Une réduction pour vous et pour votre filleul'} avec votre code :</p>
+          <h2>Parrainez vos proches</h2>
+          <p className={styles.muted}>
+            Dès que {refGoal} personnes ont fait appel à nous grâce à vous : {(biz.referral_reward || 'nettoyage Sortie de Concession offert').replace(/^./, (c) => c.toLowerCase())} 🎁
+          </p>
           <p className={styles.code}>{t.referral_code}</p>
-          <button type="button" className="btn btn-cta btn-block" onClick={share}>
-            {copied ? 'Message copié !' : 'Partager mon code'}
+          <div className={styles.refBar} role="progressbar" aria-valuemin={0} aria-valuemax={refGoal} aria-valuenow={refInCycle} aria-label="Parrainages">
+            <i style={{ width: `${Math.round((refInCycle / refGoal) * 100)}%` }} />
+          </div>
+          <p className={styles.small}>
+            {refInCycle} / {refGoal} proche{refInCycle > 1 ? 's' : ''}
+            {Number(t.filleuls_attente) > 0 ? ` · ${t.filleuls_attente} en attente de leur prestation` : ''}
+          </p>
+          {refAvailable > 0 && <p className={styles.ok}>Bravo ! Votre nettoyage offert vous attend : prévenez Enzo pour le réserver.</p>}
+          <button type="button" className="btn btn-cta btn-block" onClick={share} style={{ marginTop: 14 }}>
+            {copied ? 'Message copié !' : 'Partager mon lien'}
           </button>
-          {Number(t.filleuls) > 0 && (
-            <p className={styles.small}>
-              {t.filleuls} proche{t.filleuls > 1 ? 's ont' : ' a'} déjà utilisé votre code. Merci !
-            </p>
-          )}
         </section>
       )}
 

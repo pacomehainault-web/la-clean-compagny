@@ -25,7 +25,9 @@ const isDev = process.env.NODE_ENV === 'development'
 // - frame-src : uniquement Google Maps (composants/GoogleMapEmbed.js).
 const cspDirectives = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
+  // 'wasm-unsafe-eval' : lecture des plaques dans l'espace équipe (moteur tesseract.js en
+  // WebAssembly, servi depuis /ocr). N'autorise que la compilation de WebAssembly, pas eval().
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data: blob: https://ibeejsvztajwploqmnkh.supabase.co`,
   `font-src 'self'`,

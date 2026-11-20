@@ -10,7 +10,7 @@ const REVIEW_URL = 'https://g.page/r/CSFtfbCI8GR-EBM/review'
 const GBP_URL = 'https://business.google.com/reviews'
 
 // Avis Google : avis relevés chaque matin + demandes d'avis aux clients.
-export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen, updateLead, logActivity, flash, onSaveStats }) {
+export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen, updateLead, logActivity, flash, onSaveStats, onReview }) {
   const [filter, setFilter] = useState('sans-reponse')
   const sorted = [...reviews].sort((a, b) => ((a.review_date || '') < (b.review_date || '') ? 1 : -1))
   const pending = sorted.filter((r) => !r.replied)
@@ -24,6 +24,7 @@ export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen,
   const received = leads.filter((l) => l.status === 'avis_recu').length
 
   function ask(lead, tplId) {
+    if (tplId === 'avis' && onReview) return onReview(lead)
     const tpl = templates(lead).find((t) => t.id === tplId)
     window.open(whatsappHref(lead, tpl.text), '_blank', 'noopener')
     logActivity(lead.id, 'whatsapp', `WhatsApp « ${tpl.label} »`)
