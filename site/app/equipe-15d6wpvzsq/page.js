@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './admin.module.css'
 import { getSupabase } from '@/lib/supabaseClient'
-import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput } from './_lib/crm'
+import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime } from './_lib/crm'
 import Overview from './_components/Overview'
 import Pipeline from './_components/Pipeline'
 import Planning from './_components/Planning'
@@ -14,6 +14,10 @@ import Stats from './_components/Stats'
 import Settings from './_components/Settings'
 import LeadSheet from './_components/LeadSheet'
 import AddLead from './_components/AddLead'
+import QuickAdd from './_components/QuickAdd'
+import Tasks from './_components/Tasks'
+import Cash from './_components/Cash'
+import { CompleteRdv, MoveRdv } from './_components/RdvActions'
 import { Icon } from './_components/Icon'
 import { pushState, syncPush } from './_lib/push'
 
@@ -28,13 +32,16 @@ const VIEWS = [
   { id: 'accueil', label: 'Accueil', icon: 'home' },
   { id: 'prospects', label: 'Prospects', icon: 'users' },
   { id: 'planning', label: 'Planning', icon: 'calendar' },
+  { id: 'taches', label: 'Tâches', icon: 'check' },
+  { id: 'caisse', label: 'Caisse', icon: 'euro' },
   { id: 'documents', label: 'Devis & factures', short: 'Factures', icon: 'file' },
   { id: 'clients', label: 'Clients', icon: 'star' },
   { id: 'avis', label: 'Avis Google', icon: 'message' },
   { id: 'stats', label: 'Statistiques', icon: 'chart' },
   { id: 'reglages', label: 'Réglages', icon: 'settings' },
 ]
-const MOBILE_MAIN = ['accueil', 'prospects', 'planning', 'documents']
+const MOBILE_MAIN = ['accueil', 'planning', 'prospects']
+const MOBILE_LEFT = ['accueil', 'planning']
 
 const in3Days = () => {
   const d = addDays(new Date(), 3)
@@ -59,6 +66,11 @@ export default function TeamDashboard() {
   const [stats, setStats] = useState([])
   const [views, setViews] = useState([])
   const [settings, setSettings] = useState(null)
+  const [tasks, setTasks] = useState([])
+  const [expenses, setExpenses] = useState([])
+  const [quick, setQuick] = useState(null)
+  const [completing, setCompleting] = useState(null)
+  const [moving, setMoving] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [toast, setToast] = useState('')
@@ -86,7 +98,7 @@ export default function TeamDashboard() {
   const load = useCallback(async () => {
     setLoading(true)
     const since = toDateInput(addDays(new Date(), -120).toISOString())
-    const [l, j, d, r, st, pv, se] = await Promise.all([
+    const [l, j, d, r, st, pv, se, tk, ex] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(2000),
       supabase.from('jobs').select('*').order('done_at', { ascending: false }).limit(5000),
       supabase.from('documents').select('*').order('created_at', { ascending: false }).limit(2000),
@@ -94,6 +106,8 @@ export default function TeamDashboard() {
       supabase.from('stats_daily').select('*').gte('day', since).limit(20000),
       supabase.from('page_views').select('*').gte('day', since).limit(20000),
       supabase.from('settings').select('*').eq('id', 1).maybeSingle(),
+      supabase.from('tasks').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('expenses').select('*').order('spent_on', { ascending: false }).limit(5000),
     ])
     setLoading(false)
     if (l.error || j.error) {
@@ -108,6 +122,8 @@ export default function TeamDashboard() {
     setStats(st.data || [])
     setViews(pv.data || [])
     setSettings(se.data || null)
+    setTasks(tk.data || [])
+    setExpenses(ex.data || [])
     setLastSync(new Date())
   }, [supabase])
 
@@ -208,6 +224,7 @@ export default function TeamDashboard() {
   const updateLead = useCallback(
     async (lead, changes, { silent = false } = {}) => {
       const next = { ...changes }
+      if (next.status === 'avis_recu') next.review_done = true
       // Relances programmées automatiquement selon l'étape.
       if (next.status && next.status !== lead.status) {
         if (next.status === 'devis_envoye' && !('next_followup_at' in next) && !lead.next_followup_at) next.next_followup_at = in3Days()
@@ -285,6 +302,157 @@ export default function TeamDashboard() {
         setError("La fiche n'a pas pu être supprimée.")
         load()
       } else flash('Fiche supprimée')
+    },
+    [supabase, load]
+  )
+
+  // ---------- Opérations : rendez-vous ----------
+  const createRdv = useCallback(
+    async ({ lead: existing, first_name, phone, notes, ...fields }) => {
+      const when = `${formatDayLabel(fields.appointment_at).toLowerCase()} à ${formatTime(fields.appointment_at)}`
+      if (existing) {
+        const changes = { ...fields, status: 'reserve', next_followup_at: null }
+        if (notes) changes.notes = [existing.notes, notes].filter(Boolean).join('\n')
+        const ok = await updateLead(existing, changes, { silent: true })
+        if (!ok) return null
+        await logActivity(existing.id, 'note', `RDV ajouté : ${when}`)
+        flash('RDV ajouté')
+        return { ...existing, ...changes }
+      }
+      const { data: row, error: err } = await supabase
+        .from('leads')
+        .insert({ first_name, phone, notes, ...fields, source: 'autre', status: 'reserve' })
+        .select()
+        .single()
+      if (err) {
+        setError("Le RDV n'a pas pu être ajouté. Vérifiez le nom et le téléphone.")
+        return null
+      }
+      await logActivity(row.id, 'creation', `RDV ajouté directement : ${when}`)
+      setLeads((prev) => [row, ...prev])
+      flash('RDV ajouté')
+      return row
+    },
+    [supabase, updateLead, logActivity]
+  )
+
+  const completeRdv = useCallback(
+    async (lead, { amount, payment_method }) => {
+      const done_at = toDateInput(lead.appointment_at || new Date().toISOString())
+      const { data: row, error: err } = await supabase
+        .from('jobs')
+        .insert({ lead_id: lead.id, done_at, service: lead.service || 'Prestation', amount, payment_method })
+        .select()
+        .single()
+      if (err) {
+        setError("La prestation n'a pas pu être enregistrée.")
+        return false
+      }
+      setJobs((prev) => [row, ...prev])
+      await logActivity(lead.id, 'prestation', `${row.service} – ${amount} €`)
+      await updateLead(lead, { status: lead.review_done ? 'avis_recu' : 'fait' }, { silent: true })
+      flash('Prestation enregistrée')
+      return true
+    },
+    [supabase, logActivity, updateLead]
+  )
+
+  const askedReview = useCallback(
+    async (lead) => {
+      const cur = leads.find((l) => l.id === lead.id) || lead
+      if (cur.review_done) return
+      await updateLead(cur, { status: 'avis_demande', review_requested_at: new Date().toISOString() }, { silent: true })
+    },
+    [leads, updateLead]
+  )
+
+  const moveRdv = useCallback(
+    async (lead, changes) => {
+      const ok = await updateLead(lead, changes, { silent: true })
+      if (ok) {
+        await logActivity(lead.id, 'note', `RDV déplacé : ${formatDayLabel(changes.appointment_at).toLowerCase()} à ${formatTime(changes.appointment_at)}`)
+        flash('RDV déplacé')
+      }
+      return ok
+    },
+    [updateLead, logActivity]
+  )
+
+  const updateJob = useCallback(
+    async (job, changes) => {
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, ...changes } : j)))
+      const { error: err } = await supabase.from('jobs').update(changes).eq('id', job.id)
+      if (err) {
+        setError("L'encaissement n'a pas été enregistré.")
+        load()
+      } else flash('Enregistré')
+    },
+    [supabase, load]
+  )
+
+  // ---------- Opérations : tâches et dépenses ----------
+  const addTask = useCallback(
+    async (task) => {
+      const { data: row, error: err } = await supabase.from('tasks').insert({ ...task, author }).select().single()
+      if (err) {
+        setError("La tâche n'a pas pu être ajoutée.")
+        return false
+      }
+      setTasks((prev) => [row, ...prev])
+      flash('Tâche ajoutée')
+      return true
+    },
+    [supabase, author]
+  )
+
+  const toggleTask = useCallback(
+    async (task) => {
+      const changes = { done: !task.done, done_at: task.done ? null : new Date().toISOString() }
+      setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, ...changes } : t)))
+      const { error: err } = await supabase.from('tasks').update(changes).eq('id', task.id)
+      if (err) {
+        setError("La tâche n'a pas été mise à jour.")
+        load()
+      }
+    },
+    [supabase, load]
+  )
+
+  const deleteTask = useCallback(
+    async (task) => {
+      setTasks((prev) => prev.filter((t) => t.id !== task.id))
+      const { error: err } = await supabase.from('tasks').delete().eq('id', task.id)
+      if (err) {
+        setError("La tâche n'a pas pu être supprimée.")
+        load()
+      }
+    },
+    [supabase, load]
+  )
+
+  const addExpense = useCallback(
+    async (exp) => {
+      const { data: row, error: err } = await supabase.from('expenses').insert(exp).select().single()
+      if (err) {
+        setError("La dépense n'a pas pu être ajoutée.")
+        return false
+      }
+      setExpenses((prev) => [row, ...prev])
+      flash('Dépense ajoutée')
+      return true
+    },
+    [supabase]
+  )
+
+  const deleteExpense = useCallback(
+    async (exp) => {
+      if (!window.confirm(`Supprimer la dépense « ${exp.label} » ?`)) return
+      setExpenses((prev) => prev.filter((e) => e.id !== exp.id))
+      const { error: err } = await supabase.from('expenses').delete().eq('id', exp.id)
+      if (err) {
+        setError("La dépense n'a pas pu être supprimée.")
+        load()
+      } else flash('Dépense supprimée')
     },
     [supabase, load]
   )
@@ -499,8 +667,10 @@ export default function TeamDashboard() {
   const openLead = leads.find((l) => l.id === openId) || null
   const newCount = visibleLeads.filter((l) => l.status === 'nouveau').length
   const unreplied = reviews.filter((r) => !r.replied).length
+  const tasksDue = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t))).length
+  const openQuick = (opts = {}) => setQuick(opts)
   const shared = { leads: visibleLeads, jobs, onOpen: setOpenId, updateLead, logActivity }
-  const badge = (id) => (id === 'prospects' ? newCount : id === 'avis' ? unreplied : 0)
+  const badge = (id) => (id === 'prospects' ? newCount : id === 'avis' ? unreplied : id === 'taches' ? tasksDue : 0)
   const current = VIEWS.find((v) => v.id === view)
 
   return (
@@ -544,8 +714,8 @@ export default function TeamDashboard() {
               <button type="button" className={`${styles.iconBtn} ${loading ? styles.spinning : ''}`} onClick={load} aria-label="Actualiser les données">
                 <Icon name="refresh" />
               </button>
-              <button type="button" className={styles.btnPrimary} onClick={() => setAdding(true)}>
-                <Icon name="plus" /> <span className={styles.hideXs}>Nouveau prospect</span>
+              <button type="button" className={styles.btnPrimary} onClick={() => openQuick()}>
+                <Icon name="plus" /> <span className={styles.hideXs}>Ajouter</span>
               </button>
             </div>
           </header>
@@ -572,10 +742,40 @@ export default function TeamDashboard() {
             </div>
           )}
           {view === 'accueil' && (
-            <Overview {...shared} who={memberName} docs={docs} reviews={reviews} stats={stats} views={views} settings={settings} goTo={goTo} />
+            <Overview
+              {...shared}
+              who={memberName}
+              docs={docs}
+              reviews={reviews}
+              stats={stats}
+              views={views}
+              tasks={tasks}
+              settings={settings}
+              goTo={goTo}
+              onAdd={openQuick}
+              onComplete={setCompleting}
+              onToggleTask={toggleTask}
+            />
           )}
           {view === 'prospects' && <Pipeline {...shared} />}
-          {view === 'planning' && <Planning {...shared} />}
+          {view === 'planning' && (
+            <Planning {...shared} onAdd={(day, time, lead) => openQuick({ day, time, lead })} onComplete={setCompleting} onMove={setMoving} />
+          )}
+          {view === 'taches' && <Tasks tasks={tasks} onAdd={addTask} onToggle={toggleTask} onDelete={deleteTask} onOpenLead={setOpenId} />}
+          {view === 'caisse' && (
+            <Cash
+              jobs={jobs}
+              leads={leads}
+              expenses={expenses}
+              docs={docs}
+              settings={settings}
+              onSaveSettings={saveSettings}
+              onUpdateJob={updateJob}
+              onDeleteExpense={deleteExpense}
+              onNewExpense={() => openQuick({ mode: 'depense' })}
+              onOpenLead={setOpenId}
+            />
+          )}
           {view === 'documents' && (
             <Documents
               docs={docs}
@@ -615,7 +815,20 @@ export default function TeamDashboard() {
       </div>
 
       <nav className={styles.bottomNav} aria-label="Sections">
-        {VIEWS.filter((v) => MOBILE_MAIN.includes(v.id)).map((v) => (
+        {VIEWS.filter((v) => MOBILE_LEFT.includes(v.id)).map((v) => (
+          <button type="button" key={v.id} className={view === v.id ? styles.bottomOn : ''} onClick={() => goTo(v.id)}>
+            <Icon name={v.icon} />
+            <span>{v.short || v.label}</span>
+            {badge(v.id) > 0 && <em>{badge(v.id)}</em>}
+          </button>
+        ))}
+        <button type="button" className={styles.fab} onClick={() => openQuick()} aria-label="Ajouter un RDV, une tâche ou une dépense">
+          <span className={styles.fabIn}>
+            <Icon name="plus" size={26} />
+          </span>
+          <span>Ajouter</span>
+        </button>
+        {VIEWS.filter((v) => MOBILE_MAIN.includes(v.id) && !MOBILE_LEFT.includes(v.id)).map((v) => (
           <button type="button" key={v.id} className={view === v.id ? styles.bottomOn : ''} onClick={() => goTo(v.id)}>
             <Icon name={v.icon} />
             <span>{v.short || v.label}</span>
@@ -630,7 +843,7 @@ export default function TeamDashboard() {
         >
           <Icon name="more" />
           <span>Plus</span>
-          {unreplied > 0 && <em>{unreplied}</em>}
+          {unreplied + tasksDue > 0 && <em>{unreplied + tasksDue}</em>}
         </button>
       </nav>
 
@@ -677,8 +890,37 @@ export default function TeamDashboard() {
             setOpenDocId(id)
             goTo('documents')
           }}
+          onPlanRdv={(lead) => {
+            setOpenId(null)
+            setQuick({ lead })
+          }}
         />
       )}
+
+      {quick && (
+        <QuickAdd
+          leads={leads}
+          initial={quick}
+          onClose={() => setQuick(null)}
+          onCreateRdv={createRdv}
+          onAddTask={addTask}
+          onAddExpense={addExpense}
+          onNewProspect={() => {
+            setQuick(null)
+            setAdding(true)
+          }}
+          onOpenLead={(id) => {
+            setQuick(null)
+            setOpenId(id)
+          }}
+        />
+      )}
+
+      {completing && (
+        <CompleteRdv lead={completing} onClose={() => setCompleting(null)} onComplete={completeRdv} onAskedReview={askedReview} />
+      )}
+
+      {moving && <MoveRdv lead={moving} leads={leads} onClose={() => setMoving(null)} onMove={moveRdv} />}
 
       {adding && (
         <AddLead

@@ -2588,3 +2588,633 @@ details[open] > .pushAlt {
 .pushNudgeClose:hover {
   background: var(--night2);
 }
+
+/* =====================================================================
+   Appli de travail : ajout rapide, créneaux, planning jour, tâches, caisse
+   ===================================================================== */
+
+/* Feuilles larges (ajout rapide, décaler) */
+@media (min-width: 640px) {
+  .sheetWide {
+    width: min(680px, calc(100% - 32px));
+  }
+}
+.sheetWide .sheetHead {
+  align-items: center;
+}
+.sheetWide .sheetHead .segment {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.sheetWide .sheetHead .segment button {
+  justify-content: center;
+  padding: 9px 4px;
+  font-size: 13.5px;
+}
+@media (max-width: 419px) {
+  .sheetWide .sheetHead .segment button svg {
+    display: none;
+  }
+}
+.sheetFoot .btnBlock {
+  width: 100%;
+}
+.btnBlock {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+}
+form > .sheetFoot {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, var(--frost) 75%, rgba(237, 240, 245, 0));
+  flex-direction: column;
+  padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+}
+
+.chipsWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chipSoft {
+  background: var(--mist);
+  border-color: var(--line);
+}
+.chipSoft.chipOn {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+}
+.chipDate {
+  border: 1px solid var(--line2);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--paper);
+  font-size: 13.5px;
+}
+
+/* Client choisi / suggestions */
+.pickedClient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-item);
+  background: var(--cobalt-soft);
+}
+.pickedClient .avatar {
+  background: var(--cobalt);
+  color: #fff;
+  flex: none;
+}
+.pickedClient > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pickedClient span {
+  font-size: 13px;
+  color: var(--slate);
+}
+.matchList {
+  list-style: none;
+  margin: -4px 0 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-item);
+  background: var(--paper);
+  box-shadow: 0 8px 24px rgba(15, 27, 51, 0.08);
+}
+.matchList button {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+.matchList button:hover {
+  background: var(--mist);
+}
+.matchList span {
+  font-size: 13px;
+  color: var(--slate);
+}
+
+/* Sélecteur de créneau */
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.slotLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--slate);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+.slotDot {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--cobalt-soft);
+  color: var(--cobalt);
+  font-size: 11px;
+  font-weight: 750;
+  display: inline-grid;
+  place-items: center;
+}
+.chipOn .slotDot {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.slotDate {
+  position: relative;
+}
+.slotDate input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: pointer;
+}
+.slotTimes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.slotTime {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line2);
+  background: var(--paper);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+.slotTime:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.slotBusy {
+  background: repeating-linear-gradient(135deg, var(--mist), var(--mist) 5px, #fff 5px, #fff 10px);
+  color: var(--slate);
+  text-decoration: line-through;
+}
+.slotTimeOn,
+.slotTimeOn.slotBusy {
+  background: var(--night);
+  border-color: var(--night);
+  color: #fff;
+  text-decoration: none;
+}
+.slotTimeInput {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line2);
+  background: var(--mist);
+  padding: 0 6px;
+  font-weight: 650;
+  min-width: 0;
+}
+.slotOk,
+.slotWarn {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.slotOk {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+.slotWarn {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* Confirmation après ajout */
+.doneBox {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+}
+.doneBox h3 {
+  font-size: 20px;
+}
+.doneBox p {
+  margin: 0;
+  color: var(--slate);
+}
+.doneIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--mint-soft);
+  color: var(--mint);
+  display: grid;
+  place-items: center;
+}
+.doneActions {
+  display: grid;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .doneActions {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* Barre d'actions rapides de l'accueil */
+.quickBar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.quickBar button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  border-radius: var(--r-item);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-weight: 650;
+  font-size: 13.5px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.quickBar button svg {
+  color: var(--cobalt);
+}
+.quickBar button:active {
+  transform: scale(0.97);
+}
+.homeMain {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.closeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.closeRow > button:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.closeRow .btnPrimary {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+/* Planning : RDV */
+.rdvDone {
+  background: var(--mint-soft);
+}
+.rdvDone .rdvMain em {
+  color: var(--mint);
+}
+.rdvLarge {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+}
+.rdvLarge .rdvMain strong {
+  font-size: 16px;
+}
+.rdvDoneBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 9px;
+  border-radius: 9px;
+  border: 0;
+  background: var(--mint);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  justify-content: center;
+}
+.weekDay h3 {
+  justify-content: space-between;
+  align-items: center;
+}
+.weekDayBtn {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate);
+}
+.weekDayBtn span {
+  font-size: 20px;
+  font-stretch: 120%;
+  font-weight: 760;
+  color: var(--ink);
+}
+.weekToday .weekDayBtn span {
+  color: var(--cobalt);
+}
+.weekAdd {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px dashed var(--line2);
+  background: none;
+  color: var(--cobalt);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.weekAdd:hover {
+  background: var(--cobalt-soft);
+  border-style: solid;
+}
+
+/* Planning : vue jour */
+.dayList {
+  display: flex;
+  flex-direction: column;
+}
+.hourRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 52px;
+  border-top: 1px solid var(--line);
+  padding: 6px 0;
+}
+.hourLabel {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--slate);
+  padding-top: 6px;
+}
+.hourBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+.hourCovered .hourBody {
+  border-left: 3px solid var(--cobalt-soft);
+  padding-left: 10px;
+}
+.hourBusy {
+  font-size: 12.5px;
+  color: var(--slate);
+}
+.hourAdd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--line2);
+  background: none;
+  color: var(--slate);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  text-align: left;
+}
+.hourAdd:hover {
+  border-color: var(--cobalt);
+  color: var(--cobalt);
+  background: var(--cobalt-soft);
+}
+
+/* Tâches */
+.taskAdd {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.taskAdd .chips {
+  align-items: center;
+}
+.taskAdd .btnPrimary {
+  margin-left: auto;
+  min-height: 38px;
+}
+.taskList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.task:first-child {
+  border-top: 0;
+}
+.taskCheck {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line2);
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #fff;
+}
+.taskCheck:hover {
+  border-color: var(--mint);
+}
+.taskDone .taskCheck {
+  background: var(--mint);
+  border-color: var(--mint);
+}
+.taskBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.taskBody em {
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--slate);
+}
+.taskBody em .linkBtn {
+  font-size: 12.5px;
+  padding: 0;
+}
+.taskDone .taskBody > span {
+  text-decoration: line-through;
+  color: var(--slate);
+}
+
+/* Caisse */
+.cashKpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (min-width: 900px) {
+  .cashKpis {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.cashKpi {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-block);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cashKpi span {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--slate);
+}
+.cashKpi strong {
+  font-size: 26px;
+  font-stretch: 118%;
+  font-weight: 770;
+  letter-spacing: -0.01em;
+}
+.cashKpi em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--slate);
+}
+.cashKpiMain {
+  background: var(--night);
+  border-color: var(--night);
+  color: #fff;
+}
+.cashKpiMain span,
+.cashKpiMain em {
+  color: var(--glacier);
+}
+.cashKpiWarn strong {
+  color: var(--amber);
+}
+.cashList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cashList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.cashList li:first-child {
+  border-top: 0;
+}
+.cashList b {
+  font-weight: 720;
+  min-width: 78px;
+  text-align: right;
+}
+.cashMain {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+div.cashMain {
+  cursor: default;
+}
+.cashMain span {
+  font-size: 12.5px;
+  color: var(--slate);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cashSelect {
+  max-width: 128px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--line2);
+  background: var(--mist);
+  font-size: 13px;
+  padding: 0 6px;
+}
+.cashSelectWarn {
+  background: var(--amber-soft);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Bouton + central de la barre mobile */
+.bottomNav button.fab::before {
+  display: none;
+}
+.fabIn {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 52px;
+  margin-top: -20px;
+  border-radius: 18px;
+  background: var(--cobalt);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(47, 82, 208, 0.38);
+}
+.bottomNav button.fab span:last-child {
+  color: var(--cobalt);
+}
+.cashRate {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cashRate .field {
+  flex: 1;
+  min-width: 220px;
+}
+.sheetSection .search,
+.taskAdd .search {
+  flex: none;
+}

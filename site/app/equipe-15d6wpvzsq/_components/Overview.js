@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import styles from '../admin.module.css'
 import LeadCard from './LeadCard'
 import { Icon } from './Icon'
+import { TaskRow } from './Tasks'
 import {
   buildTodo,
   computeKpis,
@@ -21,25 +22,19 @@ import {
   telHref,
   whatsappHref,
   templates,
+  durationH,
+  taskGroup,
 } from '../_lib/crm'
 
 const DAY_START = 8
 const DAY_END = 19
-
-// Durée estimée d'une intervention, pour dessiner la journée.
-function durationH(lead) {
-  const s = (lead.service || '').toLowerCase()
-  if (/compl|concession|lustrage|polissage|céramique|ceramique/.test(s)) return 4
-  if (/ext/.test(s)) return 1.5
-  return 2.5
-}
 
 function hourOf(d) {
   const x = new Date(d)
   return x.getHours() + x.getMinutes() / 60
 }
 
-export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], settings, who, onOpen, updateLead, logActivity, goTo }) {
+export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], tasks = [], settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask }) {
   const todo = useMemo(() => buildTodo(leads, jobs), [leads, jobs])
   const k = useMemo(() => computeKpis(leads, jobs), [leads, jobs])
   const now = new Date()
@@ -51,6 +46,9 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
   const todays = booked.filter((l) => sameDay(l.appointment_at, now))
   const next = booked.find((l) => new Date(l.appointment_at).getTime() + durationH(l) * 3600000 > now.getTime())
   const nowH = hourOf(now)
+  const myTasks = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t, now)))
+  // RDV d'aujourd'hui commencé ou passé et pas encore marqué « fait »
+  const toClose = todays.filter((l) => l.status === 'reserve' && new Date(l.appointment_at) <= now)
 
   const goal = Number(settings?.monthly_goal) || 0
   const goalPct = goal ? Math.min(100, Math.round((k.caMonth / goal) * 100)) : 0
@@ -67,7 +65,7 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
   const dateLabel = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
   const summary = [
     todays.length ? `${todays.length} rendez-vous aujourd'hui` : "Pas de rendez-vous aujourd'hui",
-    todo.length ? `${todo.length} chose${todo.length > 1 ? 's' : ''} à faire` : 'rien en attente',
+    todo.length + myTasks.length ? `${todo.length + myTasks.length} chose${todo.length + myTasks.length > 1 ? 's' : ''} à faire` : 'rien en attente',
   ].join(', ')
 
   const nextTpl = next ? templates(next).find((t) => t.id === (sameDay(next.appointment_at, addDays(now, 1)) ? 'veille' : 'confirmation')) : null
@@ -164,6 +162,11 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
                 <em>{[next.service, next.address || next.city].filter(Boolean).join(', ')}</em>
               </button>
               <div className={styles.heroActions}>
+                {next.status === 'reserve' && new Date(next.appointment_at) <= now && (
+                  <button type="button" className={styles.heroBtnLight} onClick={() => onComplete(next)}>
+                    <Icon name="check" size={17} /> Terminé
+                  </button>
+                )}
                 {nextMaps && (
                   <a className={styles.heroBtn} href={nextMaps} target="_blank" rel="noopener noreferrer">
                     <Icon name="map" size={17} /> Itinéraire
@@ -189,15 +192,68 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
             <div className={styles.heroNextMain}>
               <span>Prochain rendez-vous</span>
               <strong>Aucun rendez-vous prévu</strong>
-              <button type="button" className={styles.heroLink} onClick={() => goTo('planning')}>
-                Ouvrir le planning
+              <button type="button" className={styles.heroLink} onClick={() => onAdd()}>
+                + Ajouter un RDV
               </button>
             </div>
           )}
         </div>
       </section>
 
+      <div className={styles.quickBar}>
+        <button type="button" onClick={() => onAdd()}>
+          <Icon name="calendar" size={18} /> RDV
+        </button>
+        <button type="button" onClick={() => onAdd({ mode: 'tache' })}>
+          <Icon name="check" size={18} /> Tâche
+        </button>
+        <button type="button" onClick={() => onAdd({ mode: 'depense' })}>
+          <Icon name="euro" size={18} /> Dépense
+        </button>
+        <button type="button" onClick={() => goTo('caisse')}>
+          <Icon name="chart" size={18} /> Caisse
+        </button>
+      </div>
+
       <div className={styles.homeGrid}>
+        <div className={styles.homeMain}>
+        {toClose.length > 0 && (
+          <section className={styles.block} aria-labelledby="close-title">
+            <header className={styles.blockHead}>
+              <h2 id="close-title">Prestations à valider</h2>
+              <span className={styles.count}>{toClose.length}</span>
+            </header>
+            <ul className={styles.miniList}>
+              {toClose.map((l) => (
+                <li key={l.id} className={styles.closeRow}>
+                  <button type="button" onClick={() => onOpen(l.id)}>
+                    <span className={styles.miniWhen}>{formatTime(l.appointment_at)}</span>
+                    <strong>{l.first_name}</strong>
+                    <span>{l.service || ''}</span>
+                  </button>
+                  <button type="button" className={styles.btnPrimary} onClick={() => onComplete(l)}>
+                    <Icon name="check" size={16} /> Terminé
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {myTasks.length > 0 && (
+          <section className={styles.block} aria-labelledby="tasks-title">
+            <header className={styles.blockHead}>
+              <h2 id="tasks-title">Mes tâches du jour</h2>
+              <button type="button" className={styles.linkBtn} onClick={() => goTo('taches')}>
+                Toutes
+              </button>
+            </header>
+            <ul className={styles.taskList}>
+              {myTasks.map((t) => (
+                <TaskRow key={t.id} t={t} onToggle={onToggleTask} />
+              ))}
+            </ul>
+          </section>
+        )}
         <section className={styles.block} aria-labelledby="todo-title">
           <header className={styles.blockHead}>
             <h2 id="todo-title">À faire</h2>
@@ -227,6 +283,7 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
             </div>
           )}
         </section>
+        </div>
 
         <div className={styles.homeSide}>
           <section className={styles.block} aria-labelledby="month-title">

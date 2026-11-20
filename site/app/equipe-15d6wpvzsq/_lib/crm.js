@@ -3,6 +3,14 @@
 // dépendance à l'interface : tout est testable à part.
 
 import { CONTACT } from '@/lib/constants'
+import {
+  FORMULAS_PRICING,
+  EXTERIOR_PRICING,
+  CORRECTION_PRICING,
+  LUSTRAGE_MINUTE_HIGHLIGHT,
+  MOTO_PRICING,
+  OPTICS_PRICING,
+} from '@/lib/data/pricing'
 
 // Adresse secrète de l'espace équipe (aussi dans next.config.mjs et les alertes ntfy).
 export const BASE_PATH = '/equipe-15d6wpvzsq'
@@ -482,10 +490,10 @@ function gcalStamp(d) {
 }
 
 // Lien « Ajouter à Google Agenda » pré-rempli pour un RDV.
-export function gcalHref(lead, durationH = 3) {
+export function gcalHref(lead) {
   if (!lead.appointment_at) return null
   const start = new Date(lead.appointment_at)
-  const end = new Date(start.getTime() + durationH * 3600000)
+  const end = new Date(start.getTime() + durationH(lead) * 3600000)
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: `🧽 ${lead.first_name} – ${lead.service || 'Nettoyage'}`,
@@ -519,4 +527,144 @@ export function sumStat(stats, source, metric, fromDay) {
   return stats
     .filter((s) => s.source === source && s.metric === metric && s.day >= fromDay)
     .reduce((t, s) => t + Number(s.value), 0)
+}
+
+// ---------- Catalogue (tarifs du site) ----------
+// Les prix viennent de lib/data/pricing.js : si les tarifs du site changent,
+// l'ajout rapide de RDV suit automatiquement.
+
+// Gabarits proposés à l'ajout de RDV (id = valeur de leads.vehicle_size).
+export const QUICK_SIZES = [
+  { id: 'citadine', label: 'Citadine' },
+  { id: 'compacte-berline', label: 'Berline' },
+  { id: 'suv-break', label: 'SUV / break' },
+  { id: 'grand-suv', label: 'Grand SUV' },
+  { id: 'utilitaire', label: 'Utilitaire' },
+  { id: 'moto', label: 'Moto' },
+]
+
+const priceKey = (size) => (size === 'utilitaire' ? 'grand-suv' : size)
+
+// minutes = durée habituelle sur place
+export const CATALOG = [
+  ...FORMULAS_PRICING.map((f) => ({ label: `Nettoyage intérieur – ${f.name}`, short: f.name, prices: f.prices, minutes: f.id === 'sortie-concession' ? 240 : 150 })),
+  ...EXTERIOR_PRICING.map((f) => ({ label: f.name, short: { 'lavage-exterieur': 'Lavage ext.', 'lavage-exterieur-approfondi': 'Ext. approfondi', 'decontamination-complete': 'Décontamination' }[f.id] || f.name, prices: f.prices, minutes: f.id === 'lavage-exterieur' ? 60 : 120 })),
+  { label: 'Lustrage minute', short: 'Lustrage minute', from: LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice, minutes: 60 },
+  ...CORRECTION_PRICING.map((f) => ({ label: f.name, short: f.name, prices: f.prices, minutes: f.id === 'lustrage-express' ? 180 : f.id === 'lustrage-finition' ? 300 : 420 })),
+  { label: 'Rénovation des phares', short: 'Phares', from: OPTICS_PRICING.fromPrice, minutes: 60 },
+  { label: 'Nettoyage moto', short: 'Moto', from: MOTO_PRICING.fromPrice, minutes: 90 },
+  { label: 'Canapé, matelas, tapis', short: 'Canapé / tissus', minutes: 150 },
+  { label: 'Flotte / professionnel', short: 'Pro / flotte', minutes: 240 },
+]
+
+export function catalogItem(service) {
+  if (!service) return null
+  const s = service.toLowerCase()
+  return CATALOG.find((c) => c.label.toLowerCase() === s) || CATALOG.find((c) => s.includes(c.short.toLowerCase())) || null
+}
+
+// Prix du site pour une prestation et un gabarit (null si sur devis).
+export function priceFor(service, size) {
+  const item = catalogItem(service)
+  if (!item) return null
+  if (item.prices && size && item.prices[priceKey(size)]) return item.prices[priceKey(size)]
+  return item.from || null
+}
+
+export function defaultMinutes(service) {
+  const item = catalogItem(service)
+  if (item) return item.minutes
+  const s = (service || '').toLowerCase()
+  if (/compl|concession|lustrage|polissage|céramique|ceramique/.test(s)) return 240
+  if (/ext/.test(s)) return 90
+  return 150
+}
+
+// Durée d'un RDV en heures (durée saisie, sinon estimée d'après la prestation).
+export function durationH(lead) {
+  return (Number(lead.duration_min) || defaultMinutes(lead.service)) / 60
+}
+
+export function formatDuration(min) {
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  if (!h) return `${m} min`
+  return m ? `${h} h ${String(m).padStart(2, '0')}` : `${h} h`
+}
+
+// RDV qui chevauchent un créneau donné.
+export function conflicts(leads, startIso, minutes, excludeId = null) {
+  if (!startIso) return []
+  const s = new Date(startIso).getTime()
+  const e = s + minutes * 60000
+  return leads.filter((l) => {
+    if (!l.appointment_at || l.id === excludeId || l.status === 'perdu') return false
+    const ls = new Date(l.appointment_at).getTime()
+    const le = ls + durationH(l) * 3600000
+    return ls < e && le > s
+  })
+}
+
+export const WORK_START = 8
+export const WORK_END = 19
+
+// Heures de début libres pour une journée (pas de 30 min).
+export function freeStarts(leads, day, minutes = 120, excludeId = null) {
+  const out = []
+  for (let h = WORK_START; h + minutes / 60 <= WORK_END; h += 0.5) {
+    const d = new Date(day)
+    d.setHours(Math.floor(h), (h % 1) * 60, 0, 0)
+    if (d < new Date()) continue
+    if (!conflicts(leads, d.toISOString(), minutes, excludeId).length) out.push(d)
+  }
+  return out
+}
+
+export function atTime(day, hhmm) {
+  const [h, m] = hhmm.split(':').map(Number)
+  const d = new Date(day)
+  d.setHours(h, m || 0, 0, 0)
+  return d
+}
+
+export function hhmm(d) {
+  const x = new Date(d)
+  return `${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`
+}
+
+// ---------- Caisse ----------
+export const PAYMENT_METHODS = [
+  { id: 'especes', label: 'Espèces' },
+  { id: 'cb', label: 'Carte' },
+  { id: 'virement', label: 'Virement' },
+  { id: 'lydia', label: 'Lydia / Wero' },
+  { id: 'cheque', label: 'Chèque' },
+  { id: 'a_encaisser', label: 'Pas encore payé' },
+]
+export const PAYMENT_LABEL = Object.fromEntries(PAYMENT_METHODS.map((p) => [p.id, p.label]))
+
+export const EXPENSE_CATEGORIES = [
+  { id: 'produits', label: 'Produits' },
+  { id: 'carburant', label: 'Carburant' },
+  { id: 'materiel', label: 'Matériel' },
+  { id: 'pub', label: 'Pub / marketing' },
+  { id: 'assurance', label: 'Assurance' },
+  { id: 'urssaf', label: 'URSSAF / impôts' },
+  { id: 'telephone', label: 'Téléphone / abonnements' },
+  { id: 'autre', label: 'Autre' },
+]
+export const EXPENSE_LABEL = Object.fromEntries(EXPENSE_CATEGORIES.map((c) => [c.id, c.label]))
+
+export function monthRange(year, month) {
+  return { from: toDateInput(new Date(year, month, 1).toISOString()), to: toDateInput(new Date(year, month + 1, 0).toISOString()) }
+}
+
+// ---------- Tâches ----------
+export function taskGroup(task, now = new Date()) {
+  if (task.done) return 'done'
+  if (!task.due_on) return 'later'
+  const diff = daysBetween(now, task.due_on + 'T12:00:00')
+  if (diff < 0) return 'late'
+  if (diff === 0) return 'today'
+  return 'soon'
 }

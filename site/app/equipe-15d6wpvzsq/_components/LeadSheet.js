@@ -42,7 +42,7 @@ const KIND_LABEL = {
 }
 
 // Fiche complète d'un prospect / client (panneau latéral).
-export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc }) {
+export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc, onPlanRdv }) {
   const [form, setForm] = useState(() => ({
     first_name: lead.first_name || '',
     phone: lead.phone || '',
@@ -261,6 +261,11 @@ export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, up
             <a className={styles.actCall} href={telHref(lead)} onClick={() => track('appel', 'Appel lancé')}>
               <Icon name="phone" size={17} /> <span>Appeler</span>
             </a>
+            {onPlanRdv && (
+              <button type="button" className={styles.btnPrimary} onClick={() => onPlanRdv({ ...lead, ...formToLead(form) })}>
+                <Icon name="calendar" size={17} /> {lead.appointment_at && new Date(lead.appointment_at) > new Date() ? 'Nouveau RDV' : 'Planifier un RDV'}
+              </button>
+            )}
             {maps && (
               <a className={styles.btnSecondary} href={maps} target="_blank" rel="noopener noreferrer">
                 <Icon name="map" size={17} /> Itinéraire
