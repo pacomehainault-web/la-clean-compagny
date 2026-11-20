@@ -3,9 +3,10 @@
 import { useMemo } from 'react'
 import styles from '../admin.module.css'
 import LeadCard from './LeadCard'
-import { buildTodo, computeKpis, euros, formatDayLabel, formatTime, startOfDay } from '../_lib/crm'
+import { buildTodo, computeKpis, euros, euros2, formatDayLabel, formatTime, startOfDay, addDays, toDateInput, latestStat, isOverdue } from '../_lib/crm'
+import { Icon } from './Icon'
 
-export default function Overview({ leads, jobs, onOpen, updateLead, logActivity, goTo }) {
+export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], settings, onOpen, updateLead, logActivity, goTo }) {
   const todo = useMemo(() => buildTodo(leads, jobs), [leads, jobs])
   const k = useMemo(() => computeKpis(leads, jobs), [leads, jobs])
   const upcoming = leads
@@ -14,6 +15,15 @@ export default function Overview({ leads, jobs, onOpen, updateLead, logActivity,
     .slice(0, 5)
 
   const caTrend = k.caPrev ? Math.round(((k.caMonth - k.caPrev) / k.caPrev) * 100) : null
+  const goal = Number(settings?.monthly_goal) || 0
+  const goalPct = goal ? Math.min(100, Math.round((k.caMonth / goal) * 100)) : 0
+  const since7 = toDateInput(addDays(startOfDay(), -6).toISOString())
+  const views7 = views.filter((v) => v.day >= since7).reduce((t, v) => t + v.views, 0)
+  const gbpViews = latestStat(stats, 'gbp', 'vues_30j')
+  const mainPos = latestStat(stats, 'gsc', 'pos:nettoyage voiture angers')
+  const unreplied = reviews.filter((r) => !r.replied).length
+  const unpaid = docs.filter((d) => d.kind === 'facture' && d.status === 'envoye')
+  const late = unpaid.filter((d) => isOverdue(d)).length
 
   return (
     <div className={styles.stack}>
@@ -23,7 +33,7 @@ export default function Overview({ leads, jobs, onOpen, updateLead, logActivity,
           <strong>{k.toCall}</strong>
           <em>{k.newWeek} nouveaux en 7 jours</em>
         </button>
-        <button type="button" className={styles.kpi} onClick={() => goTo('agenda')}>
+        <button type="button" className={styles.kpi} onClick={() => goTo('planning')}>
           <span>RDV à venir</span>
           <strong>{k.upcoming}</strong>
           <em>{k.pipelineValue ? `${euros(k.pipelineValue)} en devis / réservés` : 'Aucun devis en cours'}</em>
@@ -40,6 +50,47 @@ export default function Overview({ leads, jobs, onOpen, updateLead, logActivity,
           <span>Avis</span>
           <strong>{k.reviewsReceived}</strong>
           <em>reçus · {k.reviewsAsked} en attente</em>
+        </button>
+      </section>
+
+      {goal > 0 && (
+        <section className={styles.goal}>
+          <div>
+            <strong>Objectif du mois : {euros(goal)}</strong>
+            <span>
+              {euros(k.caMonth)} faits · {goalPct} %
+            </span>
+          </div>
+          <span className={styles.goalBar}>
+            <i style={{ width: `${goalPct}%` }} />
+          </span>
+        </section>
+      )}
+
+      <section className={styles.tiles}>
+        <button type="button" className={styles.tile} onClick={() => goTo('stats', 'google')}>
+          <Icon name="globe" size={18} />
+          <span>Position « nettoyage voiture Angers »</span>
+          <strong>{mainPos ? mainPos.value.toFixed(1) : '—'}</strong>
+          <em>{gbpViews ? `${gbpViews.value} vues de la fiche (30 j)` : 'relevé chaque matin'}</em>
+        </button>
+        <button type="button" className={styles.tile} onClick={() => goTo('stats', 'site')}>
+          <Icon name="chart" size={18} />
+          <span>Visites du site</span>
+          <strong>{views7}</strong>
+          <em>pages vues sur 7 jours</em>
+        </button>
+        <button type="button" className={`${styles.tile} ${unreplied ? styles.tileWarn : ''}`} onClick={() => goTo('avis')}>
+          <Icon name="star" size={18} />
+          <span>Avis Google sans réponse</span>
+          <strong>{unreplied}</strong>
+          <em>{k.reviewsAsked} demande{k.reviewsAsked > 1 ? 's' : ''} en attente</em>
+        </button>
+        <button type="button" className={`${styles.tile} ${late ? styles.tileWarn : ''}`} onClick={() => goTo('documents')}>
+          <Icon name="file" size={18} />
+          <span>Factures à encaisser</span>
+          <strong>{euros2(unpaid.reduce((t, d) => t + Number(d.total), 0))}</strong>
+          <em>{late ? `${late} en retard` : `${unpaid.length} en attente`}</em>
         </button>
       </section>
 
@@ -72,7 +123,7 @@ export default function Overview({ leads, jobs, onOpen, updateLead, logActivity,
         <section className={styles.panel}>
           <div className={styles.panelHead}>
             <h2>Prochains rendez-vous</h2>
-            <button type="button" className={styles.linkBtn} onClick={() => goTo('agenda')}>
+            <button type="button" className={styles.linkBtn} onClick={() => goTo('planning')}>
               Tout voir
             </button>
           </div>

@@ -4,6 +4,9 @@
 
 import { CONTACT } from '@/lib/constants'
 
+// Adresse secrète de l'espace équipe (aussi dans next.config.mjs et les alertes ntfy).
+export const BASE_PATH = '/equipe-15d6wpvzsq'
+
 export const STATUSES = [
   { id: 'nouveau', label: 'Nouveau', short: 'Nouveau' },
   { id: 'contacte', label: 'Contacté', short: 'Contacté' },
@@ -420,4 +423,100 @@ export function toCsv(leads, jobs) {
       .join(';')
   })
   return '﻿' + [head.map(esc).join(';'), ...rows].join('\n')
+}
+
+// ---------- Devis et factures ----------
+export const DOC_STATUS = {
+  brouillon: 'Brouillon',
+  envoye: 'Envoyé',
+  accepte: 'Accepté',
+  refuse: 'Refusé',
+  paye: 'Payée',
+  annule: 'Annulé',
+}
+
+export function lineTotal(l) {
+  return Math.round((Number(l.qty) || 0) * (Number(l.unit_price) || 0) * 100) / 100
+}
+
+export function docTotal(lines) {
+  return Math.round((lines || []).reduce((s, l) => s + lineTotal(l), 0) * 100) / 100
+}
+
+export function euros2(n) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0)
+}
+
+export function clientFromLead(lead) {
+  if (!lead) return {}
+  return {
+    name: lead.first_name || '',
+    phone: lead.phone || '',
+    email: lead.email || '',
+    address: [lead.address, lead.city].filter(Boolean).join(', '),
+    vehicle: lead.vehicle || '',
+  }
+}
+
+export function isOverdue(doc, now = new Date()) {
+  if (doc.kind !== 'facture' || doc.status !== 'envoye') return false
+  const due = doc.due_at ? new Date(doc.due_at) : addDays(new Date(doc.issued_at), 30)
+  return due < startOfDay(now)
+}
+
+// ---------- Planning ----------
+export function startOfWeek(d = new Date()) {
+  const x = startOfDay(d)
+  const day = (x.getDay() + 6) % 7 // lundi = 0
+  return addDays(x, -day)
+}
+
+export function sameDay(a, b) {
+  const x = new Date(a)
+  const y = new Date(b)
+  return x.getFullYear() === y.getFullYear() && x.getMonth() === y.getMonth() && x.getDate() === y.getDate()
+}
+
+function gcalStamp(d) {
+  return new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+}
+
+// Lien « Ajouter à Google Agenda » pré-rempli pour un RDV.
+export function gcalHref(lead, durationH = 3) {
+  if (!lead.appointment_at) return null
+  const start = new Date(lead.appointment_at)
+  const end = new Date(start.getTime() + durationH * 3600000)
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `🧽 ${lead.first_name} – ${lead.service || 'Nettoyage'}`,
+    dates: `${gcalStamp(start)}/${gcalStamp(end)}`,
+    details: [lead.phone && `Tél : ${formatPhone(lead.phone)}`, lead.vehicle && `Véhicule : ${lead.vehicle}`, lead.notes]
+      .filter(Boolean)
+      .join('\n'),
+    location: [lead.address, lead.city].filter(Boolean).join(', '),
+  })
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
+// ---------- Statistiques relevées (fiche Google, Search Console) ----------
+export function statSeries(stats, source, metric, days = 30, now = new Date()) {
+  const map = new Map(stats.filter((s) => s.source === source && s.metric === metric).map((s) => [s.day, Number(s.value)]))
+  const out = []
+  for (let i = days - 1; i >= 0; i--) {
+    const d = addDays(startOfDay(now), -i)
+    const key = toDateInput(d.toISOString())
+    out.push({ day: key, value: map.has(key) ? map.get(key) : null })
+  }
+  return out
+}
+
+export function latestStat(stats, source, metric) {
+  const rows = stats.filter((s) => s.source === source && s.metric === metric).sort((a, b) => (a.day < b.day ? 1 : -1))
+  return rows[0] ? { value: Number(rows[0].value), day: rows[0].day, prev: rows[1] ? Number(rows[1].value) : null } : null
+}
+
+export function sumStat(stats, source, metric, fromDay) {
+  return stats
+    .filter((s) => s.source === source && s.metric === metric && s.day >= fromDay)
+    .reduce((t, s) => t + Number(s.value), 0)
 }

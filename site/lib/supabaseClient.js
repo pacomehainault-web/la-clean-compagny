@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { LEADS_DB } from './constants'
 
-// Client Supabase du navigateur, utilisé par le dashboard (/admin).
+// Client Supabase du navigateur, utilisé par le dashboard (espace équipe).
 // Connexion par lien envoyé par email ; l'accès aux prospects est limité par
 // les règles de la base (RLS) aux emails de la table `team`.
 let client

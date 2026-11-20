@@ -2,6 +2,7 @@ import { Inter, Archivo } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import HideOnAdmin from '@/components/HideOnAdmin'
+import ViewTracker from '@/components/ViewTracker'
 import Footer from '@/components/Footer'
 import { WhatsAppFloat, MobileStickyCTA } from '@/components/FloatingCTAs'
 import CookieConsent from '@/components/CookieConsent'
@@ -71,6 +72,7 @@ export default function RootLayout({ children }) {
           <MobileStickyCTA />
           <CookieConsent />
           <Analytics />
+          <ViewTracker />
         </HideOnAdmin>
       </body>
     </html>

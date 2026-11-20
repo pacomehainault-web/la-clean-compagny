@@ -70,6 +70,14 @@ const nextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      {
+        // Espace équipe : jamais indexé ni mis en cache partagé.
+        source: '/equipe-15d6wpvzsq/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
+      },
     ]
   },
   // Le site est servi sur www.lacleancompagny.com. Historiquement, tout le SEO
