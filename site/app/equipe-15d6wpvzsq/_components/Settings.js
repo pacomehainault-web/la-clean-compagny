@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
+import PushPanel from './PushPanel'
 
 const FIELDS = [
   ['name', 'Nom commercial'],
@@ -23,7 +24,7 @@ const LINKS = [
 ]
 
 // Réglages : infos de l'entreprise (devis/factures), objectif, alertes et automatismes.
-export default function Settings({ settings, onSave, onTestAlert, onDigestNow, onLogout, exportCsv, hideTests, setHideTests }) {
+export default function Settings({ supabase, flash, settings, onSave, onTestAlert, onDigestNow, onLogout, exportCsv, hideTests, setHideTests }) {
   const [biz, setBiz] = useState(settings?.business || {})
   const [goal, setGoal] = useState(settings?.monthly_goal ?? '')
   const [dirty, setDirty] = useState(false)
@@ -37,10 +38,10 @@ export default function Settings({ settings, onSave, onTestAlert, onDigestNow, o
 
   return (
     <div className={styles.stack}>
-      <section className={styles.panel}>
-        <div className={styles.panelHead}>
-          <h2>Alertes sur le téléphone</h2>
-        </div>
+      <PushPanel supabase={supabase} flash={flash} onDigestNow={onDigestNow} />
+
+      <details className={styles.panel}>
+        <summary className={styles.pushAlt}>Méthode de secours : l&apos;app ntfy</summary>
         <ol className={styles.steps2}>
           <li>
             Installez l&apos;app gratuite <strong>ntfy</strong> (App Store ou Play Store).
@@ -57,15 +58,12 @@ export default function Settings({ settings, onSave, onTestAlert, onDigestNow, o
           <li>Autorisez les notifications, puis testez :</li>
         </ol>
         <div className={styles.quickRow}>
-          <button type="button" className={styles.btnPrimary} onClick={onTestAlert}>
+          <button type="button" className={styles.btnSecondary} onClick={onTestAlert}>
             <Icon name="bell" size={17} /> Envoyer un test
-          </button>
-          <button type="button" className={styles.btnSecondary} onClick={onDigestNow}>
-            Recevoir le récap du jour
           </button>
         </div>
         <p className={styles.hint}>Gardez ce sujet secret : toute personne qui le connaît recevrait les alertes.</p>
-      </section>
+      </details>
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>

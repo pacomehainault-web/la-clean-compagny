@@ -15,6 +15,7 @@ import Settings from './_components/Settings'
 import LeadSheet from './_components/LeadSheet'
 import AddLead from './_components/AddLead'
 import { Icon } from './_components/Icon'
+import { pushState, syncPush } from './_lib/push'
 
 // Espace équipe La Clean Compagny : prospects, planning, devis/factures, avis,
 // statistiques (site + Google) et réglages. Connexion par mot de passe commun
@@ -70,6 +71,7 @@ export default function TeamDashboard() {
   const [openDocId, setOpenDocId] = useState(null)
   const [adding, setAdding] = useState(false)
   const [hideTests, setHideTests] = useState(true)
+  const [pushNudge, setPushNudge] = useState(false)
 
   // ---------- Authentification ----------
   useEffect(() => {
@@ -140,6 +142,33 @@ export default function TeamDashboard() {
       document.removeEventListener('visibilitychange', onFocus)
     }
   }, [allowed, load])
+
+  // Notifications natives : garde l'abonnement de l'appareil à jour et propose de l'activer s'il ne l'est pas.
+  useEffect(() => {
+    if (allowed) syncPush(supabase)
+  }, [allowed, supabase])
+
+  useEffect(() => {
+    if (!allowed || view !== 'accueil') return
+    let cancelled = false
+    pushState().then((s) => {
+      let dismissed = false
+      try {
+        dismissed = localStorage.getItem('lcc-push-nudge') === 'off'
+      } catch {}
+      if (!cancelled) setPushNudge(!dismissed && (s === 'ready' || s === 'ios-browser'))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [allowed, view])
+
+  function hidePushNudge() {
+    setPushNudge(false)
+    try {
+      localStorage.setItem('lcc-push-nudge', 'off')
+    } catch {}
+  }
 
   useEffect(() => {
     const n = leads.filter((l) => l.status === 'nouveau' && l.source !== 'test').length
@@ -530,6 +559,18 @@ export default function TeamDashboard() {
             </p>
           )}
 
+          {view === 'accueil' && pushNudge && (
+            <div className={styles.pushNudge}>
+              <Icon name="bell" size={18} />
+              <p>Recevez les nouveaux prospects en notification sur ce téléphone, même verrouillé.</p>
+              <button type="button" className={styles.btnPrimary} onClick={() => goTo('reglages')}>
+                Activer
+              </button>
+              <button type="button" className={styles.pushNudgeClose} onClick={hidePushNudge} aria-label="Masquer">
+                ×
+              </button>
+            </div>
+          )}
           {view === 'accueil' && (
             <Overview {...shared} who={memberName} docs={docs} reviews={reviews} stats={stats} views={views} settings={settings} goTo={goTo} />
           )}
@@ -558,6 +599,8 @@ export default function TeamDashboard() {
           {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} stats={stats} views={views} initialTab={statsTab} />}
           {view === 'reglages' && settings && (
             <Settings
+              supabase={supabase}
+              flash={flash}
               settings={settings}
               onSave={saveSettings}
               onTestAlert={() => rpcFlash('test_alert', 'Test envoyé : regardez le téléphone')}

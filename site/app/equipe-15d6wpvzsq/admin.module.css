@@ -2469,3 +2469,122 @@ button.kpi:hover {
     transition: none !important;
   }
 }
+
+/* ---------- Notifications natives ---------- */
+.pushOn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--mint-soft);
+  color: var(--mint);
+  font-size: 13px;
+  font-weight: 700;
+}
+.pushLead {
+  margin: 0 0 14px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 62ch;
+}
+.pushErr {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--r-item);
+  background: var(--rose-soft);
+  color: var(--rose);
+  font-size: 14px;
+}
+.pushDevices {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.pushDevices h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--slate);
+}
+.pushDevices ul {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pushDevices li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.pushDevices li > svg {
+  flex: none;
+  color: var(--cobalt);
+}
+.pushDevices li > span {
+  flex: 1;
+  min-width: 0;
+}
+.pushDevices em {
+  font-style: normal;
+  color: var(--slate);
+  margin-left: 4px;
+}
+.pushDevices b {
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.pushAlt {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--slate);
+}
+details[open] > .pushAlt {
+  margin-bottom: 12px;
+}
+.pushNudge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 12px 12px 16px;
+  border-radius: var(--r-block);
+  background: var(--night);
+  color: #fff;
+}
+.pushNudge > svg {
+  flex: none;
+  color: var(--glacier);
+}
+.pushNudge p {
+  flex: 1;
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.pushNudge .btnPrimary {
+  flex: none;
+  min-height: 40px;
+}
+.pushNudgeClose {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--glacier);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.pushNudgeClose:hover {
+  background: var(--night2);
+}
