@@ -25,6 +25,7 @@ import { FORMULAS_PRICING, EXTERIOR_PRICING, CORRECTION_PRICING } from '@/lib/da
 import { SERVICE_PAGES, getServicePage } from '@/lib/data/servicePages'
 import { getArticle } from '@/lib/data/articles'
 import { CITIES, cityHref } from '@/lib/data/cities'
+import { getServiceCityPage, serviceCityHref } from '@/lib/data/serviceCityPages'
 import { CONTACT, telLink } from '@/lib/constants'
 import { buildMetadata } from '@/lib/seo'
 import { serviceSchema, faqPageSchema, breadcrumbSchema } from '@/lib/schema'
@@ -273,11 +274,15 @@ export default async function ServiceDetailPage({ params }) {
             {service.name} à domicile à :
           </p>
           <div className={styles.cityLinks}>
-            {CITIES.map((c) => (
-              <Link href={cityHref(c)} className={styles.cityLink} key={c.slug}>
-                {c.name}
-              </Link>
-            ))}
+            {CITIES.map((c) => {
+              // Une commune qui a sa page « prestation + commune » pointe dessus.
+              const dedicated = getServiceCityPage(service.slug, c.slug)
+              return (
+                <Link href={dedicated ? serviceCityHref(dedicated) : cityHref(c)} className={styles.cityLink} key={c.slug}>
+                  {c.name}
+                </Link>
+              )
+            })}
           </div>
           <div style={{ marginTop: 28, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
             <Link href="/devis" className="btn btn-cta">

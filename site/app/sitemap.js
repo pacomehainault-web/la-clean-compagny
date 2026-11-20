@@ -2,6 +2,7 @@ import { SITE } from '@/lib/constants'
 import { STANDALONE_CITIES, GROUPED_COMMUNES_PATH } from '@/lib/data/cities'
 import { ARTICLES } from '@/lib/data/articles'
 import { SERVICE_PAGES } from '@/lib/data/servicePages'
+import { SERVICE_CITY_PAGES, serviceCityHref } from '@/lib/data/serviceCityPages'
 
 // Date de dernière modification réelle du contenu. Avant, chaque URL
 // recevait `new Date()` (la date du build) : toutes les pages semblaient
@@ -61,5 +62,12 @@ export default function sitemap() {
     priority: 0.8,
   }))
 
-  return [...staticEntries, ...serviceEntries, ...cityEntries, ...articleEntries]
+  const serviceCityEntries = SERVICE_CITY_PAGES.map((p) => ({
+    url: new URL(serviceCityHref(p), SITE.url).toString(),
+    lastModified: CONTENT_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  return [...staticEntries, ...serviceEntries, ...serviceCityEntries, ...cityEntries, ...articleEntries]
 }
