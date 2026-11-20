@@ -1,9 +1,9 @@
 // Espace privé : jamais indexé, jamais en cache partagé.
 export const metadata = {
-  title: 'Dashboard',
+  title: 'Espace équipe',
   robots: { index: false, follow: false },
 }
 
-export default function AdminLayout({ children }) {
+export default function TeamLayout({ children }) {
   return children
 }

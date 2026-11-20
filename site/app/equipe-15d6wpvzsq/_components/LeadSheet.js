@@ -24,6 +24,9 @@ import {
   addDays,
   euros,
   timeAgo,
+  gcalHref,
+  euros2,
+  DOC_STATUS,
 } from '../_lib/crm'
 
 const KIND_LABEL = {
@@ -39,7 +42,7 @@ const KIND_LABEL = {
 }
 
 // Fiche complète d'un prospect / client (panneau latéral).
-export default function LeadSheet({ lead, jobs, supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead }) {
+export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc }) {
   const [form, setForm] = useState(() => ({
     first_name: lead.first_name || '',
     phone: lead.phone || '',
@@ -263,6 +266,11 @@ export default function LeadSheet({ lead, jobs, supabase, onClose, updateLead, l
                 <Icon name="map" size={17} /> Itinéraire
               </a>
             )}
+            {lead.appointment_at && (
+              <a className={styles.btnSecondary} href={gcalHref(lead)} target="_blank" rel="noopener noreferrer">
+                <Icon name="calendar" size={17} /> Google Agenda
+              </a>
+            )}
             <button
               type="button"
               className={styles.btnSecondary}
@@ -400,6 +408,37 @@ export default function LeadSheet({ lead, jobs, supabase, onClose, updateLead, l
             <pre className={styles.message}>{lead.message}</pre>
           </section>
         )}
+
+        {/* Devis et factures */}
+        <section className={styles.sheetSection}>
+          <div className={styles.sectionTitleRow}>
+            <h3>Devis et factures</h3>
+            <div className={styles.rowBtns}>
+              <button type="button" className={styles.linkBtn} onClick={() => onCreateDoc('devis', { ...lead, ...formToLead(form) })}>
+                + Devis
+              </button>
+              <button type="button" className={styles.linkBtn} onClick={() => onCreateDoc('facture', { ...lead, ...formToLead(form) })}>
+                + Facture
+              </button>
+            </div>
+          </div>
+          {docs.length === 0 ? (
+            <p className={styles.emptySmall}>Aucun devis ni facture pour ce client.</p>
+          ) : (
+            <ul className={styles.jobs}>
+              {docs.map((d) => (
+                <li key={d.id}>
+                  <span>{d.number}</span>
+                  <button type="button" className={styles.linkBtn} onClick={() => onOpenDoc(d.id)}>
+                    {d.kind === 'devis' ? 'Devis' : 'Facture'} · {DOC_STATUS[d.status]}
+                  </button>
+                  <em>{euros2(d.total)}</em>
+                  <span />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         {/* Prestations */}
         <section className={styles.sheetSection}>
