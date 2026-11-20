@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
 import PushPanel from './PushPanel'
@@ -30,6 +30,17 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
   const [dirty, setDirty] = useState(false)
   const auto = settings?.automations || {}
   const topic = settings?.alert_topic || ''
+  const [backupAt, setBackupAt] = useState(undefined)
+  const [backupLate, setBackupLate] = useState(false)
+
+  useEffect(() => {
+    supabase
+      ?.rpc('backup_status')
+      .then(({ data, error }) => {
+        setBackupAt(error ? null : data || null)
+        setBackupLate(!!data && Date.now() - new Date(data).getTime() > 3 * 3600000)
+      })
+  }, [supabase])
 
   function set(k, v) {
     setBiz((b) => ({ ...b, [k]: v }))
@@ -184,10 +195,16 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
             <input type="number" min="0" max="100" inputMode="numeric" value={biz.loyalty_discount ?? 20} onChange={(e) => set('loyalty_discount', Number(e.target.value) || 0)} />
           </label>
         </div>
-        <label className={styles.field}>
-          Récompense parrainage (affichée au client)
-          <input value={biz.referral_reward || ''} onChange={(e) => set('referral_reward', e.target.value)} placeholder="Ex. -10 % pour vous et votre filleul" />
-        </label>
+        <div className={styles.grid2}>
+          <label className={styles.field}>
+            Parrainage : clients à amener
+            <input type="number" min="1" max="50" inputMode="numeric" value={biz.referral_goal ?? 10} onChange={(e) => set('referral_goal', Number(e.target.value) || 10)} />
+          </label>
+          <label className={styles.field}>
+            Récompense du parrain (affichée au client)
+            <input value={biz.referral_reward || ''} onChange={(e) => set('referral_reward', e.target.value)} placeholder="Ex. Nettoyage Sortie de Concession offert" />
+          </label>
+        </div>
         <div className={styles.grid2}>
           <label className={styles.field}>
             Lien de paiement en ligne (SumUp, Stripe, Lydia Pro…)
@@ -244,6 +261,22 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
         <div className={styles.panelHead}>
           <h2>Données</h2>
         </div>
+        <p className={backupLate || backupAt === null ? styles.textWarn : styles.hint}>
+          Sauvegarde Google Sheets (toutes les heures) :{' '}
+          {backupAt === undefined
+            ? '…'
+            : backupAt
+              ? `dernière le ${new Date(backupAt).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${backupLate ? ' — en retard, vérifiez le fichier' : ' ✓'}`
+              : 'pas encore lancée'}
+          {biz.backup_sheet_url && (
+            <>
+              {' · '}
+              <a className={styles.linkBtn} href={biz.backup_sheet_url} target="_blank" rel="noopener noreferrer">
+                Ouvrir le fichier
+              </a>
+            </>
+          )}
+        </p>
         <div className={styles.quickRow}>
           <label className={styles.toggle}>
             <input type="checkbox" checked={hideTests} onChange={(e) => setHideTests(e.target.checked)} />

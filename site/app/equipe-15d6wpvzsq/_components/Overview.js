@@ -40,9 +40,19 @@ function hourOf(d) {
   return x.getHours() + x.getMinutes() / 60
 }
 
-export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], tasks = [], subs = [], products = [], fc, settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask, onGo, onVisit }) {
+export default function Overview({ leads, jobs, cars = [], docs = [], reviews = [], stats = [], views = [], tasks = [], subs = [], products = [], fc, settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask, onGo, onVisit, onReview }) {
   const todo = useMemo(() => buildTodo(leads, jobs, new Date(), subs), [leads, jobs, subs])
-  const k = useMemo(() => computeKpis(leads, jobs), [leads, jobs])
+  // Les voitures des garages partenaires comptent dans le chiffre d'affaires (facture groupée).
+  const k = useMemo(() => {
+    const base = computeKpis(leads, jobs.filter((j) => !j.partner))
+    const n = new Date()
+    const ym = (d) => d.slice(0, 7)
+    const cur = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}`
+    const p = new Date(n.getFullYear(), n.getMonth() - 1, 1)
+    const prev = `${p.getFullYear()}-${String(p.getMonth() + 1).padStart(2, '0')}`
+    const sum = (m) => cars.filter((c) => ym(c.done_on) === m).reduce((t, c) => t + Number(c.price || 0), 0)
+    return { ...base, caMonth: base.caMonth + sum(cur), caPrev: base.caPrev + sum(prev) }
+  }, [leads, jobs, cars])
   const now = new Date()
   const today = startOfDay(now)
 
@@ -377,6 +387,7 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
                   reason={t.reason}
                   tone={t.tone}
                   templateId={t.template}
+                  onReview={onReview}
                   onOpen={onOpen}
                   updateLead={updateLead}
                   logActivity={logActivity}

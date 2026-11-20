@@ -16,7 +16,7 @@ function productCost(products, service) {
 }
 
 // Caisse : encaissements (prestations), dépenses, bénéfice du mois.
-export default function Cash({ jobs, leads, expenses, docs, settings, products = [], onSaveSettings, onUpdateJob, onDeleteExpense, onNewExpense, onOpenLead }) {
+export default function Cash({ jobs, cars = [], onOpenGarages, leads, expenses, docs, settings, products = [], onSaveSettings, onUpdateJob, onDeleteExpense, onNewExpense, onOpenLead }) {
   const now = new Date()
   const [ym, setYm] = useState({ y: now.getFullYear(), m: now.getMonth() })
   const { from, to } = monthRange(ym.y, ym.m)
@@ -24,9 +24,17 @@ export default function Cash({ jobs, leads, expenses, docs, settings, products =
   const rate = Number(settings?.business?.cotisations_pct) || 0
   const [rateInput, setRateInput] = useState(rate || '')
 
-  const mJobs = jobs.filter((j) => inMonth(j.done_at)).sort((a, b) => (a.done_at < b.done_at ? 1 : -1))
+  // Les voitures des garages sont comptées depuis l'écran Garages (une ligne par garage).
+  const mJobs = jobs.filter((j) => !j.partner && inMonth(j.done_at)).sort((a, b) => (a.done_at < b.done_at ? 1 : -1))
+  const mCars = cars.filter((c) => inMonth(c.done_on))
+  const garageRows = [...mCars.reduce((m, c) => m.set(c.partner, [...(m.get(c.partner) || []), c]), new Map())].map(([partner, list]) => ({
+    partner,
+    n: list.length,
+    total: list.reduce((t, c) => t + Number(c.price || 0), 0),
+  }))
+  const garageCa = garageRows.reduce((t, g) => t + g.total, 0)
   const mExp = expenses.filter((e) => inMonth(e.spent_on)).sort((a, b) => (a.spent_on < b.spent_on ? 1 : -1))
-  const ca = mJobs.reduce((s, j) => s + Number(j.amount || 0), 0)
+  const ca = mJobs.reduce((s, j) => s + Number(j.amount || 0), 0) + garageCa
   const pending = mJobs.filter((j) => j.payment_method === 'a_encaisser').reduce((s, j) => s + Number(j.amount || 0), 0)
   const spent = mExp.reduce((s, e) => s + Number(e.amount || 0), 0)
   const cotis = rate ? Math.round(ca * rate) / 100 : 0
@@ -54,7 +62,7 @@ export default function Cash({ jobs, leads, expenses, docs, settings, products =
     .map((r) => ({ ...r, perHour: r.minutes ? ((r.ca - r.cost) / r.minutes) * 60 : 0 }))
     .sort((a, b) => b.perHour - a.perHour)
   const totalHours = perService.reduce((t, r) => t + r.minutes, 0) / 60
-  const globalPerHour = totalHours ? (ca - perService.reduce((t, r) => t + r.cost, 0)) / totalHours : 0
+  const globalPerHour = totalHours ? (ca - garageCa - perService.reduce((t, r) => t + r.cost, 0)) / totalHours : 0
 
   // Kilomètres du mois (adresses géolocalisées dans la Tournée).
   const [base, setBase] = useState(null)
@@ -119,7 +127,10 @@ export default function Cash({ jobs, leads, expenses, docs, settings, products =
         <div className={styles.cashKpi}>
           <span>Chiffre d&apos;affaires</span>
           <strong>{euros(ca)}</strong>
-          <em>{mJobs.length} prestation{mJobs.length > 1 ? 's' : ''}</em>
+          <em>
+            {mJobs.length} prestation{mJobs.length > 1 ? 's' : ''}
+            {mCars.length ? ` + ${mCars.length} voiture${mCars.length > 1 ? 's' : ''} garage` : ''}
+          </em>
         </div>
         <div className={styles.cashKpi}>
           <span>Dépenses</span>
@@ -147,7 +158,23 @@ export default function Cash({ jobs, leads, expenses, docs, settings, products =
           {byMethod.length > 0 && (
             <p className={styles.hint}>{byMethod.map((p) => `${p.label} ${euros(p.total)}`).join(' · ')}</p>
           )}
+          {garageRows.length > 0 && (
+            <ul className={styles.cashList}>
+              {garageRows.map((g) => (
+                <li key={g.partner}>
+                  <button type="button" className={styles.cashMain} onClick={onOpenGarages}>
+                    <strong>{g.partner}</strong>
+                    <span>
+                      {g.n} voiture{g.n > 1 ? 's' : ''} · facture groupée
+                    </span>
+                  </button>
+                  <b>{euros2(g.total)}</b>
+                </li>
+              ))}
+            </ul>
+          )}
           {mJobs.length === 0 ? (
+            garageRows.length ? null : 
             <p className={styles.empty}>Aucune prestation ce mois-ci. Dans le planning, touchez ✓ sur un RDV terminé.</p>
           ) : (
             <ul className={styles.cashList}>

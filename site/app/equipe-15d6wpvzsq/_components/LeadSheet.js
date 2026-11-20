@@ -29,6 +29,9 @@ import {
   DOC_STATUS,
   trackUrl,
   loyalty,
+  referralInfo,
+  referralGoal,
+  referralLink,
 } from '../_lib/crm'
 import v2 from '../v2.module.css'
 import { photoUrl } from '../_lib/media'
@@ -48,7 +51,7 @@ const KIND_LABEL = {
 }
 
 // Fiche complète d'un prospect / client (panneau latéral).
-export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos = [], subscription = null, settings, supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc, onPlanRdv, onVisit, onAddSub, onUpdateSub }) {
+export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLeads = [], photos = [], subscription = null, settings, supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc, onPlanRdv, onVisit, onAddSub, onUpdateSub }) {
   const [form, setForm] = useState(() => ({
     first_name: lead.first_name || '',
     phone: lead.phone || '',
@@ -373,20 +376,57 @@ export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos
               )
             })()}
           </div>
-          <div className={v2.loyRow}>
-            <Icon name="gift" size={16} />
-            <span>
-              Code parrain <strong className={v2.codeTag}>{lead.referral_code}</strong>
-              {(() => {
-                const kids = allLeads.filter((l) => l.ref_code && l.ref_code.toUpperCase() === lead.referral_code && l.id !== lead.id)
-                return kids.length ? ` · a parrainé ${kids.map((k) => k.first_name).join(', ')}` : ''
-              })()}
-              {lead.ref_code && (() => {
-                const parrain = allLeads.find((l) => l.referral_code === lead.ref_code.toUpperCase())
-                return ` · parrainé par ${parrain ? parrain.first_name : `le code ${lead.ref_code}`}`
-              })()}
-            </span>
-          </div>
+          {(() => {
+            const goal = referralGoal(settings)
+            const ref = referralInfo(lead, allLeads, allJobs, goal)
+            const parrain = lead.ref_code ? allLeads.find((l) => l.referral_code === lead.ref_code.toUpperCase()) : null
+            return (
+              <div className={v2.loyRow} style={{ display: 'block' }}>
+                <span>
+                  <Icon name="gift" size={16} /> Parrainage <strong className={v2.codeTag}>{lead.referral_code}</strong>
+                  {lead.ref_code ? ` · parrainé par ${parrain ? parrain.first_name : `le code ${lead.ref_code}`}` : ''}
+                </span>
+                <div className={v2.refProgress}>
+                  <div className={v2.progressBar} aria-hidden="true">
+                    <i style={{ width: `${Math.round((ref.shown / goal) * 100)}%` }} />
+                  </div>
+                  <span>
+                    {ref.shown} / {goal} filleul{ref.shown > 1 ? 's' : ''} (prestation faite)
+                    {ref.waiting.length ? ` · ${ref.waiting.length} en attente : ${ref.waiting.map((k) => k.first_name).join(', ')}` : ''}
+                    {ref.done.length ? ` · faits : ${ref.done.map((k) => k.first_name).join(', ')}` : ''}
+                  </span>
+                </div>
+                {ref.available > 0 && (
+                  <div className={v2.refReward}>
+                    <span>🎁 {ref.available > 1 ? `${ref.available} nettoyages offerts` : 'Nettoyage Sortie de Concession offert'} à utiliser</span>
+                    <button
+                      type="button"
+                      className={styles.btnSecondary}
+                      onClick={async () => {
+                        if (!window.confirm('Marquer le nettoyage offert comme utilisé ?')) return
+                        await updateLead(lead, { referral_rewards_used: ref.used + 1 })
+                        logActivity(lead.id, 'note', 'Récompense parrainage utilisée (nettoyage offert)')
+                      }}
+                    >
+                      Marquer utilisé
+                    </button>
+                  </div>
+                )}
+                <div className={v2.inlineLinks}>
+                  <button
+                    type="button"
+                    className={styles.linkBtn}
+                    onClick={() => {
+                      navigator.clipboard?.writeText(referralLink(lead))
+                      logActivity(lead.id, 'note', 'Lien de parrainage copié')
+                    }}
+                  >
+                    <Icon name="copy" size={15} /> Copier son lien
+                  </button>
+                </div>
+              </div>
+            )
+          })()}
           {subscription ? (
             <div className={v2.loyRow}>
               <Icon name="repeat" size={16} />

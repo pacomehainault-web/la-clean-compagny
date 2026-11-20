@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# moteur de lecture des plaques (copié au build par scripts/copy-ocr.mjs)
+/public/ocr/

@@ -271,7 +271,7 @@ export function templates(lead) {
     {
       id: 'parrainage',
       label: 'Parrainage',
-      text: `Bonjour ${prenom}, merci encore ! Si un proche veut faire nettoyer sa voiture, donnez-lui votre code ${lead.referral_code || ''} : vous aurez tous les deux une réduction sur la prochaine prestation. Réservation : ${SITE.url}/reserver${lead.referral_code ? `?parrain=${lead.referral_code}` : ''}${sign}`,
+      text: `Bonjour ${prenom}, merci encore ! Voici votre lien de parrainage personnel : ${lead.referral_code ? `${SITE.url}/p/${lead.referral_code}` : `${SITE.url}/reserver`}\nPartagez-le à vos proches : dès que ${REF_GOAL} personnes ont fait appel à nous grâce à vous, votre nettoyage Sortie de Concession est offert 🎁${sign}`,
     },
     {
       id: 'meteo',
@@ -726,4 +726,45 @@ export function monthForecast(leads, jobs, now = new Date()) {
     .filter((l) => l.status === 'reserve' && l.appointment_at && new Date(l.appointment_at) >= startOfDay(now) && new Date(l.appointment_at) < monthEnd)
     .reduce((s, l) => s + Number(l.quoted_price || 0), 0)
   return { done, planned, total: done + planned }
+}
+
+// ---------- Parrainage ----------
+let REF_GOAL = 10
+export function setReferralGoal(n) {
+  REF_GOAL = Math.max(1, Number(n) || 10)
+}
+// Règle d'Enzo : un client qui amène N clients (10 par défaut) gagne un nettoyage offert.
+// Un filleul compte quand sa première prestation est faite.
+export function referralGoal(settings) {
+  return Math.max(1, Number(settings?.business?.referral_goal) || 10)
+}
+
+export function referralLink(lead) {
+  return lead?.referral_code ? `${SITE.url}/p/${lead.referral_code}` : ''
+}
+
+export function referralInfo(lead, leads, jobs, goal = 10) {
+  const code = (lead?.referral_code || '').toUpperCase()
+  if (!code) return { code: '', kids: [], done: [], waiting: [], earned: 0, used: 0, available: 0, toNext: goal, inCycle: 0, shown: 0 }
+  const kids = leads.filter((l) => l.id !== lead.id && l.ref_code && l.ref_code.toUpperCase() === code)
+  const withJob = new Set(jobs.map((j) => j.lead_id))
+  const done = kids.filter((k) => withJob.has(k.id) || CLIENT_STATUSES.includes(k.status))
+  const waiting = kids.filter((k) => !done.includes(k) && k.status !== 'perdu')
+  const earned = Math.floor(done.length / goal)
+  const used = Number(lead.referral_rewards_used) || 0
+  const inCycle = done.length - earned * goal
+  const available = Math.max(0, earned - used)
+  // Barre pleine (10/10) tant que la récompense gagnée n'est pas utilisée.
+  const shown = available > 0 && inCycle === 0 ? goal : inCycle
+  return { code, kids, done, waiting, earned, used, available, toNext: goal - inCycle, inCycle, shown }
+}
+
+// Demande d'avis accompagnée de la photo « après » de la voiture.
+export function reviewText(lead, withPhoto) {
+  const prenom = lead.first_name || ''
+  const suivi = trackUrl(lead)
+  const photo = withPhoto
+    ? `\n\n📸 Voici votre voiture une fois terminée ! Si vous pouvez, ajoutez cette photo à votre avis : enregistrez-la, puis touchez « Ajouter des photos » en écrivant l'avis.`
+    : ''
+  return `Bonjour ${prenom}, merci pour votre confiance !${photo}\n\nSi le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewUrl}${suivi ? `\n\nVos photos avant/après et votre facture : ${suivi}` : ''}\nEnzo – La Clean Compagny`
 }

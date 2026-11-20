@@ -4,7 +4,7 @@ import { useState } from 'react'
 import styles from '../admin.module.css'
 import v2 from '../v2.module.css'
 import { Icon } from './Icon'
-import { euros, formatDayLabel, loyalty, searchLeads, toDateInput, addDays, whatsappHref, templates, CLIENT_STATUSES } from '../_lib/crm'
+import { euros, formatDayLabel, loyalty, searchLeads, toDateInput, addDays, whatsappHref, templates, CLIENT_STATUSES, referralInfo, referralGoal } from '../_lib/crm'
 
 // Fidélisation : formules d'entretien (revenu régulier), parrainages, carte fidélité.
 export default function Fidelite({ leads, jobs, subs, settings, onOpen, onAddSub, onUpdateSub, onDeleteSub, onPlanRdv, logActivity }) {
@@ -19,9 +19,11 @@ export default function Fidelite({ leads, jobs, subs, settings, onOpen, onAddSub
   // Parrainages : clients arrivés avec le code d'un autre client.
   const byCode = new Map(leads.filter((l) => l.referral_code).map((l) => [l.referral_code.toUpperCase(), l]))
   const referred = leads.filter((l) => l.ref_code && byCode.has(l.ref_code.toUpperCase()))
-  const godparents = [...referred.reduce((m, l) => m.set(l.ref_code.toUpperCase(), [...(m.get(l.ref_code.toUpperCase()) || []), l]), new Map())]
-    .map(([code, kids]) => ({ parrain: byCode.get(code), kids }))
-    .sort((a, b) => b.kids.length - a.kids.length)
+  const goal = referralGoal(settings)
+  const godparents = [...new Set(referred.map((l) => l.ref_code.toUpperCase()))]
+    .map((code) => ({ parrain: byCode.get(code), ref: referralInfo(byCode.get(code), leads, jobs, goal) }))
+    .sort((a, b) => b.ref.available - a.ref.available || b.ref.done.length - a.ref.done.length || b.ref.kids.length - a.ref.kids.length)
+  const rewardsDue = godparents.filter((g) => g.ref.available > 0)
 
   // Clients fidèles : nombre de prestations.
   const counts = jobs.reduce((m, j) => m.set(j.lead_id, (m.get(j.lead_id) || 0) + 1), new Map())
@@ -186,19 +188,35 @@ export default function Fidelite({ leads, jobs, subs, settings, onOpen, onAddSub
             <span className={styles.count}>{referred.length}</span>
           </div>
           <p className={styles.hint}>
-            Chaque client a un code (visible sur sa fiche et sa page de suivi). Récompense affichée : « {biz.referral_reward || '—'} ».
+            Chaque client a son lien personnel (fiche client, page de suivi, bouton dans « Terminé »). Au bout de {goal} clients amenés (prestation faite) : {(biz.referral_reward || 'nettoyage offert').toLowerCase()}.
           </p>
+          {rewardsDue.map(({ parrain, ref }) => (
+            <div className={v2.refReward} key={`r-${parrain.id}`}>
+              <span>
+                🎁 {parrain.first_name} a gagné {ref.available > 1 ? `${ref.available} nettoyages offerts` : 'son nettoyage offert'}
+              </span>
+              <button type="button" className={styles.btnSecondary} onClick={() => onOpen(parrain.id)}>
+                Voir
+              </button>
+            </div>
+          ))}
           {godparents.length === 0 ? (
             <p className={styles.empty}>Aucun parrainage pour l&apos;instant. Envoyez son code à chaque client satisfait (bouton dans « Terminé »).</p>
           ) : (
             <ul className={v2.rowsList}>
-              {godparents.map(({ parrain, kids }) => (
+              {godparents.map(({ parrain, ref }) => (
                 <li key={parrain.id}>
                   <button type="button" className={v2.rowMain} onClick={() => onOpen(parrain.id)}>
                     <strong>
-                      {parrain.first_name} <span className={styles.count}>{kids.length}</span>
+                      {parrain.first_name} <span className={styles.count}>{ref.shown}/{goal}</span>
                     </strong>
-                    <span>a parrainé {kids.map((k) => k.first_name).join(', ')}</span>
+                    <div className={v2.progressBar} style={{ margin: '4px 0' }} aria-hidden="true">
+                      <i style={{ width: `${Math.round((ref.shown / goal) * 100)}%` }} />
+                    </div>
+                    <span>
+                      {ref.done.length ? `Faits : ${ref.done.map((k) => k.first_name).join(', ')}` : 'Aucun filleul passé pour l’instant'}
+                      {ref.waiting.length ? ` · en attente : ${ref.waiting.map((k) => k.first_name).join(', ')}` : ''}
+                    </span>
                   </button>
                 </li>
               ))}

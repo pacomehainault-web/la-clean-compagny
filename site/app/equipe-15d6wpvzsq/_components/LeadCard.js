@@ -6,7 +6,7 @@ import { STATUS_LABEL, sourceLabel, timeAgo, formatPhone, telHref, whatsappHref,
 
 // Carte compacte d'un prospect / client, avec les actions en un geste.
 // `reason` (optionnel) : pourquoi il apparaît dans « À faire ».
-export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason, tone, templateId = 'premier' }) {
+export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason, tone, templateId = 'premier', onReview }) {
   const tpl = templates(lead).find((t) => t.id === templateId) || templates(lead)[0]
 
   function markContacted(kind) {
@@ -45,6 +45,12 @@ export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason
           <Icon name="phone" size={17} />
           <span>Appeler</span>
         </a>
+        {onReview && templateId === 'avis' ? (
+          <button type="button" className={styles.actReview} onClick={() => onReview(lead)}>
+            <Icon name="star" size={17} />
+            <span>{tpl.label}</span>
+          </button>
+        ) : (
         <a
           className={templateId === 'avis' || templateId === 'relance-avis' ? styles.actReview : styles.actWa}
           href={whatsappHref(lead, tpl.text)}
@@ -55,6 +61,7 @@ export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason
           <Icon name={templateId === 'avis' || templateId === 'relance-avis' ? 'star' : 'whatsapp'} size={17} />
           <span>{tpl.label}</span>
         </a>
+        )}
       </div>
     </article>
   )
