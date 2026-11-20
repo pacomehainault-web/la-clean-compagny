@@ -1028,3 +1028,407 @@
   font-size: 13px;
   color: var(--slate);
 }
+
+/* ---------- Carte « Intervention » de l'accueil ---------- */
+.ms {
+  grid-area: next;
+  background: var(--night2);
+  border-radius: var(--r-block);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.msHead {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #fff;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  align-items: flex-start;
+}
+.msKicker {
+  font-size: 13px;
+  color: var(--glacier);
+  font-weight: 650;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.msLive i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5be3a6;
+  box-shadow: 0 0 0 0 rgba(91, 227, 166, 0.6);
+  animation: msPulse 1.6s infinite;
+}
+@keyframes msPulse {
+  70% {
+    box-shadow: 0 0 0 8px rgba(91, 227, 166, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(91, 227, 166, 0);
+  }
+}
+.msTitle {
+  font-size: 21px;
+  font-stretch: 112%;
+  font-weight: 740;
+  line-height: 1.15;
+}
+.msSub {
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+.msBlock {
+  background: var(--night);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.msLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.msLabel {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #fff;
+}
+.msSwitch {
+  display: inline-flex;
+  flex: none;
+  background: var(--night3);
+  border-radius: 99px;
+  padding: 2px;
+}
+.msSwitch button {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 650;
+  padding: 5px 9px;
+  border-radius: 99px;
+  cursor: pointer;
+}
+.msSwitch .msSwitchOn {
+  background: var(--glacier);
+  color: var(--night);
+}
+.msEta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+  gap: 5px;
+}
+.msEtaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  border-radius: 12px;
+  background: var(--wa);
+  color: #fff !important;
+  line-height: 1;
+  transition: transform 0.08s ease;
+}
+.msEtaBtn:active {
+  transform: scale(0.95);
+}
+.msEtaBtn strong {
+  font-size: 20px;
+  font-weight: 780;
+  font-stretch: 112%;
+}
+.msEtaBtn span {
+  font-size: 11px;
+  margin-top: 3px;
+  opacity: 0.85;
+}
+.msHint {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.msNav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+  gap: 6px;
+}
+.msNavBtn {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 56px;
+  border-radius: 12px;
+  background: var(--night3);
+  color: #fff !important;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.msNavBtn:active {
+  transform: scale(0.96);
+}
+.msMain,
+.msTwo > * {
+  border: 0;
+}
+.msMain {
+  min-height: 52px;
+  font-size: 16px;
+}
+.msTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.msTwo > * {
+  min-height: 48px;
+}
+.msInline {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.msTextLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--glacier) !important;
+  font-weight: 650;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.msProgress {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--night3);
+  overflow: hidden;
+}
+.msProgress i {
+  display: block;
+  height: 100%;
+  background: #5be3a6;
+  border-radius: 99px;
+  transition: width 0.4s;
+}
+.reviewSend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------- Fiche client réorganisée ---------- */
+.lsQuick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 16px 0;
+}
+.lsQuick > a,
+.lsQuick > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 64px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink) !important;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+.lsQuick > a:first-child {
+  background: var(--night);
+  border-color: var(--night);
+  color: #fff !important;
+}
+.lsQuick > *:nth-child(2) {
+  background: var(--wa);
+  border-color: var(--wa);
+  color: #fff !important;
+}
+.lsQuick > *:active {
+  transform: scale(0.96);
+}
+.lsStage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 16px 0;
+  font-size: 13px;
+  color: var(--slate);
+  font-weight: 600;
+}
+.lsStageTrack {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+}
+.lsStageTrack i {
+  flex: 1;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--line);
+}
+.lsStageTrack .lsStageOn {
+  background: var(--cobalt);
+}
+.lsStageSelect {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.lsStageSelect select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--cobalt);
+  background: var(--cobalt-soft);
+  color: var(--cobalt);
+  font: inherit;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 99px;
+  padding: 7px 30px 7px 13px;
+  cursor: pointer;
+}
+.lsStageSelect svg {
+  position: absolute;
+  right: 10px;
+  color: var(--cobalt);
+  pointer-events: none;
+  transform: rotate(90deg);
+}
+.nextStep {
+  margin: 12px 16px 0;
+  padding: 16px;
+  background: var(--paper);
+  border: 2px solid var(--cobalt);
+  border-radius: var(--r-block);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nsHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nsHead span {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cobalt);
+}
+.nsHead strong {
+  font-size: 19px;
+  font-stretch: 112%;
+  font-weight: 740;
+  line-height: 1.2;
+}
+.nsHead em {
+  font-style: normal;
+  font-size: 14px;
+  color: var(--slate);
+}
+.nsBtns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.nsBtns > * {
+  min-height: 48px;
+}
+.lsTabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin: 16px 16px 0;
+  padding: 3px;
+  background: #e2e6ee;
+  border-radius: 12px;
+}
+.lsTabs button {
+  border: 0;
+  background: none;
+  border-radius: 9px;
+  padding: 9px 4px;
+  font-weight: 650;
+  font-size: 13.5px;
+  color: var(--slate);
+  cursor: pointer;
+}
+.lsTabs .lsTabOn {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(15, 27, 51, 0.12);
+}
+.lsFacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+  margin: 0;
+}
+.lsFacts dt {
+  font-size: 12px;
+  color: var(--slate);
+  font-weight: 600;
+}
+.lsFacts dd {
+  margin: 2px 0 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.lsFactWide {
+  grid-column: 1 / -1;
+}
+.lsDetails summary {
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 14px;
+  color: var(--cobalt);
+}
+.lsDetails pre {
+  margin-top: 8px;
+}
+.lsSave {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+}
+.lsBottom {
+  height: 24px;
+}

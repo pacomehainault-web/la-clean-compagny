@@ -31,6 +31,7 @@ import v2 from '../v2.module.css'
 import { dayWeather, slotRain, weatherEmoji } from '../_lib/geo'
 import { lowStock } from './Stock'
 import { duelSummary } from './Duel'
+import Mission, { pickMission } from './Mission'
 
 const DAY_START = 8
 const DAY_END = 19
@@ -40,7 +41,7 @@ function hourOf(d) {
   return x.getHours() + x.getMinutes() / 60
 }
 
-export default function Overview({ leads, jobs, cars = [], docs = [], reviews = [], stats = [], views = [], tasks = [], subs = [], products = [], fc, settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask, onGo, onVisit, onReview }) {
+export default function Overview({ leads, jobs, cars = [], docs = [], reviews = [], stats = [], views = [], tasks = [], subs = [], products = [], fc, settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask, onStage, onVisit, onReview }) {
   const todo = useMemo(() => buildTodo(leads, jobs, new Date(), subs), [leads, jobs, subs])
   // Les voitures des garages partenaires comptent dans le chiffre d'affaires (facture groupée).
   const k = useMemo(() => {
@@ -60,7 +61,7 @@ export default function Overview({ leads, jobs, cars = [], docs = [], reviews = 
     .filter((l) => l.appointment_at && l.status !== 'perdu')
     .sort((a, b) => (a.appointment_at > b.appointment_at ? 1 : -1))
   const todays = booked.filter((l) => sameDay(l.appointment_at, now))
-  const next = booked.find((l) => new Date(l.appointment_at).getTime() + durationH(l) * 3600000 > now.getTime())
+  const mission = pickMission(leads, now)
   const nowH = hourOf(now)
   const myTasks = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t, now)))
   // RDV d'aujourd'hui commencé ou passé et pas encore marqué « fait »
@@ -90,8 +91,6 @@ export default function Overview({ leads, jobs, cars = [], docs = [], reviews = 
     todo.length + myTasks.length ? `${todo.length + myTasks.length} chose${todo.length + myTasks.length > 1 ? 's' : ''} à faire` : 'rien en attente',
   ].join(', ')
 
-  const nextTpl = next ? templates(next).find((t) => t.id === (sameDay(next.appointment_at, addDays(now, 1)) ? 'veille' : 'confirmation')) : null
-  const nextMaps = next ? mapsHref(next) : null
 
   const vis = [
     {
@@ -172,64 +171,16 @@ export default function Overview({ leads, jobs, cars = [], docs = [], reviews = 
           </div>
         </div>
 
-        <div className={styles.heroNext}>
-          {next ? (
-            <>
-              <button type="button" className={styles.heroNextMain} onClick={() => onOpen(next.id)}>
-                <span>Prochain rendez-vous</span>
-                <strong>
-                  {next.first_name}, {sameDay(next.appointment_at, now) ? "aujourd'hui" : formatDayLabel(next.appointment_at).toLowerCase()} à{' '}
-                  {formatTime(next.appointment_at)}
-                </strong>
-                <em>{[next.service, next.address || next.city].filter(Boolean).join(', ')}</em>
-              </button>
-              <div className={styles.heroActions}>
-                {next.status === 'reserve' && new Date(next.appointment_at) <= now && (
-                  <button type="button" className={styles.heroBtnLight} onClick={() => onComplete(next)}>
-                    <Icon name="check" size={17} /> Terminé
-                  </button>
-                )}
-                {onGo && sameDay(next.appointment_at, now) && next.status === 'reserve' && next.track_stage !== 'sur_place' && (
-                  <button type="button" className={styles.heroBtnLight} onClick={() => onGo(next)}>
-                    <Icon name="car" size={17} /> {next.track_stage === 'en_route' ? 'Je suis arrivé' : 'Je pars'}
-                  </button>
-                )}
-                {onVisit && sameDay(next.appointment_at, now) && (
-                  <button type="button" className={styles.heroBtn} onClick={() => onVisit(next)}>
-                    <Icon name="camera" size={17} /> Intervention
-                  </button>
-                )}
-                {nextMaps && (
-                  <a className={styles.heroBtn} href={nextMaps} target="_blank" rel="noopener noreferrer">
-                    <Icon name="map" size={17} /> Itinéraire
-                  </a>
-                )}
-                <a className={styles.heroBtn} href={telHref(next)} onClick={() => logActivity(next.id, 'appel', 'Appel lancé depuis l’accueil')}>
-                  <Icon name="phone" size={17} /> Appeler
-                </a>
-                {nextTpl && (
-                  <a
-                    className={styles.heroBtnLight}
-                    href={whatsappHref(next, nextTpl.text)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => logActivity(next.id, 'whatsapp', `WhatsApp « ${nextTpl.label} »`)}
-                  >
-                    <Icon name="whatsapp" size={17} /> {nextTpl.label}
-                  </a>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className={styles.heroNextMain}>
-              <span>Prochain rendez-vous</span>
-              <strong>Aucun rendez-vous prévu</strong>
-              <button type="button" className={styles.heroLink} onClick={() => onAdd()}>
-                + Ajouter un RDV
-              </button>
-            </div>
-          )}
-        </div>
+        <Mission
+          mission={mission}
+          onOpen={onOpen}
+          onStage={onStage}
+          onComplete={onComplete}
+          onVisit={onVisit}
+          onReview={onReview}
+          onAdd={onAdd}
+          logActivity={logActivity}
+        />
       </section>
 
       <div className={styles.quickBar}>
