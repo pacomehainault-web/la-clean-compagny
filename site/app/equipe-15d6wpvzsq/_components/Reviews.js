@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
+import Duel from './Duel'
 import { formatDate, templates, whatsappHref, daysBetween } from '../_lib/crm'
 
 const REVIEW_URL = 'https://g.page/r/CSFtfbCI8GR-EBM/review'
 const GBP_URL = 'https://business.google.com/reviews'
 
 // Avis Google : avis relevés chaque matin + demandes d'avis aux clients.
-export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen, updateLead, logActivity, flash }) {
+export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen, updateLead, logActivity, flash, onSaveStats }) {
   const [filter, setFilter] = useState('sans-reponse')
   const sorted = [...reviews].sort((a, b) => ((a.review_date || '') < (b.review_date || '') ? 1 : -1))
   const pending = sorted.filter((r) => !r.replied)
@@ -31,6 +32,7 @@ export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen,
 
   return (
     <div className={styles.stack}>
+      {onSaveStats && <Duel stats={stats} onSave={onSaveStats} />}
       <section className={styles.kpis}>
         <div className={styles.kpi}>
           <span>Note Google</span>

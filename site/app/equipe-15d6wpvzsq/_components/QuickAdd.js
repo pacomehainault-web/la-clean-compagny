@@ -1,9 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import styles from '../admin.module.css'
+import v2 from '../v2.module.css'
 import { Icon } from './Icon'
 import SlotPicker from './SlotPicker'
+import { partnerList } from './Partners'
+import { parseRdvSentence, speechSupported, startDictation } from '../_lib/voice'
 import {
   CATALOG,
   QUICK_SIZES,
@@ -31,7 +34,7 @@ const MODES = [
 ]
 
 // Le bouton « + » : un RDV, une tâche ou une dépense en quelques secondes.
-export default function QuickAdd({ leads, initial = {}, onClose, onCreateRdv, onAddTask, onAddExpense, onNewProspect, onOpenLead }) {
+export default function QuickAdd({ leads, settings, initial = {}, onClose, onCreateRdv, onAddTask, onAddExpense, onNewProspect, onOpenLead }) {
   const [mode, setMode] = useState(initial.mode || 'rdv')
 
   function pick(m) {
@@ -58,7 +61,7 @@ export default function QuickAdd({ leads, initial = {}, onClose, onCreateRdv, on
             <Icon name="close" />
           </button>
         </header>
-        {mode === 'rdv' && <RdvForm leads={leads} initial={initial} onCreate={onCreateRdv} onClose={onClose} onOpenLead={onOpenLead} />}
+        {mode === 'rdv' && <RdvForm leads={leads} settings={settings} initial={initial} onCreate={onCreateRdv} onClose={onClose} onOpenLead={onOpenLead} />}
         {mode === 'tache' && <TaskForm leads={leads} onAdd={onAddTask} onClose={onClose} />}
         {mode === 'depense' && <ExpenseForm onAdd={onAddExpense} onClose={onClose} />}
       </div>
@@ -66,8 +69,15 @@ export default function QuickAdd({ leads, initial = {}, onClose, onCreateRdv, on
   )
 }
 
-function RdvForm({ leads, initial, onCreate, onClose, onOpenLead }) {
+function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
   const [q, setQ] = useState('')
+  const [partner, setPartner] = useState(initial.partner || initial.lead?.partner || '')
+  const [plate, setPlate] = useState(initial.lead?.plate || '')
+  const [sentence, setSentence] = useState('')
+  const [listening, setListening] = useState(false)
+  const [heard, setHeard] = useState('')
+  const rec = useRef(null)
+  const partners = partnerList(settings, leads)
   const [client, setClient] = useState(initial.lead || null)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -118,6 +128,67 @@ function RdvForm({ leads, initial, onCreate, onClose, onOpenLead }) {
     }
   }
 
+  function applySentence(text) {
+    const p = parseRdvSentence(text, leads)
+    const filled = []
+    if (p.lead) {
+      chooseClient(p.lead)
+      filled.push(p.lead.first_name)
+    } else if (p.name) {
+      setClient(null)
+      setName(p.name)
+      filled.push(p.name)
+    }
+    if (p.phone) setPhone(p.phone)
+    const svc = p.service || service
+    const sz = p.size || size
+    if (p.service) {
+      setService(p.service)
+      if (!slotTouched) setSlot((v) => ({ ...v, minutes: defaultMinutes(p.service) }))
+      filled.push(p.service.replace('Nettoyage intérieur – ', ''))
+    }
+    if (p.size) setSize(p.size)
+    if (p.price) {
+      setPrice(p.price)
+      setPriceTouched(true)
+    } else if (!priceTouched && svc) {
+      const pr = priceFor(svc, sz)
+      if (pr) setPrice(pr)
+    }
+    if (p.vehicle) {
+      setVehicle(p.vehicle)
+      filled.push(p.vehicle)
+    }
+    if (p.address) setAddress(p.address)
+    if (p.city) setCity(p.city)
+    if (p.day || p.time) {
+      setSlot((v) => ({ ...v, day: p.day || v.day, time: p.time || v.time }))
+      filled.push([p.day ? p.day.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric' }) : '', p.time ? p.time.replace(':', 'h') : ''].filter(Boolean).join(' '))
+    }
+    setHeard(filled.length ? `Compris : ${filled.join(' · ')}` : "Je n'ai rien reconnu, complétez à la main.")
+  }
+
+  function toggleMic() {
+    if (listening) {
+      rec.current?.stop()
+      return
+    }
+    setHeard('')
+    setListening(true)
+    rec.current = startDictation({
+      onText: (t, final) => {
+        setSentence(t)
+        if (final) applySentence(t)
+      },
+      onEnd: () => setListening(false),
+      onError: () => {
+        setListening(false)
+        setHeard('Micro indisponible : écrivez la phrase à la place.')
+      },
+    })
+    if (!rec.current) setListening(false)
+  }
+
   async function submit(e) {
     e.preventDefault()
     setErr('')
@@ -137,6 +208,8 @@ function RdvForm({ leads, initial, onCreate, onClose, onOpenLead }) {
       notes: notes.trim() || null,
       appointment_at: atTime(slot.day, slot.time).toISOString(),
       duration_min: slot.minutes,
+      partner: partner || null,
+      plate: plate.trim().toUpperCase() || null,
     })
     setBusy(false)
     if (lead) setDone(lead)
@@ -182,6 +255,35 @@ function RdvForm({ leads, initial, onCreate, onClose, onOpenLead }) {
 
   return (
     <form onSubmit={submit}>
+      {!initial.lead && (
+        <section className={`${styles.sheetSection} ${v2.voice}`}>
+          <div className={v2.voiceRow}>
+            {speechSupported() && (
+              <button type="button" className={`${v2.micBtn} ${listening ? v2.micOn : ''}`} onClick={toggleMic} aria-label={listening ? 'Arrêter la dictée' : 'Dicter le RDV'}>
+                <Icon name="mic" size={20} />
+              </button>
+            )}
+            <input
+              value={sentence}
+              onChange={(e) => setSentence(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  applySentence(sentence)
+                }
+              }}
+              placeholder={listening ? 'Je vous écoute…' : 'En une phrase : « mardi 14h Golf intérieur chez Martin à Avrillé »'}
+              aria-label="Décrire le RDV en une phrase"
+            />
+            {sentence && !listening && (
+              <button type="button" className={styles.btnSecondary} onClick={() => applySentence(sentence)}>
+                Remplir
+              </button>
+            )}
+          </div>
+          {heard && <p className={styles.hint}>{heard}</p>}
+        </section>
+      )}
       <section className={styles.sheetSection}>
         <h3>Client</h3>
         {client ? (
@@ -265,6 +367,22 @@ function RdvForm({ leads, initial, onCreate, onClose, onOpenLead }) {
             <input value={vehicle} onChange={(e) => setVehicle(e.target.value)} placeholder="Ex. Golf 7" />
           </label>
         </div>
+        <div className={styles.chipsWrap}>
+          <button type="button" className={`${styles.chip} ${styles.chipSoft} ${!partner ? styles.chipOn : ''}`} onClick={() => setPartner('')}>
+            Particulier
+          </button>
+          {partners.map((p) => (
+            <button type="button" key={p} className={`${styles.chip} ${styles.chipSoft} ${partner === p ? styles.chipOn : ''}`} onClick={() => setPartner(p)}>
+              <Icon name="building" size={14} /> {p}
+            </button>
+          ))}
+        </div>
+        {partner && (
+          <label className={styles.field}>
+            Plaque d&apos;immatriculation
+            <input value={plate} onChange={(e) => setPlate(e.target.value.toUpperCase())} placeholder="AB-123-CD" maxLength={20} />
+          </label>
+        )}
       </section>
 
       <section className={styles.sheetSection}>

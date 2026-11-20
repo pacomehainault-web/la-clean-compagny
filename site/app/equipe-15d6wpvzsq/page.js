@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './admin.module.css'
 import { getSupabase } from '@/lib/supabaseClient'
-import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime } from './_lib/crm'
+import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime, defaultMinutes, stockCategory, setTravelBuffer } from './_lib/crm'
 import Overview from './_components/Overview'
 import Pipeline from './_components/Pipeline'
 import Planning from './_components/Planning'
@@ -17,7 +17,13 @@ import AddLead from './_components/AddLead'
 import QuickAdd from './_components/QuickAdd'
 import Tasks from './_components/Tasks'
 import Cash from './_components/Cash'
-import { CompleteRdv, MoveRdv } from './_components/RdvActions'
+import { CompleteRdv, MoveRdv, GoRdv } from './_components/RdvActions'
+import Visit from './_components/Visit'
+import Fidelite from './_components/Fidelite'
+import Partners from './_components/Partners'
+import Stock, { lowStock } from './_components/Stock'
+import Content from './_components/Content'
+import { useForecast } from './_lib/geo'
 import { Icon } from './_components/Icon'
 import { pushState, syncPush } from './_lib/push'
 
@@ -34,6 +40,10 @@ const VIEWS = [
   { id: 'planning', label: 'Planning', icon: 'calendar' },
   { id: 'taches', label: 'Tâches', icon: 'check' },
   { id: 'caisse', label: 'Caisse', icon: 'euro' },
+  { id: 'fidelite', label: 'Fidélité', icon: 'gift' },
+  { id: 'contenu', label: 'Contenu Insta / Google', short: 'Contenu', icon: 'spark' },
+  { id: 'partenaires', label: 'Garages partenaires', short: 'Garages', icon: 'building' },
+  { id: 'stock', label: 'Stock produits', short: 'Stock', icon: 'box' },
   { id: 'documents', label: 'Devis & factures', short: 'Factures', icon: 'file' },
   { id: 'clients', label: 'Clients', icon: 'star' },
   { id: 'avis', label: 'Avis Google', icon: 'message' },
@@ -68,6 +78,12 @@ export default function TeamDashboard() {
   const [settings, setSettings] = useState(null)
   const [tasks, setTasks] = useState([])
   const [expenses, setExpenses] = useState([])
+  const [photos, setPhotos] = useState([])
+  const [products, setProducts] = useState([])
+  const [subs, setSubs] = useState([])
+  const [going, setGoing] = useState(null)
+  const [visitingId, setVisitingId] = useState(null)
+  const fc = useForecast()
   const [quick, setQuick] = useState(null)
   const [completing, setCompleting] = useState(null)
   const [moving, setMoving] = useState(null)
@@ -98,7 +114,7 @@ export default function TeamDashboard() {
   const load = useCallback(async () => {
     setLoading(true)
     const since = toDateInput(addDays(new Date(), -120).toISOString())
-    const [l, j, d, r, st, pv, se, tk, ex] = await Promise.all([
+    const [l, j, d, r, st, pv, se, tk, ex, ph, pr, sb] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(2000),
       supabase.from('jobs').select('*').order('done_at', { ascending: false }).limit(5000),
       supabase.from('documents').select('*').order('created_at', { ascending: false }).limit(2000),
@@ -108,6 +124,9 @@ export default function TeamDashboard() {
       supabase.from('settings').select('*').eq('id', 1).maybeSingle(),
       supabase.from('tasks').select('*').order('created_at', { ascending: false }).limit(1000),
       supabase.from('expenses').select('*').order('spent_on', { ascending: false }).limit(5000),
+      supabase.from('photos').select('*').order('created_at', { ascending: true }).limit(5000),
+      supabase.from('products').select('*').order('name').limit(500),
+      supabase.from('subscriptions').select('*').order('created_at', { ascending: false }).limit(1000),
     ])
     setLoading(false)
     if (l.error || j.error) {
@@ -124,6 +143,9 @@ export default function TeamDashboard() {
     setSettings(se.data || null)
     setTasks(tk.data || [])
     setExpenses(ex.data || [])
+    setPhotos(ph.data || [])
+    setProducts(pr.data || [])
+    setSubs(sb.data || [])
     setLastSync(new Date())
   }, [supabase])
 
@@ -198,6 +220,11 @@ export default function TeamDashboard() {
 
   function goTo(v, sub) {
     if (v === 'stats' && sub) setStatsTab(sub)
+    if (v === 'planning' && sub) {
+      try {
+        localStorage.setItem('lcc-planning', sub)
+      } catch {}
+    }
     setView(v)
     setMoreOpen(false)
     window.scrollTo({ top: 0 })
@@ -311,7 +338,7 @@ export default function TeamDashboard() {
     async ({ lead: existing, first_name, phone, notes, ...fields }) => {
       const when = `${formatDayLabel(fields.appointment_at).toLowerCase()} à ${formatTime(fields.appointment_at)}`
       if (existing) {
-        const changes = { ...fields, status: 'reserve', next_followup_at: null }
+        const changes = { ...fields, status: 'reserve', next_followup_at: null, track_stage: null, eta_at: null }
         if (notes) changes.notes = [existing.notes, notes].filter(Boolean).join('\n')
         const ok = await updateLead(existing, changes, { silent: true })
         if (!ok) return null
@@ -321,7 +348,7 @@ export default function TeamDashboard() {
       }
       const { data: row, error: err } = await supabase
         .from('leads')
-        .insert({ first_name, phone, notes, ...fields, source: 'autre', status: 'reserve' })
+        .insert({ first_name, phone, notes, ...fields, source: fields.partner ? 'partenaire' : 'autre', status: 'reserve' })
         .select()
         .single()
       if (err) {
@@ -334,27 +361,6 @@ export default function TeamDashboard() {
       return row
     },
     [supabase, updateLead, logActivity]
-  )
-
-  const completeRdv = useCallback(
-    async (lead, { amount, payment_method }) => {
-      const done_at = toDateInput(lead.appointment_at || new Date().toISOString())
-      const { data: row, error: err } = await supabase
-        .from('jobs')
-        .insert({ lead_id: lead.id, done_at, service: lead.service || 'Prestation', amount, payment_method })
-        .select()
-        .single()
-      if (err) {
-        setError("La prestation n'a pas pu être enregistrée.")
-        return false
-      }
-      setJobs((prev) => [row, ...prev])
-      await logActivity(lead.id, 'prestation', `${row.service} – ${amount} €`)
-      await updateLead(lead, { status: lead.review_done ? 'avis_recu' : 'fait' }, { silent: true })
-      flash('Prestation enregistrée')
-      return true
-    },
-    [supabase, logActivity, updateLead]
   )
 
   const askedReview = useCallback(
@@ -543,6 +549,18 @@ export default function TeamDashboard() {
     [updateDoc, createDoc, leads]
   )
 
+  const createPartnerInvoice = useCallback(
+    async (partner, lines, notes) => {
+      const doc = await createDoc('facture', null, { lines, client: { name: partner }, notes })
+      if (doc) {
+        setOpenDocId(doc.id)
+        setView('documents')
+        window.scrollTo({ top: 0 })
+      }
+    },
+    [createDoc]
+  )
+
   const markPaid = useCallback(
     async (doc) => {
       const today = toDateInput(new Date().toISOString())
@@ -555,6 +573,194 @@ export default function TeamDashboard() {
       } else flash('Facture payée')
     },
     [updateDoc, leads, jobs, addJob]
+  )
+
+  const completeRdv = useCallback(
+    async (lead, { amount, payment_method, discount = 0, invoice = true, plate = null }) => {
+      const done_at = toDateInput(lead.appointment_at || new Date().toISOString())
+      const service = lead.service || 'Prestation'
+      const { data: row, error: err } = await supabase
+        .from('jobs')
+        .insert({
+          lead_id: lead.id,
+          done_at,
+          service,
+          amount,
+          payment_method,
+          minutes: Number(lead.duration_min) || defaultMinutes(lead.service),
+          partner: lead.partner || null,
+          plate: plate || lead.plate || null,
+          discount: discount || 0,
+        })
+        .select()
+        .single()
+      if (err) {
+        setError("La prestation n'a pas pu être enregistrée.")
+        return null
+      }
+      setJobs((prev) => [row, ...prev])
+      await logActivity(lead.id, 'prestation', `${row.service} – ${amount} €${discount ? ` (remise fidélité ${discount} €)` : ''}`)
+      const leadChanges = { status: lead.review_done ? 'avis_recu' : 'fait', track_stage: 'termine', eta_at: null }
+      if (plate && plate !== lead.plate) leadChanges.plate = plate
+      await updateLead(lead, leadChanges, { silent: true })
+
+      // Facture automatique (les garages partenaires ont leur facture mensuelle groupée).
+      let invoiceNumber = null
+      if (invoice && amount > 0 && !lead.partner) {
+        const lines = [{ label: `${service}${lead.vehicle ? ` – ${lead.vehicle}` : ''}`, qty: 1, unit_price: Number(amount) + Number(discount || 0) }]
+        if (discount) lines.push({ label: 'Remise fidélité', qty: 1, unit_price: -Number(discount) })
+        const doc = await createDoc('facture', { ...lead, ...leadChanges }, { lines, client: clientFromLead(lead), notes: null })
+        if (doc) {
+          invoiceNumber = doc.number
+          const paid = payment_method !== 'a_encaisser'
+          await updateDoc(doc, paid ? { status: 'paye', paid_at: done_at } : { status: 'envoye' }, { silent: true })
+        }
+      }
+
+      // Stock : consommation de la prestation.
+      const cat = stockCategory(service)
+      const used = products.filter(
+        (p) => Number(p.per_job) > 0 && (p.applies_to === 'tout' || p.applies_to === cat || (cat === 'complet' && ['interieur', 'exterieur'].includes(p.applies_to)))
+      )
+      const stockAlerts = []
+      for (const p of used) {
+        const stock = Math.round((Number(p.stock) - Number(p.per_job)) * 100) / 100
+        await supabase.from('products').update({ stock }).eq('id', p.id)
+        if (Number(p.alert_at) > 0 && stock <= Number(p.alert_at)) stockAlerts.push(p.name)
+      }
+      if (used.length) setProducts((prev) => prev.map((p) => (used.some((u) => u.id === p.id) ? { ...p, stock: Math.round((Number(p.stock) - Number(p.per_job)) * 100) / 100 } : p)))
+
+      // Formule d'entretien : prochain passage.
+      const sub = subs.find((x) => x.lead_id === lead.id && x.active)
+      if (sub) {
+        const next_on = toDateInput(addDays(new Date(`${done_at}T12:00:00`), sub.every_days).toISOString())
+        setSubs((prev) => prev.map((x) => (x.id === sub.id ? { ...x, next_on } : x)))
+        await supabase.from('subscriptions').update({ next_on }).eq('id', sub.id)
+      }
+      flash('Prestation enregistrée')
+      return { lead: { ...lead, ...leadChanges }, invoiceNumber, stockAlerts }
+    },
+    [supabase, logActivity, updateLead, createDoc, updateDoc, products, subs]
+  )
+
+  // « Je pars » / « Sur place » : met à jour la page de suivi du client.
+  const setStage = useCallback(
+    async (lead, stage, eta) => {
+      const ok = await updateLead(lead, { track_stage: stage, eta_at: eta }, { silent: true })
+      if (ok) {
+        await logActivity(lead.id, 'note', stage === 'en_route' ? `En route, arrivée prévue ${formatTime(eta)}` : 'Arrivé sur place')
+        flash(stage === 'en_route' ? 'Le client voit votre arrivée' : 'Le client voit « nettoyage en cours »')
+      }
+      return ok
+    },
+    [updateLead, logActivity]
+  )
+
+  const saveCoords = useCallback(
+    (lead, coords) => {
+      setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, ...coords } : l)))
+      supabase.from('leads').update(coords).eq('id', lead.id).then(() => {})
+    },
+    [supabase]
+  )
+
+  const onPhotos = useCallback(({ add, remove }) => {
+    if (add) setPhotos((prev) => [...prev, ...add])
+    if (remove) setPhotos((prev) => prev.filter((p) => p.id !== remove))
+  }, [])
+
+  // ---------- Opérations : formules, stock, duel ----------
+  const addSub = useCallback(
+    async (row) => {
+      const { data, error: err } = await supabase.from('subscriptions').insert(row).select().single()
+      if (err) {
+        setError("La formule n'a pas pu être créée.")
+        return false
+      }
+      setSubs((prev) => [data, ...prev])
+      await logActivity(row.lead_id, 'note', `Formule « ${row.label} » créée (${row.price} € tous les ${row.every_days} j)`)
+      flash('Formule créée')
+      return true
+    },
+    [supabase, logActivity]
+  )
+
+  const updateSub = useCallback(
+    async (sub, changes) => {
+      setSubs((prev) => prev.map((x) => (x.id === sub.id ? { ...x, ...changes } : x)))
+      const { error: err } = await supabase.from('subscriptions').update(changes).eq('id', sub.id)
+      if (err) {
+        setError("La formule n'a pas été mise à jour.")
+        load()
+      } else flash('Enregistré')
+    },
+    [supabase, load]
+  )
+
+  const deleteSub = useCallback(
+    async (sub) => {
+      setSubs((prev) => prev.filter((x) => x.id !== sub.id))
+      const { error: err } = await supabase.from('subscriptions').delete().eq('id', sub.id)
+      if (err) {
+        setError("La formule n'a pas pu être supprimée.")
+        load()
+      }
+    },
+    [supabase, load]
+  )
+
+  const addProduct = useCallback(
+    async (row) => {
+      const { data, error: err } = await supabase.from('products').insert(row).select().single()
+      if (err) {
+        setError("Le produit n'a pas pu être ajouté.")
+        return false
+      }
+      setProducts((prev) => [...prev, data])
+      flash('Produit ajouté')
+      return true
+    },
+    [supabase]
+  )
+
+  const updateProduct = useCallback(
+    async (prod, changes) => {
+      setProducts((prev) => prev.map((x) => (x.id === prod.id ? { ...x, ...changes } : x)))
+      const { error: err } = await supabase.from('products').update(changes).eq('id', prod.id)
+      if (err) {
+        setError("Le produit n'a pas été mis à jour.")
+        load()
+        return false
+      }
+      return true
+    },
+    [supabase, load]
+  )
+
+  const deleteProduct = useCallback(
+    async (prod) => {
+      setProducts((prev) => prev.filter((x) => x.id !== prod.id))
+      const { error: err } = await supabase.from('products').delete().eq('id', prod.id)
+      if (err) {
+        setError("Le produit n'a pas pu être supprimé.")
+        load()
+      }
+    },
+    [supabase, load]
+  )
+
+  const saveStats = useCallback(
+    async (rows) => {
+      const { error: err } = await supabase.from('stats_daily').upsert(rows, { onConflict: 'day,source,metric' })
+      if (err) {
+        setError("Le relevé n'a pas été enregistré.")
+        return false
+      }
+      setStats((prev) => [...prev.filter((x) => !rows.some((r) => r.day === x.day && r.source === x.source && r.metric === x.metric)), ...rows])
+      flash('Relevé enregistré')
+      return true
+    },
+    [supabase]
   )
 
   // ---------- Avis, réglages ----------
@@ -663,14 +869,17 @@ export default function TeamDashboard() {
   }
 
   // ---------- Dashboard ----------
+  setTravelBuffer(settings?.business?.travel_buffer_min ?? 30)
   const visibleLeads = hideTests ? leads.filter((l) => l.source !== 'test') : leads
+  const visiting = leads.find((l) => l.id === visitingId) || null
+  const lowCount = lowStock(products).length
   const openLead = leads.find((l) => l.id === openId) || null
   const newCount = visibleLeads.filter((l) => l.status === 'nouveau').length
   const unreplied = reviews.filter((r) => !r.replied).length
   const tasksDue = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t))).length
   const openQuick = (opts = {}) => setQuick(opts)
   const shared = { leads: visibleLeads, jobs, onOpen: setOpenId, updateLead, logActivity }
-  const badge = (id) => (id === 'prospects' ? newCount : id === 'avis' ? unreplied : id === 'taches' ? tasksDue : 0)
+  const badge = (id) => (id === 'prospects' ? newCount : id === 'avis' ? unreplied : id === 'taches' ? tasksDue : id === 'stock' ? lowCount : 0)
   const current = VIEWS.find((v) => v.id === view)
 
   return (
@@ -750,16 +959,31 @@ export default function TeamDashboard() {
               stats={stats}
               views={views}
               tasks={tasks}
+              subs={subs}
+              products={products}
+              fc={fc}
               settings={settings}
               goTo={goTo}
               onAdd={openQuick}
               onComplete={setCompleting}
               onToggleTask={toggleTask}
+              onGo={(l) => setGoing({ lead: l })}
+              onVisit={(l) => setVisitingId(l.id)}
             />
           )}
           {view === 'prospects' && <Pipeline {...shared} />}
           {view === 'planning' && (
-            <Planning {...shared} onAdd={(day, time, lead) => openQuick({ day, time, lead })} onComplete={setCompleting} onMove={setMoving} />
+            <Planning
+              {...shared}
+              fc={fc}
+              settings={settings}
+              saveCoords={saveCoords}
+              onAdd={(day, time, lead) => openQuick({ day, time, lead })}
+              onComplete={setCompleting}
+              onMove={setMoving}
+              onGo={(l, min) => setGoing({ lead: l, min })}
+              onVisit={(l) => setVisitingId(l.id)}
+            />
           )}
           {view === 'taches' && <Tasks tasks={tasks} onAdd={addTask} onToggle={toggleTask} onDelete={deleteTask} onOpenLead={setOpenId} />}
           {view === 'caisse' && (
@@ -768,6 +992,7 @@ export default function TeamDashboard() {
               leads={leads}
               expenses={expenses}
               docs={docs}
+              products={products}
               settings={settings}
               onSaveSettings={saveSettings}
               onUpdateJob={updateJob}
@@ -794,8 +1019,44 @@ export default function TeamDashboard() {
               setOpenDocId={setOpenDocId}
             />
           )}
+          {view === 'fidelite' && (
+            <Fidelite
+              leads={visibleLeads}
+              jobs={jobs}
+              subs={subs}
+              settings={settings}
+              onOpen={setOpenId}
+              onAddSub={addSub}
+              onUpdateSub={updateSub}
+              onDeleteSub={deleteSub}
+              onPlanRdv={(lead) => openQuick({ lead })}
+              logActivity={logActivity}
+            />
+          )}
+          {view === 'contenu' && <Content leads={leads} jobs={jobs} photos={photos} settings={settings} onSaveSettings={saveSettings} flash={flash} />}
+          {view === 'partenaires' && (
+            <Partners
+              leads={leads}
+              jobs={jobs}
+              docs={docs}
+              settings={settings}
+              onSaveSettings={saveSettings}
+              onCreateInvoice={createPartnerInvoice}
+              onAddVehicle={(partner) => openQuick({ partner })}
+              onOpen={setOpenId}
+            />
+          )}
+          {view === 'stock' && (
+            <Stock
+              products={products}
+              onAdd={addProduct}
+              onUpdate={updateProduct}
+              onDelete={deleteProduct}
+              onTask={(title) => addTask({ title, due_on: toDateInput(new Date().toISOString()) })}
+            />
+          )}
           {view === 'clients' && <Clients {...shared} />}
-          {view === 'avis' && <Reviews {...shared} reviews={reviews} stats={stats} onUpdateReview={updateReview} flash={flash} />}
+          {view === 'avis' && <Reviews {...shared} reviews={reviews} stats={stats} onUpdateReview={updateReview} flash={flash} onSaveStats={saveStats} />}
           {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} stats={stats} views={views} initialTab={statsTab} />}
           {view === 'reglages' && settings && (
             <Settings
@@ -870,6 +1131,16 @@ export default function TeamDashboard() {
           lead={openLead}
           jobs={jobs.filter((j) => j.lead_id === openLead.id)}
           docs={docs.filter((d) => d.lead_id === openLead.id)}
+          allLeads={leads}
+          photos={photos.filter((p) => p.lead_id === openLead.id).slice().reverse()}
+          subscription={subs.find((x) => x.lead_id === openLead.id) || null}
+          settings={settings}
+          onVisit={(l) => {
+            setOpenId(null)
+            setVisitingId(l.id)
+          }}
+          onAddSub={addSub}
+          onUpdateSub={updateSub}
           supabase={supabase}
           onClose={() => setOpenId(null)}
           updateLead={updateLead}
@@ -900,6 +1171,7 @@ export default function TeamDashboard() {
       {quick && (
         <QuickAdd
           leads={leads}
+          settings={settings}
           initial={quick}
           onClose={() => setQuick(null)}
           onCreateRdv={createRdv}
@@ -917,7 +1189,52 @@ export default function TeamDashboard() {
       )}
 
       {completing && (
-        <CompleteRdv lead={completing} onClose={() => setCompleting(null)} onComplete={completeRdv} onAskedReview={askedReview} />
+        <CompleteRdv
+          lead={leads.find((l) => l.id === completing.id) || completing}
+          visits={jobs.filter((j) => j.lead_id === completing.id).length}
+          settings={settings}
+          subscription={subs.find((x) => x.lead_id === completing.id && x.active) || null}
+          onClose={() => setCompleting(null)}
+          onComplete={completeRdv}
+          onAskedReview={askedReview}
+          onOpenVisit={(l) => {
+            setCompleting(null)
+            setVisitingId(l.id)
+          }}
+          onAddSubscription={addSub}
+          logActivity={logActivity}
+        />
+      )}
+
+      {going && (
+        <GoRdv
+          key={going.lead.id}
+          lead={leads.find((l) => l.id === going.lead.id) || going.lead}
+          driveMin={going.min || null}
+          onClose={() => setGoing(null)}
+          onStage={setStage}
+          logActivity={logActivity}
+        />
+      )}
+
+      {visiting && (
+        <Visit
+          key={visiting.id}
+          lead={visiting}
+          photos={photos}
+          supabase={supabase}
+          fc={fc}
+          onClose={() => setVisitingId(null)}
+          updateLead={updateLead}
+          onPhotos={onPhotos}
+          onGo={(l) => setGoing({ lead: l })}
+          onComplete={(l) => {
+            setVisitingId(null)
+            setCompleting(l)
+          }}
+          flash={flash}
+          logActivity={logActivity}
+        />
       )}
 
       {moving && <MoveRdv lead={moving} leads={leads} onClose={() => setMoving(null)} onMove={moveRdv} />}

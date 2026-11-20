@@ -24,7 +24,13 @@ import {
   templates,
   durationH,
   taskGroup,
+  isOutdoor,
+  monthForecast,
 } from '../_lib/crm'
+import v2 from '../v2.module.css'
+import { dayWeather, slotRain, weatherEmoji } from '../_lib/geo'
+import { lowStock } from './Stock'
+import { duelSummary } from './Duel'
 
 const DAY_START = 8
 const DAY_END = 19
@@ -34,8 +40,8 @@ function hourOf(d) {
   return x.getHours() + x.getMinutes() / 60
 }
 
-export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], tasks = [], settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask }) {
-  const todo = useMemo(() => buildTodo(leads, jobs), [leads, jobs])
+export default function Overview({ leads, jobs, docs = [], reviews = [], stats = [], views = [], tasks = [], subs = [], products = [], fc, settings, who, onOpen, updateLead, logActivity, goTo, onAdd, onComplete, onToggleTask, onGo, onVisit }) {
+  const todo = useMemo(() => buildTodo(leads, jobs, new Date(), subs), [leads, jobs, subs])
   const k = useMemo(() => computeKpis(leads, jobs), [leads, jobs])
   const now = new Date()
   const today = startOfDay(now)
@@ -51,6 +57,12 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
   const toClose = todays.filter((l) => l.status === 'reserve' && new Date(l.appointment_at) <= now)
 
   const goal = Number(settings?.monthly_goal) || 0
+  const forecast = monthForecast(leads, jobs, now)
+  const wToday = dayWeather(fc, now)
+  const rainy = booked.filter((l) => l.status === 'reserve' && new Date(l.appointment_at) >= now && new Date(l.appointment_at) < addDays(today, 3) && isOutdoor(l.service)).map((l) => ({ l, r: slotRain(fc, l.appointment_at, durationH(l) * 60) })).filter((x) => x.r && x.r.prob >= 50)
+  const tomorrows = booked.filter((l) => l.status === 'reserve' && sameDay(l.appointment_at, addDays(now, 1)))
+  const low = lowStock(products)
+  const duel = duelSummary(stats)
   const goalPct = goal ? Math.min(100, Math.round((k.caMonth / goal) * 100)) : 0
   const caTrend = k.caPrev ? Math.round(((k.caMonth - k.caPrev) / k.caPrev) * 100) : null
   const since7 = toDateInput(addDays(today, -6).toISOString())
@@ -167,6 +179,16 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
                     <Icon name="check" size={17} /> Terminé
                   </button>
                 )}
+                {onGo && sameDay(next.appointment_at, now) && next.status === 'reserve' && next.track_stage !== 'sur_place' && (
+                  <button type="button" className={styles.heroBtnLight} onClick={() => onGo(next)}>
+                    <Icon name="car" size={17} /> {next.track_stage === 'en_route' ? 'Je suis arrivé' : 'Je pars'}
+                  </button>
+                )}
+                {onVisit && sameDay(next.appointment_at, now) && (
+                  <button type="button" className={styles.heroBtn} onClick={() => onVisit(next)}>
+                    <Icon name="camera" size={17} /> Intervention
+                  </button>
+                )}
                 {nextMaps && (
                   <a className={styles.heroBtn} href={nextMaps} target="_blank" rel="noopener noreferrer">
                     <Icon name="map" size={17} /> Itinéraire
@@ -217,6 +239,86 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
 
       <div className={styles.homeGrid}>
         <div className={styles.homeMain}>
+        <section className={`${styles.block} ${v2.brief}`} aria-labelledby="brief-title">
+          <header className={styles.blockHead}>
+            <h2 id="brief-title">Le brief</h2>
+            {wToday && (
+              <span className={v2.briefWeather}>
+                {weatherEmoji(wToday.code)} {wToday.tmax}° · pluie {wToday.prob ?? 0} %
+              </span>
+            )}
+          </header>
+          <ul className={v2.briefList}>
+            <li>
+              <Icon name="route" size={17} />
+              <span>
+                {todays.length ? `${todays.length} client${todays.length > 1 ? 's' : ''} aujourd'hui` : "Pas de tournée aujourd'hui"}
+                {todays.length ? ` · ${Math.round(todays.reduce((t, l) => t + durationH(l), 0) * 10) / 10} h sur place` : ''}
+              </span>
+              {todays.length > 0 && (
+                <button type="button" className={styles.linkBtn} onClick={() => goTo('planning', 'tournee')}>
+                  Tournée
+                </button>
+              )}
+            </li>
+            {rainy.map(({ l, r }) => (
+              <li key={l.id} className={v2.briefWarn}>
+                <Icon name="cloud" size={17} />
+                <span>
+                  Pluie {r.prob} % pour {l.first_name} ({formatDayLabel(l.appointment_at).toLowerCase()} {formatTime(l.appointment_at)})
+                </span>
+                <a
+                  className={styles.linkBtn}
+                  href={whatsappHref(l, templates(l).find((t) => t.id === 'meteo').text)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => logActivity(l.id, 'whatsapp', 'Alerte météo envoyée')}
+                >
+                  Prévenir
+                </a>
+              </li>
+            ))}
+            {tomorrows.length > 0 && (
+              <li>
+                <Icon name="bell" size={17} />
+                <span>Rappels à envoyer pour demain :</span>
+              </li>
+            )}
+            {tomorrows.map((l) => {
+              const tpl = templates(l).find((t) => t.id === 'veille')
+              return (
+                <li key={l.id} className={v2.briefSub}>
+                  <span>
+                    {formatTime(l.appointment_at)} · <strong>{l.first_name}</strong>
+                  </span>
+                  <a className={styles.actWa} href={whatsappHref(l, tpl.text)} target="_blank" rel="noopener noreferrer" onClick={() => logActivity(l.id, 'whatsapp', 'Rappel de la veille envoyé')}>
+                    <Icon name="whatsapp" size={15} /> Rappel
+                  </a>
+                </li>
+              )
+            })}
+            {low.length > 0 && (
+              <li className={v2.briefWarn}>
+                <Icon name="box" size={17} />
+                <span>Stock bas : {low.map((p) => p.name).join(', ')}</span>
+                <button type="button" className={styles.linkBtn} onClick={() => goTo('stock')}>
+                  Voir
+                </button>
+              </li>
+            )}
+            {duel.gap != null && duel.gap > 0 && (
+              <li>
+                <Icon name="trophy" size={17} />
+                <span>
+                  {`${duel.gap} avis d’écart avec FreshInside`}
+                </span>
+                <button type="button" className={styles.linkBtn} onClick={() => goTo('avis')}>
+                  Duel
+                </button>
+              </li>
+            )}
+          </ul>
+        </section>
         {toClose.length > 0 && (
           <section className={styles.block} aria-labelledby="close-title">
             <header className={styles.blockHead}>
@@ -303,6 +405,11 @@ export default function Overview({ leads, jobs, docs = [], reviews = [], stats =
                 </em>
               )}
             </div>
+            {forecast.planned > 0 && (
+              <p className={v2.forecastLine}>
+                Prévision fin de mois : <strong>{euros(forecast.total)}</strong> (dont {euros(forecast.planned)} de RDV prévus)
+              </p>
+            )}
             {goal > 0 && (
               <div className={styles.goal}>
                 <span className={styles.goalBar} role="progressbar" aria-valuenow={goalPct} aria-valuemin={0} aria-valuemax={100} aria-label="Objectif du mois">

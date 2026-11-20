@@ -27,9 +27,9 @@ const cspDirectives = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ''}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' data: blob:`,
+  `img-src 'self' data: blob: https://ibeejsvztajwploqmnkh.supabase.co`,
   `font-src 'self'`,
-  `connect-src 'self' https://ibeejsvztajwploqmnkh.supabase.co https://api.cloudinary.com https://api.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com`,
+  `connect-src 'self' https://ibeejsvztajwploqmnkh.supabase.co https://api.open-meteo.com https://nominatim.openstreetmap.org https://api.cloudinary.com https://api.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com`,
   `frame-src https://www.google.com`,
   `object-src 'none'`,
   `base-uri 'self'`,
@@ -49,7 +49,7 @@ const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
   { key: 'Content-Security-Policy', value: contentSecurityPolicy },
   // 2 ans, sous-domaines inclus, éligible à la liste de préchargement HSTS des
   // navigateurs — n'a d'effet qu'une fois le site servi en HTTPS (Vercel le
@@ -69,6 +69,15 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+      {
+        // Pages de suivi client (lien secret) : jamais indexées ni mises en cache partagé.
+        source: '/suivi/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
       },
       {
         // Espace équipe : jamais indexé ni mis en cache partagé.

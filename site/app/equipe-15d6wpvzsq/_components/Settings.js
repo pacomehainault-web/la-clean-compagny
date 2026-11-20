@@ -97,7 +97,7 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
               <Icon name="check" size={16} />
               <span>
                 <strong>Relances programmées toutes seules</strong>
-                <em>Devis envoyé → relance prévue à J+3. Prestation faite → demande d&apos;avis, relance à J+3. Dernier nettoyage il y a 6 mois → proposition d&apos;entretien.</em>
+                <em>Devis envoyé → relance prévue à J+3. Prestation faite → demande d&apos;avis, relance à J+3. Relance d&apos;entretien au bon moment selon la prestation (extérieur 1 mois, intérieur 3 mois, lustrage 6 mois, céramique 1 an). Formules d&apos;entretien → passage à planifier.</em>
               </span>
             </span>
           </li>
@@ -146,6 +146,68 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
             }}
           />
         </label>
+        {dirty && (
+          <div className={styles.rowBtns}>
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              onClick={async () => {
+                const ok = await onSave({ business: biz, monthly_goal: goal === '' ? null : Number(goal) })
+                if (ok) setDirty(false)
+              }}
+            >
+              Enregistrer
+            </button>
+          </div>
+        )}
+      </section>
+
+      <section className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h2>Terrain, page client et fidélité</h2>
+        </div>
+        <div className={styles.grid2}>
+          <label className={styles.field}>
+            Adresse de départ des tournées
+            <input value={biz.base_address || ''} onChange={(e) => set('base_address', e.target.value)} placeholder="Ex. Angers" />
+          </label>
+          <label className={styles.field}>
+            Trajet laissé entre deux clients (min)
+            <input type="number" min="0" max="120" step="5" inputMode="numeric" value={biz.travel_buffer_min ?? 30} onChange={(e) => set('travel_buffer_min', e.target.value === '' ? 0 : Number(e.target.value))} />
+          </label>
+          <label className={styles.field}>
+            Remise fidélité tous les … passages
+            <input type="number" min="2" max="20" inputMode="numeric" value={biz.loyalty_every ?? 5} onChange={(e) => set('loyalty_every', Number(e.target.value) || 5)} />
+          </label>
+          <label className={styles.field}>
+            Remise fidélité (%)
+            <input type="number" min="0" max="100" inputMode="numeric" value={biz.loyalty_discount ?? 20} onChange={(e) => set('loyalty_discount', Number(e.target.value) || 0)} />
+          </label>
+        </div>
+        <label className={styles.field}>
+          Récompense parrainage (affichée au client)
+          <input value={biz.referral_reward || ''} onChange={(e) => set('referral_reward', e.target.value)} placeholder="Ex. -10 % pour vous et votre filleul" />
+        </label>
+        <div className={styles.grid2}>
+          <label className={styles.field}>
+            Lien de paiement en ligne (SumUp, Stripe, Lydia Pro…)
+            <input value={biz.payment_link || ''} onChange={(e) => set('payment_link', e.target.value.trim())} placeholder="https://…" inputMode="url" />
+          </label>
+          <label className={styles.field}>
+            Acompte demandé à la réservation (%)
+            <input type="number" min="0" max="100" inputMode="numeric" value={biz.deposit_pct ?? 0} onChange={(e) => set('deposit_pct', Number(e.target.value) || 0)} />
+          </label>
+        </div>
+        <p className={styles.hint}>
+          Avec un lien de paiement, la page du client affiche « Payer en ligne » sur la facture et, si l&apos;acompte est supérieur à 0 %, « Régler l&apos;acompte » avant le RDV. Créez le lien dans votre appli de paiement (SumUp, Stripe…), puis collez-le ici.
+        </p>
+        <p className={styles.hint}>
+          Réservation en ligne pour vos clients :{' '}
+          <a href="/reserver" target="_blank" rel="noopener noreferrer">
+            lacleancompagny.com/reserver
+          </a>{' '}
+          (créneaux libres calculés avec le trajet ci-dessus, dimanche fermé).
+        </p>
         {dirty && (
           <div className={styles.rowBtns}>
             <button

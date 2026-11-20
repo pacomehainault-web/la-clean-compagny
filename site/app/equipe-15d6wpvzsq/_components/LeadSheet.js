@@ -27,7 +27,12 @@ import {
   gcalHref,
   euros2,
   DOC_STATUS,
+  trackUrl,
+  loyalty,
 } from '../_lib/crm'
+import v2 from '../v2.module.css'
+import { photoUrl } from '../_lib/media'
+import { partnerList } from './Partners'
 
 const KIND_LABEL = {
   appel: '📞 Appel',
@@ -42,7 +47,7 @@ const KIND_LABEL = {
 }
 
 // Fiche complète d'un prospect / client (panneau latéral).
-export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc, onPlanRdv }) {
+export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos = [], subscription = null, settings, supabase, onClose, updateLead, logActivity, addJob, deleteJob, deleteLead, onCreateDoc, onOpenDoc, onPlanRdv, onVisit, onAddSub, onUpdateSub }) {
   const [form, setForm] = useState(() => ({
     first_name: lead.first_name || '',
     phone: lead.phone || '',
@@ -57,6 +62,9 @@ export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, up
     next_followup_at: toDateInput(lead.next_followup_at),
     notes: lead.notes || '',
     lost_reason: lead.lost_reason || '',
+    partner: lead.partner || '',
+    plate: lead.plate || '',
+    ref_code: lead.ref_code || '',
   }))
   const [dirty, setDirty] = useState(false)
   const [tplId, setTplIdRaw] = useState(() => defaultTemplate(lead.status))
@@ -106,7 +114,9 @@ export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, up
   }
 
   async function save() {
-    const ok = await updateLead(lead, formToLead(form))
+    const changes = formToLead(form)
+    if ((changes.address || null) !== (lead.address || null) || (changes.city || null) !== (lead.city || null)) Object.assign(changes, { lat: null, lng: null })
+    const ok = await updateLead(lead, changes)
     if (ok) setDirty(false)
   }
 
@@ -316,6 +326,110 @@ export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, up
           </div>
         </section>
 
+        {/* Suivi client, fidélité, parrainage */}
+        <section className={styles.sheetSection}>
+          <div className={styles.sectionTitleRow}>
+            <h3>Page client &amp; fidélité</h3>
+            {onVisit && lead.appointment_at && (
+              <button type="button" className={styles.linkBtn} onClick={() => onVisit(lead)}>
+                <Icon name="camera" size={15} /> Intervention
+              </button>
+            )}
+          </div>
+          <div className={v2.trackRow}>
+            <Icon name="link" size={16} />
+            <span>Suivi en direct, devis, photos, facture, avis</span>
+            <a className={styles.linkBtn} href={trackUrl(lead)} target="_blank" rel="noopener noreferrer">
+              Voir
+            </a>
+            <button
+              type="button"
+              className={styles.linkBtn}
+              onClick={() => {
+                navigator.clipboard?.writeText(trackUrl(lead))
+                logActivity(lead.id, 'note', 'Lien de suivi copié')
+              }}
+            >
+              Copier
+            </button>
+          </div>
+          <div className={v2.loyRow}>
+            {(() => {
+              const loy = loyalty(jobs.length, settings?.business?.loyalty_every)
+              return (
+                <>
+                  <div className={v2.loyaltyDots} aria-label={`${loy.inCycle} sur ${loy.every - 1} passages`}>
+                    {Array.from({ length: loy.every }, (_, i) => (
+                      <i key={i} className={i < loy.inCycle ? v2.dotOn : i === loy.every - 1 ? v2.dotGift : ''} />
+                    ))}
+                  </div>
+                  <span>
+                    {jobs.length} prestation{jobs.length > 1 ? 's' : ''} · {loy.rewardNow ? `🎁 la prochaine à -${settings?.business?.loyalty_discount || 20} %` : `encore ${loy.left} avant la remise`}
+                  </span>
+                </>
+              )
+            })()}
+          </div>
+          <div className={v2.loyRow}>
+            <Icon name="gift" size={16} />
+            <span>
+              Code parrain <strong className={v2.codeTag}>{lead.referral_code}</strong>
+              {(() => {
+                const kids = allLeads.filter((l) => l.ref_code && l.ref_code.toUpperCase() === lead.referral_code && l.id !== lead.id)
+                return kids.length ? ` · a parrainé ${kids.map((k) => k.first_name).join(', ')}` : ''
+              })()}
+              {lead.ref_code && (() => {
+                const parrain = allLeads.find((l) => l.referral_code === lead.ref_code.toUpperCase())
+                return ` · parrainé par ${parrain ? parrain.first_name : `le code ${lead.ref_code}`}`
+              })()}
+            </span>
+          </div>
+          {subscription ? (
+            <div className={v2.loyRow}>
+              <Icon name="repeat" size={16} />
+              <span>
+                Formule « {subscription.label} » · {euros(subscription.price)} tous les {subscription.every_days} j
+                {subscription.active ? (subscription.next_on ? ` · prochain ${formatDate(subscription.next_on)}` : '') : ' · en pause'}
+              </span>
+              {onUpdateSub && (
+                <button type="button" className={styles.linkBtn} onClick={() => onUpdateSub(subscription, { active: !subscription.active })}>
+                  {subscription.active ? 'Pause' : 'Réactiver'}
+                </button>
+              )}
+            </div>
+          ) : (
+            onAddSub &&
+            jobs.length > 0 && (
+              <button
+                type="button"
+                className={styles.linkBtn}
+                onClick={() =>
+                  onAddSub({
+                    lead_id: lead.id,
+                    label: `Entretien ${lead.vehicle || ''}`.trim(),
+                    price: Math.round((Number(lead.quoted_price) || Number(jobs[0]?.amount) || 0) * 0.85),
+                    every_days: 30,
+                    next_on: toDateInput(addDays(new Date(), 30).toISOString()),
+                  })
+                }
+              >
+                <Icon name="repeat" size={15} /> Créer une formule d&apos;entretien mensuelle
+              </button>
+            )
+          )}
+          {photos.length > 0 && (
+            <div className={v2.leadPhotos}>
+              {photos.slice(0, 12).map((p) => (
+                <a key={p.id} href={photoUrl(p.path)} target="_blank" rel="noopener noreferrer" title={`${p.kind} · ${formatDate(p.taken_on)}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={photoUrl(p.path)} alt={p.kind} loading="lazy" />
+                  <em>{p.kind === 'apres' ? 'après' : p.kind}</em>
+                </a>
+              ))}
+            </div>
+          )}
+        </section>
+
         {/* Infos */}
         <section className={styles.sheetSection}>
           <h3>Infos</h3>
@@ -361,6 +475,27 @@ export default function LeadSheet({ lead, jobs, docs = [], supabase, onClose, up
           <label className={styles.field}>
             Prestation
             <input list="services-list" value={form.service} onChange={(e) => set('service', e.target.value)} />
+          </label>
+          <div className={styles.grid2}>
+            <label className={styles.field}>
+              Garage partenaire
+              <select value={form.partner} onChange={(e) => set('partner', e.target.value)}>
+                <option value="">— Particulier —</option>
+                {partnerList(settings, allLeads).map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={styles.field}>
+              Plaque
+              <input value={form.plate} onChange={(e) => set('plate', e.target.value.toUpperCase())} placeholder="AB-123-CD" maxLength={20} />
+            </label>
+          </div>
+          <label className={styles.field}>
+            Code parrain utilisé
+            <input value={form.ref_code} onChange={(e) => set('ref_code', e.target.value.toUpperCase())} placeholder="Code d'un client qui l'a recommandé" maxLength={20} />
           </label>
           <div className={styles.grid2}>
             <label className={styles.field}>
@@ -566,5 +701,8 @@ function formToLead(f) {
     next_followup_at: f.next_followup_at ? new Date(`${f.next_followup_at}T09:00:00`).toISOString() : null,
     notes: f.notes.trim() || null,
     lost_reason: f.lost_reason || null,
+    partner: f.partner || null,
+    plate: f.plate.trim().toUpperCase() || null,
+    ref_code: f.ref_code.trim().toUpperCase() || null,
   }
 }
