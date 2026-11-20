@@ -74,6 +74,8 @@ export default function TeamDashboard() {
   const [docs, setDocs] = useState([])
   const [reviews, setReviews] = useState([])
   const [stats, setStats] = useState([])
+  const [syncInfo, setSyncInfo] = useState(null)
+  const [syncing, setSyncing] = useState(false)
   const [views, setViews] = useState([])
   const [settings, setSettings] = useState(null)
   const [tasks, setTasks] = useState([])
@@ -114,7 +116,7 @@ export default function TeamDashboard() {
   const load = useCallback(async () => {
     setLoading(true)
     const since = toDateInput(addDays(new Date(), -120).toISOString())
-    const [l, j, d, r, st, pv, se, tk, ex, ph, pr, sb] = await Promise.all([
+    const [l, j, d, r, st, pv, se, tk, ex, ph, pr, sb, sl] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(2000),
       supabase.from('jobs').select('*').order('done_at', { ascending: false }).limit(5000),
       supabase.from('documents').select('*').order('created_at', { ascending: false }).limit(2000),
@@ -127,6 +129,7 @@ export default function TeamDashboard() {
       supabase.from('photos').select('*').order('created_at', { ascending: true }).limit(5000),
       supabase.from('products').select('*').order('name').limit(500),
       supabase.from('subscriptions').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('sync_log').select('*').order('at', { ascending: false }).limit(1),
     ])
     setLoading(false)
     if (l.error || j.error) {
@@ -146,6 +149,7 @@ export default function TeamDashboard() {
     setPhotos(ph.data || [])
     setProducts(pr.data || [])
     setSubs(sb.data || [])
+    setSyncInfo(sl.data?.[0] || null)
     setLastSync(new Date())
   }, [supabase])
 
@@ -548,6 +552,15 @@ export default function TeamDashboard() {
     },
     [updateDoc, createDoc, leads]
   )
+
+  const syncGoogle = useCallback(async () => {
+    setSyncing(true)
+    const { error: err } = await supabase.functions.invoke('google-sync', { body: {} })
+    setSyncing(false)
+    if (err) setError("Le relevé Google n'a pas pu être lancé.")
+    else flash('Relevé Google terminé')
+    load()
+  }, [supabase, load])
 
   const createPartnerInvoice = useCallback(
     async (partner, lines, notes) => {
@@ -1057,7 +1070,7 @@ export default function TeamDashboard() {
           )}
           {view === 'clients' && <Clients {...shared} />}
           {view === 'avis' && <Reviews {...shared} reviews={reviews} stats={stats} onUpdateReview={updateReview} flash={flash} onSaveStats={saveStats} />}
-          {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} stats={stats} views={views} initialTab={statsTab} />}
+          {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} stats={stats} views={views} sync={syncInfo} onSync={syncGoogle} syncing={syncing} initialTab={statsTab} />}
           {view === 'reglages' && settings && (
             <Settings
               supabase={supabase}

@@ -286,7 +286,41 @@ const GBP_METRICS = [
   { id: 'itineraires_30j', label: 'Itinéraires' },
 ]
 
-function Google({ stats }) {
+function SyncStatus({ sync, onSync, syncing }) {
+  const r = sync?.result || {}
+  const part = (x, label) => {
+    if (!x) return null
+    if (x.error) return `${label} : erreur (${x.error})`
+    if (x.skipped) return `${label} : pas encore configuré`
+    return null
+  }
+  const issues = [part(r.searchConsole, 'Search Console')].filter(Boolean)
+  return (
+    <section className={styles.panel}>
+      <div className={styles.panelHead}>
+        <h2>Relevé automatique</h2>
+        {onSync && (
+          <button type="button" className={styles.btnSecondary} onClick={onSync} disabled={syncing}>
+            {syncing ? 'Relevé en cours…' : 'Actualiser maintenant'}
+          </button>
+        )}
+      </div>
+      <p className={styles.hint}>
+        Search Console : chaque matin à 6h20, automatiquement.
+        {sync ? ` Dernier relevé : ${new Date(sync.at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}${r.searchConsole?.days != null ? ` (${r.searchConsole.days} jours, ${r.searchConsole.queries} requêtes)` : ''}.` : ''}
+        <br />
+        Fiche Google, avis et Duel : chaque soir à 18h47 par le Mac (il doit être allumé, app Claude ouverte).
+      </p>
+      {issues.map((t) => (
+        <p key={t} className={styles.errText}>
+          {t}
+        </p>
+      ))}
+    </section>
+  )
+}
+
+function Google({ stats, sync, onSync, syncing }) {
   const keywords = useMemo(() => {
     const byKey = new Map()
     for (const x of stats) {
@@ -306,6 +340,7 @@ function Google({ stats }) {
   const anyGsc = stats.some((s) => s.source === 'gsc')
   return (
     <div className={styles.stack}>
+      <SyncStatus sync={sync} onSync={onSync} syncing={syncing} />
       <section className={styles.kpis}>
         {GBP_METRICS.map((m) => {
           const l = latestStat(stats, 'gbp', m.id)
@@ -321,7 +356,7 @@ function Google({ stats }) {
           )
         })}
       </section>
-      {!anyGbp && <p className={styles.hint}>Les chiffres de la fiche Google sont relevés chaque matin automatiquement : ils apparaissent dès le premier relevé.</p>}
+      {!anyGbp && <p className={styles.hint}>Les chiffres de la fiche Google apparaissent après le premier relevé du soir par le Mac.</p>}
 
       <div className={styles.twoCols}>
         <section className={styles.panel}>
@@ -344,7 +379,7 @@ function Google({ stats }) {
           <span className={styles.count}>objectif : top 4</span>
         </div>
         {!anyGsc || keywords.length === 0 ? (
-          <p className={styles.emptySmall}>Les positions sont relevées chaque matin dans la Search Console.</p>
+          <p className={styles.emptySmall}>Les positions apparaissent après le premier relevé de la Search Console (requêtes avec « angers » et les villes autour).</p>
         ) : (
           <ul className={styles.ranking}>
             {keywords.map((r) => {
@@ -369,7 +404,7 @@ function Google({ stats }) {
   )
 }
 
-export default function Stats({ leads, jobs, stats, views, initialTab = 'activite' }) {
+export default function Stats({ leads, jobs, stats, views, sync, onSync, syncing, initialTab = 'activite' }) {
   const [tab, setTab] = useState(initialTab)
   return (
     <div className={styles.stack}>
@@ -385,7 +420,7 @@ export default function Stats({ leads, jobs, stats, views, initialTab = 'activit
         ))}
       </div>
       {tab === 'activite' && <Activity leads={leads} jobs={jobs} />}
-      {tab === 'google' && <Google stats={stats} />}
+      {tab === 'google' && <Google stats={stats} sync={sync} onSync={onSync} syncing={syncing} />}
       {tab === 'site' && <Site views={views} leads={leads} />}
     </div>
   )
