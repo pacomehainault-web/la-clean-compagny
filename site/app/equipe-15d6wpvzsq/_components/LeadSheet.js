@@ -33,6 +33,7 @@ import {
 import v2 from '../v2.module.css'
 import { photoUrl } from '../_lib/media'
 import { partnerList } from './Partners'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 const KIND_LABEL = {
   appel: '📞 Appel',
@@ -65,6 +66,7 @@ export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos
     partner: lead.partner || '',
     plate: lead.plate || '',
     ref_code: lead.ref_code || '',
+    coords: null,
   }))
   const [dirty, setDirty] = useState(false)
   const [tplId, setTplIdRaw] = useState(() => defaultTemplate(lead.status))
@@ -115,7 +117,8 @@ export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos
 
   async function save() {
     const changes = formToLead(form)
-    if ((changes.address || null) !== (lead.address || null) || (changes.city || null) !== (lead.city || null)) Object.assign(changes, { lat: null, lng: null })
+    if (form.coords) Object.assign(changes, { lat: form.coords.lat, lng: form.coords.lng })
+    else if ((changes.address || null) !== (lead.address || null) || (changes.city || null) !== (lead.city || null)) Object.assign(changes, { lat: null, lng: null })
     const ok = await updateLead(lead, changes)
     if (ok) setDirty(false)
   }
@@ -453,7 +456,19 @@ export default function LeadSheet({ lead, jobs, docs = [], allLeads = [], photos
           </div>
           <label className={styles.field}>
             Adresse d&apos;intervention
-            <input value={form.address} onChange={(e) => set('address', e.target.value)} placeholder="N°, rue" />
+            <AddressAutocomplete
+              value={form.address}
+              onChange={(v) => {
+                set('address', v)
+                set('coords', null)
+              }}
+              onSelect={(it) => {
+                set('address', it.address || it.label)
+                if (it.city) set('city', it.city)
+                set('coords', it.lat != null ? { lat: it.lat, lng: it.lng } : null)
+              }}
+              placeholder="Tapez l'adresse, choisissez dans la liste"
+            />
           </label>
           <div className={styles.grid2}>
             <label className={styles.field}>

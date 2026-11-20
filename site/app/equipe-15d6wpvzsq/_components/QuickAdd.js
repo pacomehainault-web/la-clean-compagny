@@ -7,6 +7,7 @@ import { Icon } from './Icon'
 import SlotPicker from './SlotPicker'
 import { partnerList } from './Partners'
 import { parseRdvSentence, speechSupported, startDictation } from '../_lib/voice'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 import {
   CATALOG,
   QUICK_SIZES,
@@ -87,6 +88,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
   const [priceTouched, setPriceTouched] = useState(Boolean(initial.lead?.quoted_price))
   const [vehicle, setVehicle] = useState(initial.lead?.vehicle || '')
   const [address, setAddress] = useState(initial.lead?.address || '')
+  const [coords, setCoords] = useState(initial.lead?.lat != null ? { lat: initial.lead.lat, lng: initial.lead.lng } : null)
   const [city, setCity] = useState(initial.lead?.city || '')
   const [notes, setNotes] = useState('')
   const [slot, setSlot] = useState({
@@ -108,6 +110,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
     if (l.vehicle_size) setSize(l.vehicle_size)
     setVehicle(l.vehicle || '')
     setAddress(l.address || '')
+    setCoords(l.lat != null ? { lat: l.lat, lng: l.lng } : null)
     setCity(l.city || '')
   }
 
@@ -159,7 +162,10 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
       setVehicle(p.vehicle)
       filled.push(p.vehicle)
     }
-    if (p.address) setAddress(p.address)
+    if (p.address) {
+      setAddress(p.address)
+      setCoords(null)
+    }
     if (p.city) setCity(p.city)
     if (p.day || p.time) {
       setSlot((v) => ({ ...v, day: p.day || v.day, time: p.time || v.time }))
@@ -204,6 +210,8 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
       quoted_price: price === '' ? null : Number(price),
       vehicle: vehicle.trim() || null,
       address: address.trim() || null,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
       city: city.trim() || null,
       notes: notes.trim() || null,
       appointment_at: atTime(slot.day, slot.time).toISOString(),
@@ -400,16 +408,27 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
 
       <section className={styles.sheetSection}>
         <h3>Où ?</h3>
-        <div className={styles.grid2}>
-          <label className={styles.field}>
+        <label className={styles.field}>
             Adresse
-            <input value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="off" />
-          </label>
-          <label className={styles.field}>
-            Ville
-            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Angers" />
-          </label>
-        </div>
+            <AddressAutocomplete
+              value={address}
+              onChange={(v) => {
+                setAddress(v)
+                setCoords(null)
+              }}
+              onSelect={(it) => {
+                setAddress(it.address || it.label)
+                if (it.city) setCity(it.city)
+                setCoords(it.lat != null ? { lat: it.lat, lng: it.lng } : null)
+              }}
+              placeholder="Tapez l'adresse, choisissez dans la liste"
+            />
+        </label>
+        <label className={styles.field}>
+          Ville
+          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Angers" />
+        </label>
+        {coords && <p className={styles.hint}>📍 Adresse vérifiée</p>}
         <label className={styles.field}>
           Notes
           <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Code portail, état du véhicule, prise électrique…" />
