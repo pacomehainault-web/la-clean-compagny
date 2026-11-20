@@ -20,19 +20,24 @@ export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason
   return (
     <article className={`${styles.card} ${tone ? styles[`tone_${tone}`] : ''}`}>
       <button type="button" className={styles.cardMain} onClick={() => onOpen(lead.id)}>
-        <span className={styles.cardTop}>
-          <strong>{lead.first_name}</strong>
-          <span className={`${styles.badge} ${styles[`s_${lead.status}`]}`}>{STATUS_LABEL[lead.status]}</span>
+        <span className={styles.avatar} aria-hidden="true">
+          {(lead.first_name || '?').trim().charAt(0).toUpperCase()}
         </span>
-        {reason && <span className={styles.reason}>{reason}</span>}
-        <span className={styles.cardMeta}>
-          {[lead.service, lead.vehicle, lead.city].filter(Boolean).join(' · ') || 'Demande de rappel'}
-        </span>
-        <span className={styles.cardSub}>
-          {lead.appointment_at && lead.status === 'reserve'
-            ? `RDV ${formatDayLabel(lead.appointment_at).toLowerCase()} ${formatTime(lead.appointment_at)}`
-            : `${timeAgo(lead.created_at)} · ${sourceLabel(lead.source)}`}
-          {lead.quoted_price ? ` · ${euros(lead.quoted_price)}` : ''}
+        <span className={styles.cardBody}>
+          <span className={styles.cardTop}>
+            <strong>{lead.first_name}</strong>
+            <span className={`${styles.badge} ${styles[`s_${lead.status}`]}`}>{STATUS_LABEL[lead.status]}</span>
+          </span>
+          {reason && <span className={styles.reason}>{reason}</span>}
+          <span className={styles.cardMeta}>
+            {[lead.service, lead.vehicle, lead.city].filter(Boolean).join(', ') || 'Demande de rappel'}
+          </span>
+          <span className={styles.cardSub}>
+            {lead.appointment_at && lead.status === 'reserve'
+              ? `RDV ${formatDayLabel(lead.appointment_at).toLowerCase()} à ${formatTime(lead.appointment_at)}`
+              : `${timeAgo(lead.created_at).replace(/^./, (c) => c.toUpperCase())}, ${sourceLabel(lead.source).toLowerCase()}`}
+            {lead.quoted_price ? `, ${euros(lead.quoted_price)}` : ''}
+          </span>
         </span>
       </button>
       <div className={styles.cardActions}>

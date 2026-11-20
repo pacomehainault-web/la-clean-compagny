@@ -2,7 +2,8 @@
   min-height: 100dvh;
   background: #e9e7e2;
   padding: 16px 12px 40px;
-  font-family: var(--font-body), Inter, system-ui, sans-serif;
+  font-family: 'Archivo Variable', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   color: #15171b;
   margin-top: calc(-1 * var(--fixed-header-total, 0px));
 }
@@ -20,7 +21,7 @@
 }
 .toolbar button {
   border: 0;
-  background: #0a6cff;
+  background: #2f52d0;
   color: #fff;
   font: inherit;
   font-weight: 700;
@@ -52,7 +53,7 @@
 }
 .logoBox {
   display: inline-block;
-  background: #14161a;
+  background: #0f1b33;
   border-radius: 12px;
   padding: 6px 12px;
   -webkit-print-color-adjust: exact;
@@ -77,9 +78,11 @@
 }
 .meta h1 {
   margin: 0 0 8px;
-  font-size: 30px;
-  letter-spacing: 0.08em;
-  color: #0a6cff;
+  font-size: 34px;
+  font-stretch: 125%;
+  font-weight: 780;
+  letter-spacing: -0.01em;
+  color: #0f1b33;
 }
 .meta p {
   margin: 0;

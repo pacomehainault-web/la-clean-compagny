@@ -353,7 +353,7 @@ function Google({ stats }) {
                 <li key={r.k}>
                   <span>{r.k}</span>
                   <span className={styles.rankBar}>
-                    <i style={{ width: `${Math.max(4, 100 - (r.pos - 1) * 5)}%`, background: r.pos <= 4 ? 'var(--green)' : r.pos <= 10 ? 'var(--blue)' : 'var(--orange)' }} />
+                    <i style={{ width: `${Math.max(4, 100 - (r.pos - 1) * 5)}%`, background: r.pos <= 4 ? 'var(--mint)' : r.pos <= 10 ? 'var(--cobalt)' : 'var(--amber)' }} />
                   </span>
                   <strong>
                     {r.pos.toFixed(1)}
