@@ -414,10 +414,12 @@ export default function TeamDashboard() {
 
   if (!session) {
     return (
-      <div className={styles.screen}>
+      <div className={`${styles.screen} ${styles.loginScreen}`}>
         <form className={styles.login} onSubmit={login}>
-          <span className={styles.brandMark}>La Clean Compagny</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo/logo-new.png" alt="La Clean Compagny" className={styles.loginLogo} />
           <h1>Espace équipe</h1>
+          <p>Prospects, planning, factures et suivi Google.</p>
           <label htmlFor="team-password">Mot de passe</label>
           <div className={styles.pwdRow}>
             <input
@@ -477,8 +479,9 @@ export default function TeamDashboard() {
       <div className={styles.app}>
         <aside className={styles.side}>
           <div className={styles.sideBrand}>
-            <span className={styles.brandMark}>La Clean</span>
-            <span className={styles.sideHello}>Salut{memberName ? ` ${memberName}` : ''} 👋</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo/logo-new.png" alt="La Clean Compagny" className={styles.sideLogo} />
+            <span className={styles.sideHello}>Espace équipe</span>
           </div>
           <nav className={styles.sideNav} aria-label="Sections">
             {VIEWS.map((v) => (
@@ -490,28 +493,30 @@ export default function TeamDashboard() {
             ))}
           </nav>
           <div className={styles.sideFoot}>
-            <button type="button" className={styles.linkBtn} onClick={() => supabase.auth.signOut()}>
-              Déconnexion
+            <span>
+              {loading
+                ? 'Synchronisation…'
+                : lastSync
+                  ? `Données à jour à ${lastSync.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+                  : ''}
+            </span>
+            <button type="button" className={styles.sideLink} onClick={() => supabase.auth.signOut()}>
+              <Icon name="lock" size={16} /> Se déconnecter
             </button>
           </div>
         </aside>
 
         <main className={styles.main}>
-          <header className={styles.topbar}>
-            <h1>{current?.label}</h1>
+          <header className={`${styles.topbar} ${view === 'accueil' ? styles.topbarHome : ''}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo/logo-new.png" alt="La Clean Compagny" className={styles.topLogo} />
+            <h1 className={styles.pageTitle}>{view === 'accueil' ? 'Aujourd’hui' : current?.label}</h1>
             <div className={styles.topActions}>
-              <span className={styles.sync}>
-                {loading
-                  ? 'Synchronisation…'
-                  : lastSync
-                    ? `À jour ${lastSync.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
-                    : ''}
-              </span>
-              <button type="button" className={styles.iconBtn} onClick={load} aria-label="Actualiser">
+              <button type="button" className={`${styles.iconBtn} ${loading ? styles.spinning : ''}`} onClick={load} aria-label="Actualiser les données">
                 <Icon name="refresh" />
               </button>
               <button type="button" className={styles.btnPrimary} onClick={() => setAdding(true)}>
-                <Icon name="plus" /> <span className={styles.hideXs}>Prospect</span>
+                <Icon name="plus" /> <span className={styles.hideXs}>Nouveau prospect</span>
               </button>
             </div>
           </header>
@@ -526,7 +531,7 @@ export default function TeamDashboard() {
           )}
 
           {view === 'accueil' && (
-            <Overview {...shared} docs={docs} reviews={reviews} stats={stats} views={views} settings={settings} goTo={goTo} />
+            <Overview {...shared} who={memberName} docs={docs} reviews={reviews} stats={stats} views={views} settings={settings} goTo={goTo} />
           )}
           {view === 'prospects' && <Pipeline {...shared} />}
           {view === 'planning' && <Planning {...shared} />}
