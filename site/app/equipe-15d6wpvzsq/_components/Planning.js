@@ -3,7 +3,11 @@
 import { useMemo, useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
+import Tournee from './Tournee'
+import v2 from '../v2.module.css'
+import { slotRain } from '../_lib/geo'
 import {
+  isOutdoor,
   addDays,
   startOfWeek,
   sameDay,
@@ -27,8 +31,10 @@ import {
 
 const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-function RdvCard({ l, onOpen, logActivity, onComplete, onMove, large = false }) {
+function RdvCard({ l, onOpen, logActivity, onComplete, onMove, onGo, onVisit, fc, large = false }) {
   const done = CLIENT_STATUSES.includes(l.status)
+  const rain = !done && isOutdoor(l.service) ? slotRain(fc, l.appointment_at, durationH(l) * 60) : null
+  const isToday = sameDay(l.appointment_at, new Date())
   const isPast = new Date(l.appointment_at) < new Date()
   const tpl = templates(l).find((t) => t.id === (isPast ? 'avis' : 'veille'))
   const maps = mapsHref(l)
@@ -45,8 +51,21 @@ function RdvCard({ l, onOpen, logActivity, onComplete, onMove, large = false }) 
         <span>{[l.service, l.vehicle].filter(Boolean).join(' · ')}</span>
         {large && (l.address || l.city) && <span>{[l.address, l.city].filter(Boolean).join(', ')}</span>}
         {l.quoted_price ? <span>{euros(l.quoted_price)}</span> : null}
+        {rain && rain.prob >= 40 && <span className={v2.rainChip}>🌧️ pluie {rain.prob} %</span>}
+        {l.track_stage === 'en_route' && <span className={v2.liveChip}>En route</span>}
+        {l.track_stage === 'sur_place' && <span className={v2.liveChip}>Sur place</span>}
       </button>
       <div className={styles.rdvActs}>
+        {!done && isToday && onGo && l.track_stage !== 'sur_place' && (
+          <button type="button" className={styles.iconBtnSm2} onClick={() => onGo(l)} aria-label={l.track_stage === 'en_route' ? 'Je suis arrivé' : 'Je pars'} title={l.track_stage === 'en_route' ? 'Je suis arrivé' : 'Je pars'}>
+            <Icon name="car" size={15} />
+          </button>
+        )}
+        {onVisit && (
+          <button type="button" className={styles.iconBtnSm2} onClick={() => onVisit(l)} aria-label="Intervention : checklist, photos, état des lieux" title="Intervention">
+            <Icon name="camera" size={15} />
+          </button>
+        )}
         {!done && l.status === 'reserve' && (
           <button type="button" className={styles.rdvDoneBtn} onClick={() => onComplete(l)} aria-label={`Prestation de ${l.first_name} terminée`}>
             <Icon name="check" size={15} /> {large ? 'Terminé' : ''}
@@ -86,7 +105,7 @@ function RdvCard({ l, onOpen, logActivity, onComplete, onMove, large = false }) 
 }
 
 // Planning : vue jour (par heure) ou semaine, ajout sur un créneau, terminer, décaler.
-export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete, onMove }) {
+export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete, onMove, onGo, onVisit, fc, settings, saveCoords }) {
   const [mode, setMode] = useState(() => {
     try {
       return localStorage.getItem('lcc-planning') || 'jour'
@@ -112,7 +131,7 @@ export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete
         .sort((a, b) => (a.appointment_at > b.appointment_at ? 1 : -1)),
     [leads]
   )
-  const cardProps = { onOpen, logActivity, onComplete, onMove }
+  const cardProps = { onOpen, logActivity, onComplete, onMove, onGo, onVisit, fc }
 
   const followups = leads
     .filter((l) => l.next_followup_at && !['perdu', 'avis_recu'].includes(l.status))
@@ -144,29 +163,34 @@ export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete
           <button type="button" className={mode === 'semaine' ? styles.segOn : ''} onClick={() => switchMode('semaine')}>
             Semaine
           </button>
+          <button type="button" className={mode === 'tournee' ? styles.segOn : ''} onClick={() => switchMode('tournee')}>
+            Tournée
+          </button>
         </div>
         <div className={styles.segment} role="group" aria-label="Navigation">
           <button
             type="button"
-            onClick={() => (mode === 'jour' ? setDay(addDays(day, -1)) : setWeekStart(addDays(weekStart, -7)))}
-            aria-label={mode === 'jour' ? 'Jour précédent' : 'Semaine précédente'}
+            onClick={() => (mode !== 'semaine' ? setDay(addDays(day, -1)) : setWeekStart(addDays(weekStart, -7)))}
+            aria-label={mode !== 'semaine' ? 'Jour précédent' : 'Semaine précédente'}
           >
             <Icon name="left" size={16} />
           </button>
-          <button type="button" onClick={() => (mode === 'jour' ? setDay(startOfDay()) : setWeekStart(startOfWeek()))}>
-            {mode === 'jour' ? "Aujourd'hui" : 'Cette semaine'}
+          <button type="button" onClick={() => (mode !== 'semaine' ? setDay(startOfDay()) : setWeekStart(startOfWeek()))}>
+            {mode !== 'semaine' ? (sameDay(day, today) ? "Aujourd'hui" : formatDayLabel(day).replace(/^./, (c) => c.toUpperCase())) : 'Cette semaine'}
           </button>
           <button
             type="button"
-            onClick={() => (mode === 'jour' ? setDay(addDays(day, 1)) : setWeekStart(addDays(weekStart, 7)))}
-            aria-label={mode === 'jour' ? 'Jour suivant' : 'Semaine suivante'}
+            onClick={() => (mode !== 'semaine' ? setDay(addDays(day, 1)) : setWeekStart(addDays(weekStart, 7)))}
+            aria-label={mode !== 'semaine' ? 'Jour suivant' : 'Semaine suivante'}
           >
             <Icon name="right" size={16} />
           </button>
         </div>
       </div>
 
-      {mode === 'jour' ? (
+      {mode === 'tournee' ? (
+        <Tournee leads={leads} day={day} fc={fc} settings={settings} onOpen={onOpen} onGo={onGo} onVisit={onVisit} onComplete={onComplete} saveCoords={saveCoords} />
+      ) : mode === 'jour' ? (
         <section className={styles.block}>
           <header className={styles.blockHead}>
             <h2>{formatDayLabel(day).replace(/^./, (c) => c.toUpperCase())}</h2>

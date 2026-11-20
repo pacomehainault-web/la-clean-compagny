@@ -1,4 +1,5 @@
 import { LEADS_DB } from './constants'
+import { storedReferral } from './booking'
 
 // Envoi d'un prospect depuis les formulaires du site : enregistré dans la
 // base Supabase (table `leads`), lue par le dashboard. Pas d'email : tout se
@@ -21,6 +22,7 @@ export function normalizeLead(raw) {
     message: clean(raw.message, 3000),
     source: clean(raw.source, 120) || 'site',
     consent_relance: Boolean(raw.consentRelance),
+    ref_code: clean(raw.refCode ?? storedReferral(), 20),
   }
 }
 

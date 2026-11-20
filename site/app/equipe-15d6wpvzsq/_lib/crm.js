@@ -2,15 +2,8 @@
 // calculs (à faire aujourd'hui, chiffres clés, statistiques). Aucune
 // dépendance à l'interface : tout est testable à part.
 
-import { CONTACT } from '@/lib/constants'
-import {
-  FORMULAS_PRICING,
-  EXTERIOR_PRICING,
-  CORRECTION_PRICING,
-  LUSTRAGE_MINUTE_HIGHLIGHT,
-  MOTO_PRICING,
-  OPTICS_PRICING,
-} from '@/lib/data/pricing'
+import { CONTACT, SITE } from '@/lib/constants'
+import { defaultMinutes, recallDays, WORK_START, WORK_END } from '@/lib/catalog'
 
 // Adresse secrète de l'espace équipe (aussi dans next.config.mjs et les alertes ntfy).
 export const BASE_PATH = '/equipe-15d6wpvzsq'
@@ -222,6 +215,8 @@ export function templates(lead) {
     : '[date et heure]'
   const prix = lead.quoted_price ? euros(lead.quoted_price) : '[prix]'
   const service = lead.service ? lead.service.toLowerCase() : 'nettoyage'
+  const suivi = trackUrl(lead)
+  const eta = lead.eta_at ? formatTime(lead.eta_at) : ''
   return [
     {
       id: 'premier',
@@ -236,7 +231,7 @@ export function templates(lead) {
     {
       id: 'devis',
       label: 'Envoi du devis',
-      text: `Bonjour ${prenom}, comme convenu voici mon prix pour${vehiclePart(lead)} : ${prix} pour ${service}, à domicile, déplacement compris. Dites-moi le jour qui vous arrange et je bloque le créneau.${sign}`,
+      text: `Bonjour ${prenom}, comme convenu voici mon prix pour${vehiclePart(lead)} : ${prix} pour ${service}, à domicile, déplacement compris. Dites-moi le jour qui vous arrange et je bloque le créneau.${suivi ? `\nVous pouvez aussi voir et accepter le devis ici : ${suivi}` : ''}${sign}`,
     },
     {
       id: 'relance-devis',
@@ -246,7 +241,12 @@ export function templates(lead) {
     {
       id: 'confirmation',
       label: 'Confirmation RDV',
-      text: `Bonjour ${prenom}, c'est confirmé pour ${rdv}${lead.address ? ` au ${lead.address}` : ''}. Pensez juste à prévoir un accès à l'électricité. À bientôt !${sign}`,
+      text: `Bonjour ${prenom}, c'est confirmé pour ${rdv}${lead.address ? ` au ${lead.address}` : ''}. Pensez juste à prévoir un accès à l'électricité. À bientôt !${suivi ? `\n\nSuivez votre RDV en direct ici : ${suivi}` : ''}${sign}`,
+    },
+    {
+      id: 'en-route',
+      label: 'Je suis en route',
+      text: `Bonjour ${prenom}, je suis en route${eta ? `, arrivée prévue vers ${eta}` : ''} 🚗${suivi ? `\nSuivi en direct : ${suivi}` : ''}${sign}`,
     },
     {
       id: 'veille',
@@ -256,7 +256,7 @@ export function templates(lead) {
     {
       id: 'avis',
       label: 'Demande d’avis',
-      text: `Bonjour ${prenom}, merci pour votre confiance ! Si le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewUrl}${sign}`,
+      text: `Bonjour ${prenom}, merci pour votre confiance !${suivi ? ` Vos photos avant/après et votre facture sont ici : ${suivi}\n\n` : ' '}Si le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewUrl}${sign}`,
     },
     {
       id: 'relance-avis',
@@ -266,7 +266,17 @@ export function templates(lead) {
     {
       id: 'entretien',
       label: 'Relance entretien',
-      text: `Bonjour ${prenom}, ça fait quelques mois depuis le dernier nettoyage de${vehiclePart(lead)}. On le remet au propre ? Je peux passer dans la semaine, dites-moi ce qui vous arrange.${sign}`,
+      text: `Bonjour ${prenom}, ça fait quelques mois depuis le dernier nettoyage de${vehiclePart(lead)}. On le remet au propre ? Je peux passer dans la semaine, dites-moi ce qui vous arrange. Vous pouvez aussi réserver directement ici : ${SITE.url}/reserver${sign}`,
+    },
+    {
+      id: 'parrainage',
+      label: 'Parrainage',
+      text: `Bonjour ${prenom}, merci encore ! Si un proche veut faire nettoyer sa voiture, donnez-lui votre code ${lead.referral_code || ''} : vous aurez tous les deux une réduction sur la prochaine prestation. Réservation : ${SITE.url}/reserver${lead.referral_code ? `?parrain=${lead.referral_code}` : ''}${sign}`,
+    },
+    {
+      id: 'meteo',
+      label: 'Pluie prévue',
+      text: `Bonjour ${prenom}, de la pluie est annoncée ${rdv === '[date et heure]' ? 'le jour du RDV' : rdv.split(' à ')[0]}. Pour un résultat parfait à l'extérieur, on peut décaler. Vous avez un garage ou un abri ? Sinon je vous propose un autre créneau.${sign}`,
     },
   ]
 }
@@ -282,7 +292,7 @@ export function lastJob(jobs, leadId) {
 }
 
 // Liste « À faire » : chaque entrée = { lead, reason, tone, sort, template }
-export function buildTodo(leads, jobs, now = new Date()) {
+export function buildTodo(leads, jobs, now = new Date(), subs = []) {
   const items = []
   const today = startOfDay(now)
   const tomorrowEnd = addDays(today, 2)
@@ -346,8 +356,15 @@ export function buildTodo(leads, jobs, now = new Date()) {
     }
     if (CLIENT_STATUSES.includes(lead.status)) {
       const job = lastJob(jobs, lead.id)
-      if (job && daysBetween(job.done_at, now) >= 180 && !lead.next_followup_at) {
-        items.push({ lead, kind: 'entretien', reason: `Dernier nettoyage il y a ${Math.round(daysBetween(job.done_at, now) / 30)} mois : proposer un entretien`, tone: 'info', sort: 7, template: 'entretien' })
+      const sub = subs.find((x) => x.lead_id === lead.id && x.active)
+      if (sub && sub.next_on && daysBetween(now, sub.next_on + 'T12:00:00') <= 3 && !(lead.appointment_at && new Date(lead.appointment_at) > now)) {
+        items.push({ lead, kind: 'abonnement', reason: `Formule « ${sub.label} » : passage à planifier (${formatDayLabel(sub.next_on + 'T12:00:00').toLowerCase()})`, tone: 'info', sort: 6.5, template: 'entretien' })
+        continue
+      }
+      const wait = recallDays(job?.service || lead.service)
+      if (job && daysBetween(job.done_at, now) >= wait && !lead.next_followup_at && !(lead.appointment_at && new Date(lead.appointment_at) > now)) {
+        const months = Math.max(1, Math.round(daysBetween(job.done_at, now) / 30))
+        items.push({ lead, kind: 'entretien', reason: `${job.service} il y a ${months} mois : c'est le bon moment pour le reproposer`, tone: 'info', sort: 7, template: 'entretien' })
       }
     }
   }
@@ -530,55 +547,22 @@ export function sumStat(stats, source, metric, fromDay) {
 }
 
 // ---------- Catalogue (tarifs du site) ----------
-// Les prix viennent de lib/data/pricing.js : si les tarifs du site changent,
-// l'ajout rapide de RDV suit automatiquement.
-
-// Gabarits proposés à l'ajout de RDV (id = valeur de leads.vehicle_size).
-export const QUICK_SIZES = [
-  { id: 'citadine', label: 'Citadine' },
-  { id: 'compacte-berline', label: 'Berline' },
-  { id: 'suv-break', label: 'SUV / break' },
-  { id: 'grand-suv', label: 'Grand SUV' },
-  { id: 'utilitaire', label: 'Utilitaire' },
-  { id: 'moto', label: 'Moto' },
-]
-
-const priceKey = (size) => (size === 'utilitaire' ? 'grand-suv' : size)
-
-// minutes = durée habituelle sur place
-export const CATALOG = [
-  ...FORMULAS_PRICING.map((f) => ({ label: `Nettoyage intérieur – ${f.name}`, short: f.name, prices: f.prices, minutes: f.id === 'sortie-concession' ? 240 : 150 })),
-  ...EXTERIOR_PRICING.map((f) => ({ label: f.name, short: { 'lavage-exterieur': 'Lavage ext.', 'lavage-exterieur-approfondi': 'Ext. approfondi', 'decontamination-complete': 'Décontamination' }[f.id] || f.name, prices: f.prices, minutes: f.id === 'lavage-exterieur' ? 60 : 120 })),
-  { label: 'Lustrage minute', short: 'Lustrage minute', from: LUSTRAGE_MINUTE_HIGHLIGHT.fromPrice, minutes: 60 },
-  ...CORRECTION_PRICING.map((f) => ({ label: f.name, short: f.name, prices: f.prices, minutes: f.id === 'lustrage-express' ? 180 : f.id === 'lustrage-finition' ? 300 : 420 })),
-  { label: 'Rénovation des phares', short: 'Phares', from: OPTICS_PRICING.fromPrice, minutes: 60 },
-  { label: 'Nettoyage moto', short: 'Moto', from: MOTO_PRICING.fromPrice, minutes: 90 },
-  { label: 'Canapé, matelas, tapis', short: 'Canapé / tissus', minutes: 150 },
-  { label: 'Flotte / professionnel', short: 'Pro / flotte', minutes: 240 },
-]
-
-export function catalogItem(service) {
-  if (!service) return null
-  const s = service.toLowerCase()
-  return CATALOG.find((c) => c.label.toLowerCase() === s) || CATALOG.find((c) => s.includes(c.short.toLowerCase())) || null
-}
-
-// Prix du site pour une prestation et un gabarit (null si sur devis).
-export function priceFor(service, size) {
-  const item = catalogItem(service)
-  if (!item) return null
-  if (item.prices && size && item.prices[priceKey(size)]) return item.prices[priceKey(size)]
-  return item.from || null
-}
-
-export function defaultMinutes(service) {
-  const item = catalogItem(service)
-  if (item) return item.minutes
-  const s = (service || '').toLowerCase()
-  if (/compl|concession|lustrage|polissage|céramique|ceramique/.test(s)) return 240
-  if (/ext/.test(s)) return 90
-  return 150
-}
+// Les prix viennent de lib/data/pricing.js via lib/catalog.js (partagé avec la
+// réservation en ligne) : si les tarifs du site changent, tout suit.
+export {
+  QUICK_SIZES,
+  CATALOG,
+  catalogItem,
+  priceFor,
+  defaultMinutes,
+  serviceFamily,
+  isOutdoor,
+  recallDays,
+  checklistFor,
+  stockCategory,
+  WORK_START,
+  WORK_END,
+} from '@/lib/catalog'
 
 // Durée d'un RDV en heures (durée saisie, sinon estimée d'après la prestation).
 export function durationH(lead) {
@@ -592,21 +576,27 @@ export function formatDuration(min) {
   return m ? `${h} h ${String(m).padStart(2, '0')}` : `${h} h`
 }
 
-// RDV qui chevauchent un créneau donné.
-export function conflicts(leads, startIso, minutes, excludeId = null) {
+// Temps de trajet laissé entre deux RDV (réglage « trajet entre deux clients »).
+let travelBuffer = 0
+export function setTravelBuffer(min) {
+  travelBuffer = Math.max(0, Number(min) || 0)
+}
+export function getTravelBuffer() {
+  return travelBuffer
+}
+
+// RDV qui chevauchent un créneau donné (trajet compris).
+export function conflicts(leads, startIso, minutes, excludeId = null, buffer = travelBuffer) {
   if (!startIso) return []
   const s = new Date(startIso).getTime()
-  const e = s + minutes * 60000
+  const e = s + (minutes + buffer) * 60000
   return leads.filter((l) => {
     if (!l.appointment_at || l.id === excludeId || l.status === 'perdu') return false
     const ls = new Date(l.appointment_at).getTime()
-    const le = ls + durationH(l) * 3600000
+    const le = ls + (durationH(l) * 60 + buffer) * 60000
     return ls < e && le > s
   })
 }
-
-export const WORK_START = 8
-export const WORK_END = 19
 
 // Heures de début libres pour une journée (pas de 30 min).
 export function freeStarts(leads, day, minutes = 120, excludeId = null) {
@@ -667,4 +657,73 @@ export function taskGroup(task, now = new Date()) {
   if (diff < 0) return 'late'
   if (diff === 0) return 'today'
   return 'soon'
+}
+
+// ---------- Suivi client, fidélité, tournée ----------
+export function trackUrl(lead) {
+  return lead?.track_token ? `${SITE.url}/suivi/${lead.track_token}` : ''
+}
+
+// Carte fidélité : toutes les N prestations, la suivante est remisée.
+export function loyalty(visits, every = 5) {
+  const n = Math.max(2, Number(every) || 5)
+  const inCycle = visits % n
+  return { visits, every: n, inCycle, left: n - 1 - inCycle, rewardNow: inCycle === n - 1 }
+}
+
+// Numéro de semaine ISO.
+export function isoWeek(d = new Date()) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
+  const day = x.getUTCDay() || 7
+  x.setUTCDate(x.getUTCDate() + 4 - day)
+  const y0 = new Date(Date.UTC(x.getUTCFullYear(), 0, 1))
+  return Math.ceil(((x - y0) / 86400000 + 1) / 7)
+}
+
+// Distance à vol d'oiseau (km).
+export function haversine(a, b) {
+  if (!a || !b || a.lat == null || b.lat == null) return null
+  const R = 6371
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(x))
+}
+
+// Estimation route : distance réelle ≈ 1,3 × vol d'oiseau, 45 km/h de moyenne autour d'Angers.
+export function roadKm(a, b) {
+  const d = haversine(a, b)
+  return d == null ? null : Math.round(d * 1.3 * 10) / 10
+}
+export function driveMinutes(km) {
+  return km == null ? null : Math.max(5, Math.round((km / 45) * 60))
+}
+
+export function addressOf(lead) {
+  return [lead.address, lead.city].filter(Boolean).join(', ')
+}
+
+// Itinéraire Google Maps multi-arrêts (départ = position actuelle).
+export function routeHref(stops) {
+  const list = stops.map(addressOf).filter(Boolean)
+  if (!list.length) return null
+  const params = new URLSearchParams({ api: '1', destination: list[list.length - 1], travelmode: 'driving' })
+  if (list.length > 1) params.set('waypoints', list.slice(0, -1).join('|'))
+  return `https://www.google.com/maps/dir/?${params.toString()}`
+}
+
+export function wazeHref(lead) {
+  const q = addressOf(lead)
+  return q ? `https://waze.com/ul?q=${encodeURIComponent(q)}&navigate=yes` : null
+}
+
+// Prévision de CA : encaissé + RDV encore prévus ce mois-ci.
+export function monthForecast(leads, jobs, now = new Date()) {
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const done = jobs.filter((j) => new Date(j.done_at) >= monthStart && new Date(j.done_at) < monthEnd).reduce((s, j) => s + Number(j.amount || 0), 0)
+  const planned = leads
+    .filter((l) => l.status === 'reserve' && l.appointment_at && new Date(l.appointment_at) >= startOfDay(now) && new Date(l.appointment_at) < monthEnd)
+    .reduce((s, l) => s + Number(l.quoted_price || 0), 0)
+  return { done, planned, total: done + planned }
 }

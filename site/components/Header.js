@@ -9,6 +9,7 @@ import { IconMenu, IconClose, IconPhone, IconInstagram, IconTiktok, IconFacebook
 import { CONTACT, SOCIALS, telLink } from '@/lib/constants'
 
 const NAV_LINKS = [
+  { href: '/reserver', label: 'Réserver en ligne' },
   { href: '/prestations', label: 'Prestations' },
   { href: '/galerie', label: 'Galerie' },
   { href: '/evenements', label: 'Événements' },
