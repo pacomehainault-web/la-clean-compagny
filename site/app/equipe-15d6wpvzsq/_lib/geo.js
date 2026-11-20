@@ -109,21 +109,16 @@ function geoCache() {
   }
 }
 
-let lastCall = 0
 export async function geocode(address) {
   const q = (address || '').trim()
   if (q.length < 3) return null
   const cache = geoCache()
   if (cache[q]) return cache[q]
-  // Nominatim : une requête par seconde maximum.
-  const wait = Math.max(0, lastCall + 1100 - Date.now())
-  if (wait) await new Promise((r) => setTimeout(r, wait))
-  lastCall = Date.now()
-  const params = new URLSearchParams({ format: 'json', limit: '1', countrycodes: 'fr', q: /angers|49\d{3}|france/i.test(q) ? q : `${q}, Maine-et-Loire` })
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { 'Accept-Language': 'fr' } })
-  if (!res.ok) return null
-  const j = await res.json()
-  const hit = j[0] ? { lat: Number(j[0].lat), lng: Number(j[0].lon) } : null
+  // Base Adresse Nationale (IGN) : précise pour les adresses françaises.
+  const { searchAddresses } = await import('@/components/AddressAutocomplete')
+  const res = await searchAddresses(q).catch(() => [])
+  const first = res.find((r) => r.lat != null)
+  const hit = first ? { lat: first.lat, lng: first.lng } : null
   if (hit) {
     cache[q] = hit
     try {

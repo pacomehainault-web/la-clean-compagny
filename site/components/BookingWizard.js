@@ -6,6 +6,7 @@ import styles from './BookingWizard.module.css'
 import { CATALOG, QUICK_SIZES, priceFor } from '@/lib/catalog'
 import { fetchBusy, bookSlot, freeSlots, BOOKING_ERRORS, storedReferral, rememberReferral } from '@/lib/booking'
 import { CONTACT } from '@/lib/constants'
+import AddressAutocomplete from './AddressAutocomplete'
 
 const GROUPS = [
   { label: 'Intérieur', test: (c) => /intérieur/i.test(c.label) },
@@ -241,7 +242,14 @@ export default function BookingWizard() {
                 </label>
                 <label className={styles.full}>
                   Adresse où se trouve le véhicule
-                  <input required value={form.address} onChange={(e) => set('address', e.target.value)} autoComplete="street-address" placeholder="N°, rue" maxLength={300} />
+                  <AddressAutocomplete
+                    required
+                    value={form.address}
+                    onChange={(v) => set('address', v)}
+                    onSelect={(it) => setForm((f) => ({ ...f, address: it.address || it.label, city: it.city || f.city }))}
+                    autoComplete="street-address"
+                    placeholder="Tapez votre adresse puis choisissez-la"
+                  />
                 </label>
                 <label>
                   Ville
