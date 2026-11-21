@@ -125,7 +125,7 @@ export const ARTICLES = [
       { type: 'h2', text: 'Nos deux formules principales' },
       { type: 'p', text: "Le **Coup de Propre** (dès 109 €) est notre formule d'entretien régulier : aspiration complète, dépoussiérage, nettoyage des vitres et tapis, désodorisation. La **Sortie de Concession** (dès 179 €) y ajoute le nettoyage en profondeur des plastiques, le shampouinage des tapis, et inclut le lavage extérieur complet, offert. Tout le détail est sur notre page [nettoyage intérieur voiture à Angers](/prestations/nettoyage-interieur-voiture)." },
       { type: 'h2', text: 'Un tarif confirmé avant intervention' },
-      { type: 'p', text: "Nos formules sont affichées « à partir de » car le tarif final dépend du gabarit et de l'état de votre véhicule. Pour toute prestation complémentaire (polissage, céramique, décontamination), un devis est systématiquement établi avant intervention — sans mauvaise surprise le jour J. Demandez le vôtre en ligne, pour un nettoyage à [Angers et dans un rayon de 30 km](/)." },
+      { type: 'p', text: "Nos formules sont affichées « à partir de » car le tarif final dépend du gabarit et de l'état de votre véhicule. Pour toute prestation complémentaire (polissage, céramique, décontamination), un devis est systématiquement établi avant intervention — sans mauvaise surprise le jour J. Demandez le vôtre en ligne : tout le détail de notre [nettoyage de voiture à domicile à Angers](/) (formules, conditions, zone de 30 km) est sur notre page d'accueil." },
     ],
   },
   {

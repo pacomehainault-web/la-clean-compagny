@@ -114,7 +114,13 @@ export default async function VillePage({ params }) {
                 <span>
                   Intervention directement à votre domicile ou sur votre lieu de travail à{' '}
                   {city.name}, sans surcoût de déplacement dans notre zone habituelle
-                  {city.distanceKm ? ` (${city.distanceKm} km d'Angers)` : ''}.
+                  {city.distanceKm ? (
+                    <>
+                      {' '}
+                      ({city.distanceKm} km de chez nous : voir aussi notre <Link href="/">nettoyage de voiture à domicile à Angers</Link>)
+                    </>
+                  ) : ''}
+                  .
                 </span>
               </div>
               {local?.sectors?.length > 0 && (

@@ -120,7 +120,7 @@ export default function SubscriptionSection() {
                     <tr key={tier.id}>
                       <th scope="row">{tier.label}</th>
                       {PASSES.map((pass) => (
-                        <td key={pass.id}>{pass.prices[tier.id]} €</td>
+                        <td key={pass.id}>dès {pass.prices[tier.id]} €</td>
                       ))}
                     </tr>
                   ))}
@@ -178,6 +178,7 @@ export default function SubscriptionSection() {
                 <strong>Sur devis</strong>
               ) : (
                 <>
+                  <span>dès </span>
                   <strong>{mobilePrice} €</strong>
                   <span> / an</span>
                 </>
