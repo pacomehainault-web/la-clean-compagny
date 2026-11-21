@@ -51,9 +51,9 @@ const ANGERS = getCity(HOME_CITY_SLUG)
 const RATING = AGGREGATE_RATING.ratingValue.toFixed(1).replace('.', ',')
 
 const MAIN_SERVICES = [
-  { slug: 'nettoyage-interieur-voiture', title: 'Nettoyage intérieur', text: 'Aspiration, plastiques, vitres, tapis, odeurs', img: '/images/interieur/bmw-x7-nettoyage-interieur-angers.jpg', alt: 'Habitacle de BMW X7 nettoyé à domicile à Angers' },
-  { slug: 'lavage-exterieur-domicile', title: 'Lavage extérieur', text: 'Lavage manuel, jantes, séchage, devant chez vous', img: '/images/exterieur/bmw-m3-lavage-exterieur-angers.jpg', alt: 'BMW M3 lavée à domicile à Angers' },
-  { slug: 'lustrage-polissage', title: 'Lustrage et polissage', text: 'Brillance retrouvée, micro-rayures effacées', img: '/images/lustrage/x1-lustrage-minute-apres.jpg', alt: 'Carrosserie de BMW X1 après un lustrage' },
+  { slug: 'nettoyage-interieur-voiture', title: 'Nettoyage intérieur', text: 'Aspiration, plastiques, vitres, tapis, odeurs', img: '/images/interieur/aston-martin-vantage-s-nettoyage-interieur-angers.jpg', alt: 'Habitacle cuir d’Aston Martin Vantage S après un nettoyage intérieur à Angers' },
+  { slug: 'lavage-exterieur-domicile', title: 'Lavage extérieur', text: 'Lavage manuel, jantes, séchage, devant chez vous', img: '/images/exterieur/ferrari-lavage-mousse-angers.jpg', alt: 'Ferrari couverte de mousse pendant un lavage extérieur La Clean Compagny à Angers' },
+  { slug: 'lustrage-polissage', title: 'Lustrage et polissage', text: 'Brillance retrouvée, micro-rayures effacées', img: '/images/exterieur/porsche-911-gt3-polissage-showroom-angers.jpg', alt: 'Porsche 911 GT3 rouge brillante après un polissage à Angers' },
   { slug: 'renovation-optiques', title: 'Rénovation des phares', text: 'Phares jaunis rendus transparents', img: '/images/lustrage/lustrage-reflet-phare.jpg', alt: 'Reflet sur un phare rénové' },
 ].map((s) => ({ ...s, priceLine: SERVICE_PAGES.find((p) => p.slug === s.slug)?.priceLine }))
 
@@ -300,8 +300,8 @@ export default function HomePage() {
         <div className={`container ${styles.about}`}>
           <div className={styles.aboutImg}>
             <Image
-              src="/images/equipe/enzo-soldet-gerant-la-clean-compagny.jpg"
-              alt={`${SITE.gerant}, fondateur de La Clean Compagny`}
+              src="/images/equipe/enzo-nettoyage-tapis-la-clean-compagny.jpg"
+              alt={`${SITE.gerant}, fondateur de La Clean Compagny, en train de nettoyer un tapis de voiture`}
               fill
               sizes="(max-width: 900px) 100vw, 440px"
             />
@@ -446,8 +446,8 @@ export default function HomePage() {
             <article className={`${styles.pointCard} ${styles.pointWide}`}>
               <h3>Tarif</h3>
               <p>
-                Prix de départ selon le gabarit, déplacement compris. Le prix final est confirmé au devis selon l&apos;état du
-                véhicule. Les véhicules de prestige et de collection sont sur devis.
+                Prix « à partir de » selon le gabarit, déplacement compris. Le prix final est confirmé au devis selon
+                l&apos;état du véhicule. Les véhicules de prestige et de collection sont sur devis.
               </p>
               <div className={styles.priceWrap}>
                 <table className={styles.priceTable}>
@@ -469,7 +469,7 @@ export default function HomePage() {
                           {r.note && <span className={styles.priceNote}>{r.note}</span>}
                         </th>
                         {PRICED_TIER_IDS.map((t) => (
-                          <td key={t}>{r.prices[t]} €</td>
+                          <td key={t}>dès {r.prices[t]} €</td>
                         ))}
                       </tr>
                     ))}

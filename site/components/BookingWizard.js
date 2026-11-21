@@ -149,7 +149,7 @@ export default function BookingWizard() {
                       >
                         <strong>{c.short}</strong>
                         <span>
-                          {c.prices && size ? euros(p) : `dès ${euros(c.from || Math.min(...Object.values(c.prices || { a: 0 })))}`} ·{' '}
+                          dès {c.prices && size ? euros(p) : euros(c.from || Math.min(...Object.values(c.prices || { a: 0 })))} ·{' '}
                           {c.minutes >= 60 ? `${Math.floor(c.minutes / 60)} h${c.minutes % 60 ? pad(c.minutes % 60) : ''}` : `${c.minutes} min`}
                         </span>
                       </button>
@@ -289,11 +289,11 @@ export default function BookingWizard() {
             <dd>{slot ? `${slot.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à ${hhmm(slot)}` : '—'}</dd>
           </div>
           <div>
-            <dt>Prix</dt>
+            <dt>À partir de</dt>
             <dd>{price ? euros(price) : item ? (needsSize ? 'selon le véhicule' : 'sur place') : '—'}</dd>
           </div>
         </dl>
-        <p className={styles.sumNote}>Déplacement compris · paiement après la prestation · annulation gratuite en nous prévenant.</p>
+        <p className={styles.sumNote}>Prix de départ, confirmé selon l&apos;état du véhicule · déplacement compris · paiement après la prestation · annulation gratuite en nous prévenant.</p>
         {error && (
           <p className={styles.error} role="alert">
             {error}

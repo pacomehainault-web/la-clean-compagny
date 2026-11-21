@@ -345,7 +345,7 @@ export default function Tracking({ token }) {
             {t.quoted_price ? (
               <div>
                 <dt>Prix</dt>
-                <dd>{euros0(t.quoted_price)} · déplacement compris</dd>
+                <dd>À partir de {euros0(t.quoted_price)} · déplacement compris</dd>
               </div>
             ) : null}
           </dl>
