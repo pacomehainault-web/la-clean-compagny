@@ -36,7 +36,7 @@ export default function FormulaCard({ formula }) {
       </ul>
 
       <div className={styles.actions}>
-        <Link href={`/devis?formule=${formula.id}`} className="btn btn-cta btn-sm">
+        <Link href={`/reserver?prestation=${encodeURIComponent(formula.name)}`} className="btn btn-cta btn-sm">
           Réserver cette formule
         </Link>
         <Link href="/prestations" className="btn btn-ghost btn-sm">

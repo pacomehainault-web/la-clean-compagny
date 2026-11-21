@@ -38,7 +38,7 @@ export default function FAQPage() {
                 Nous écrire
               </a>
             </div>
-            <Link href="/devis" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 24, color: 'var(--color-text-muted)' }}>
+            <Link href="/reserver" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 24, color: 'var(--color-text-muted)' }}>
               Ou passez directement au devis
               <IconArrowRight size={14} />
             </Link>

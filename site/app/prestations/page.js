@@ -208,7 +208,7 @@ export default function PrestationsPage() {
               </div>
               <p className={styles.prestigeNote}>{PRESTIGE_SECTION.note}</p>
               <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-                <Link href="/devis" className="btn btn-cta">
+                <Link href="/reserver" className="btn btn-cta">
                   Demander mon devis Prestige
                   <IconArrowRight size={18} />
                 </Link>
@@ -231,7 +231,7 @@ export default function PrestationsPage() {
               immédiate.
             </p>
             <div className={styles.ctaActions}>
-              <Link href="/devis" className="btn btn-cta">
+              <Link href="/reserver" className="btn btn-cta">
                 Voir les tarifs et réserver
                 <IconArrowRight size={18} />
               </Link>
