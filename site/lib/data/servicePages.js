@@ -26,6 +26,16 @@ export const SERVICE_PAGES = [
       { type: 'p', text: "Une odeur tenace (tabac, humidité, animal) ne part pas toujours avec un simple nettoyage : dans ce cas, nous recommandons d'associer notre [désinfection à l'ozone](/prestations/desinfection-ozone), qui traite la source de l'odeur plutôt que de la masquer." },
       { type: 'h2', text: 'Comment se déroule l’intervention ?' },
       { type: 'p', text: "Vous décrivez votre véhicule et son état lors du devis, nous convenons d'un créneau, puis nous intervenons directement chez vous ou sur votre lieu de travail à Angers et dans un rayon de 30 km — il suffit d'un accès à l'eau et à l'électricité. Comptez entre 2h et 6h selon la formule choisie." },
+      { type: 'h2', text: 'Quel nettoyage intérieur pour votre situation ?' },
+      { type: 'ul', items: [
+        "**Voiture familiale** (miettes, sièges enfants, taches de boisson) : la Sortie de Concession, avec le shampouinage des tapis et le passage dans les rails de sièges, est la plus adaptée. Nos conseils pour [enlever une tache sur un siège en tissu](/conseils/enlever-tache-siege-tissu-voiture).",
+        "**Chien dans la voiture** : les poils s'incrustent dans les moquettes et le coffre ; on les retire avant le nettoyage des textiles. Voir aussi [comment enlever les poils de chien](/conseils/enlever-poils-chien-voiture).",
+        "**Odeur de tabac, d'humidité ou d'animal** : le nettoyage seul ne suffit pas toujours ; associez la [désinfection à l'ozone](/prestations/desinfection-ozone), qui traite la source de l'odeur. Plus d'explications dans [enlever une mauvaise odeur de voiture](/conseils/enlever-mauvaise-odeur-voiture).",
+        "**Revente ou fin de LOA / LLD** : un habitacle impeccable évite les frais de remise en état et rassure l'acheteur. Notre article sur la [restitution d'une voiture en LOA ou LLD](/conseils/nettoyage-voiture-restitution-loa-lld) détaille ce qui est contrôlé.",
+        "**Entretien régulier** : un Coup de Propre tous les deux à trois mois garde l'intérieur sain sans gros travail à chaque fois.",
+      ] },
+      { type: 'h2', text: 'Partout à Angers, sans frais de déplacement' },
+      { type: 'p', text: "Nous nettoyons l'intérieur des voitures dans tous les quartiers d'Angers : centre-ville, La Doutre, Monplaisir, Belle-Beille, Lac de Maine, Saint-Serge, Justices, Roseraie et Deux-Croix-Banchais, devant chez vous, dans un parking de résidence ou sur le parking de votre entreprise. Nous intervenons aussi dans les communes voisines, à Trélazé, Avrillé, Saint-Barthélemy-d'Anjou, Les Ponts-de-Cé ou Beaucouzé : voir notre [zone d'intervention](/zone-intervention)." },
     ],
     faq: [
       {
@@ -35,6 +45,14 @@ export const SERVICE_PAGES = [
       {
         question: 'Combien de temps dure un nettoyage intérieur complet ?',
         answer: "Comptez 2h à 3h pour un Coup de Propre, et 4h à 6h pour une Sortie de Concession, qui inclut un travail plus minutieux (dressing UV, shampouinage des tapis, recoins difficiles d'accès).",
+      },
+      {
+        question: 'Faut-il vider la voiture avant le nettoyage intérieur ?',
+        answer: "Idéalement oui : retirez vos effets personnels (papiers, sièges enfants si possible, objets dans les vide-poches et le coffre). Cela nous permet de traiter toutes les surfaces et vous évite de chercher vos affaires ensuite.",
+      },
+      {
+        question: 'Est-ce que les sièges sont secs à la fin ?',
+        answer: "Après un nettoyage textile ou un shampouinage, les sièges et les tapis restent légèrement humides quelques heures selon la météo. Laissez les vitres entrouvertes si possible : la voiture peut être utilisée normalement en attendant.",
       },
       {
         question: 'Travaillez-vous sur les selleries cuir ?',
@@ -353,6 +371,16 @@ export const SERVICE_PAGES = [
       { type: 'h2', text: 'Un devis adapté à chaque textile' },
       { type: 'p', text: "La taille du canapé, du fauteuil, du matelas ou du tapis, le type de tissu et l'ampleur des taches à traiter font varier le temps d'intervention et donc le tarif : cette prestation est systématiquement établie sur devis, sans mauvaise surprise le jour de l'intervention." },
       { type: 'p', text: "Comme pour nos prestations automobiles, nous nous déplaçons directement chez vous, à Angers et dans un rayon de 30 km." },
+      { type: 'h2', text: 'Ce que nous nettoyons' },
+      { type: 'ul', items: [
+        "**Canapé en tissu ou en microfibre** : assise, dossier, accoudoirs et coussins, avec un traitement ciblé des taches avant le shampouinage complet.",
+        "**Fauteuils et chaises rembourrées** : même méthode, idéal avant une réception ou après un déménagement.",
+        "**Matelas** : nettoyage de surface en profondeur et traitement des taches et des odeurs, pour un couchage plus sain.",
+        "**Tapis** : les fibres sont nettoyées sur place, sans avoir à déplacer le tapis jusqu'à un pressing.",
+      ] },
+      { type: 'h2', text: 'Comment se passe le nettoyage d’un canapé à domicile ?' },
+      { type: 'p', text: "Vous nous envoyez une ou deux photos du canapé, du fauteuil ou du tapis avec les taches à traiter : nous vous donnons un devis précis. Le jour J, nous testons d'abord le produit sur une zone discrète, traitons les taches une à une, puis nettoyons tout le textile en profondeur. Le canapé reste légèrement humide quelques heures ; aérer la pièce accélère le séchage." },
+      { type: 'p', text: "Vous pouvez aussi grouper avec le nettoyage intérieur de votre voiture le même jour : un seul déplacement pour la maison et la voiture. Voir notre [nettoyage intérieur de voiture à Angers](/prestations/nettoyage-interieur-voiture)." },
     ],
     faq: [
       {
@@ -362,6 +390,14 @@ export const SERVICE_PAGES = [
       {
         question: 'Pouvez-vous enlever une tache ancienne, déjà sèche ?',
         answer: "Dans la majorité des cas, oui : notre méthode d'extraction en profondeur permet de traiter des taches incrustées depuis un moment. Le résultat dépend toutefois de la nature de la tache et du textile — nous restons honnêtes sur ce point lors du devis.",
+      },
+      {
+        question: 'Combien de temps le canapé met-il à sécher ?',
+        answer: "En général quelques heures, selon le tissu, l'épaisseur de l'assise et l'aération de la pièce. Ouvrir une fenêtre ou mettre le chauffage accélère le séchage. Vous pouvez vous asseoir dessus une fois le tissu sec au toucher.",
+      },
+      {
+        question: 'Intervenez-vous en dehors d’Angers pour un canapé ?',
+        answer: "Oui, dans un rayon de 30 km autour d'Angers, comme pour les voitures : Trélazé, Avrillé, Saint-Barthélemy-d'Anjou, Les Ponts-de-Cé, Beaucouzé et les communes voisines.",
       },
       {
         question: 'Combien coûte le nettoyage d’un canapé, d’un fauteuil, d’un matelas ou d’un tapis ?',

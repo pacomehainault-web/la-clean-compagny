@@ -40,7 +40,7 @@ const FROM_PRICE = FORMULAS_PRICING[0].prices.citadine
 // tirés de AGGREGATE_RATING pour rester exacts). Le nom de marque est affiché par Google à part.
 export const metadata = buildMetadata({
   title: `Nettoyage voiture Angers à domicile | ${AGGREGATE_RATING.ratingValue.toFixed(1).replace('.', ',')}★ · ${AGGREGATE_RATING.reviewCount} avis Google`,
-  description: `Nettoyage voiture à domicile à Angers dès ${FROM_PRICE} € : intérieur, extérieur, lustrage, céramique. 30 km autour d'Angers, avis 5.0 ★ Google, rappel sous 24h.`,
+  description: `Nettoyage voiture et lavage auto à domicile à Angers dès ${FROM_PRICE} € : intérieur, extérieur, detailing, lustrage. Jusqu'à 30 km, avis 5,0 ★ Google, réponse sous 24h.`,
   path: '/',
 })
 
@@ -247,6 +247,43 @@ export default function HomePage() {
             <Link href="/prestations" className={styles.chipLink}>
               Tous les tarifs
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 3 bis. Les mots que les gens tapent : nettoyage auto, lavage, detailing */}
+      <section className="section section-alt">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <span className="eyebrow">Nettoyage, lavage ou detailing ?</span>
+            <h2>Nettoyage auto à Angers : quelle prestation choisir ?</h2>
+          </div>
+          <div className={styles.words}>
+            <div>
+              <h3>Nettoyage auto intérieur</h3>
+              <p>
+                L&apos;habitacle de A à Z : aspiration, plastiques, vitres, tapis, odeurs. C&apos;est le{' '}
+                <Link href="/prestations/nettoyage-interieur-voiture">nettoyage intérieur de voiture</Link>, dès {FROM_PRICE} € avec le
+                Coup de Propre.
+              </p>
+            </div>
+            <div>
+              <h3>Lavage auto à domicile</h3>
+              <p>
+                La carrosserie lavée à la main devant chez vous, jantes et séchage compris, sans rouleaux de station :
+                notre <Link href="/prestations/lavage-exterieur-domicile">lavage extérieur à domicile</Link>, dès{' '}
+                {EXTERIOR_PRICING[0].prices.citadine} €.
+              </p>
+            </div>
+            <div>
+              <h3>Detailing automobile</h3>
+              <p>
+                Pour aller plus loin que la propreté : remise en état complète de l&apos;intérieur avec la Sortie de Concession,{' '}
+                <Link href="/prestations/lustrage-polissage">lustrage et polissage</Link> de la carrosserie,{' '}
+                <Link href="/prestations/traitement-ceramique">traitement céramique</Link> et{' '}
+                <Link href="/prestations/renovation-optiques">rénovation des phares</Link>.
+              </p>
+            </div>
           </div>
         </div>
       </section>

@@ -124,6 +124,17 @@ const nextConfig = {
       toWww('lacleancompagny.fr'),
       toWww('www.lacleancompagny.fr'),
       toWww('lacleancompagny.com'),
+      // Adresse Vercel de production : sinon Google voit un doublon complet du site.
+      // (Les aperçus de branches « la-clean-compagny-git-… » ne sont pas concernés.)
+      // L'espace équipe, l'API, le suivi client et le service worker restent servis tels quels
+      // (une appli installée depuis cette adresse continue de fonctionner).
+      { source: '/', has: [{ type: 'host', value: 'la-clean-compagny.vercel.app' }], destination: 'https://www.lacleancompagny.com/', permanent: true },
+      {
+        source: '/:path((?!equipe-15d6wpvzsq|api|suivi|p/|_next).*)',
+        has: [{ type: 'host', value: 'la-clean-compagny.vercel.app' }],
+        destination: 'https://www.lacleancompagny.com/:path',
+        permanent: true,
+      },
       { source: '/zone-intervention/angers', destination: '/', permanent: true },
       ...groupedCommunes,
     ]
