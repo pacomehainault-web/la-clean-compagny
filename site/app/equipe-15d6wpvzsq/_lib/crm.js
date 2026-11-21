@@ -759,12 +759,51 @@ export function referralInfo(lead, leads, jobs, goal = 10) {
   return { code, kids, done, waiting, earned, used, available, toNext: goal - inCycle, inCycle, shown }
 }
 
-// Demande d'avis accompagnée de la photo « après » de la voiture.
-export function reviewText(lead, withPhoto) {
+// Demande d'avis (ou relance) accompagnée de la photo « après » de la voiture.
+// linkFirst : la page du client passe en premier, pour que WhatsApp affiche sa photo « après »
+// en aperçu du lien quand la photo elle-même ne peut pas être jointe.
+export function reviewText(lead, withPhoto, { relance = false, linkFirst = false } = {}) {
   const prenom = lead.first_name || ''
   const suivi = trackUrl(lead)
+  const sign = '\nEnzo – La Clean Compagny'
+  const avis = CONTACT.googleReviewUrl
+  if (linkFirst && suivi) {
+    const head = relance
+      ? `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄`
+      : `Bonjour ${prenom}, merci pour votre confiance !`
+    return `${head}\n\n📸 Votre voiture une fois terminée (photos avant/après${relance ? '' : ' et facture'}) : ${suivi}\n\nSi le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${avis}\nVous pouvez y ajouter la photo ✨${sign}`
+  }
   const photo = withPhoto
     ? `\n\n📸 Voici votre voiture une fois terminée ! Si vous pouvez, ajoutez cette photo à votre avis : enregistrez-la, puis touchez « Ajouter des photos » en écrivant l'avis.`
     : ''
-  return `Bonjour ${prenom}, merci pour votre confiance !${photo}\n\nSi le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewUrl}${suivi ? `\n\nVos photos avant/après et votre facture : ${suivi}` : ''}\nEnzo – La Clean Compagny`
+  if (relance) {
+    return `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄${photo}\n\nSi vous avez 30 secondes pour l'avis, voici le lien : ${avis}\nMerci beaucoup !${sign}`
+  }
+  return `Bonjour ${prenom}, merci pour votre confiance !${photo}\n\nSi le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${avis}${suivi ? `\n\nVos photos avant/après et votre facture : ${suivi}` : ''}${sign}`
+}
+
+// ---------- Messages « intervention » (carte Intervention de l'accueil) ----------
+
+const SIGN = '\nEnzo – La Clean Compagny'
+
+// « J'arrive dans X min » : heure d'arrivée + lien de suivi en direct.
+export function onMyWayText(lead, etaIso) {
+  const suivi = trackUrl(lead)
+  const mins = Math.max(1, Math.round((new Date(etaIso) - Date.now()) / 60000))
+  return `Bonjour ${lead.first_name || ''}, je suis en route 🚗 J'arrive dans ${mins} min environ (vers ${formatTime(etaIso)}).${suivi ? `\nSuivi en direct : ${suivi}` : ''}${SIGN}`
+}
+
+// Petit retard : nouvelle heure d'arrivée.
+export function lateText(lead, etaIso) {
+  return `Bonjour ${lead.first_name || ''}, petit retard de mon côté, désolé ! J'arrive vers ${formatTime(etaIso)}.${SIGN}`
+}
+
+// Devant chez le client.
+export function arrivedText(lead) {
+  return `Bonjour ${lead.first_name || ''}, je suis devant chez vous 👋 Vous pouvez me laisser accéder au véhicule ?${SIGN}`
+}
+
+// Bientôt fini.
+export function almostDoneText(lead, endIso) {
+  return `Bonjour ${lead.first_name || ''}, j'ai bientôt terminé${endIso ? ` (vers ${formatTime(endIso)})` : ''} ✨ Je vous préviens dès que c'est prêt.${SIGN}`
 }

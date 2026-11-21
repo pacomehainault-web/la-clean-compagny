@@ -16,11 +16,15 @@ export function lastAfterPhoto(photos, leadId) {
   )
 }
 
-// Demande d'avis : la photo « après » part avec le message (WhatsApp, Messages…) via le menu
-// de partage du téléphone. La photo est préparée à l'avance, pour que le partage s'ouvre au toucher.
-export default function ReviewSend({ lead, photo, onSent, compact = false }) {
+// Demande d'avis (ou relance) avec la photo « après ».
+// - Sur téléphone : la vraie photo part avec le message, via le menu de partage (WhatsApp, Messages…).
+//   Un lien wa.me ne peut PAS joindre de photo : c'est pour ça que le bouton WhatsApp simple n'en mettait pas.
+// - En secours (texte seul) : le lien de la page client est placé en premier, WhatsApp affiche alors
+//   la photo « après » en aperçu (image de partage de la page /suivi).
+export default function ReviewSend({ lead, photo, onSent, compact = false, relance = false }) {
   const [prepared, setPrepared] = useState({ url: '', file: null, can: false })
   const [note, setNote] = useState('')
+  const [shared, setShared] = useState(false)
   const url = photo ? photoUrl(photo.path) : ''
   const file = prepared.url === url ? prepared.file : null
   const canShare = prepared.url === url && prepared.can
@@ -28,7 +32,7 @@ export default function ReviewSend({ lead, photo, onSent, compact = false }) {
   useEffect(() => {
     let alive = true
     if (!url || typeof navigator === 'undefined' || !navigator.canShare) return
-    fetch(url)
+    fetch(url, { mode: 'cors' })
       .then((r) => (r.ok ? r.blob() : Promise.reject(new Error('photo'))))
       .then((blob) => {
         if (!alive) return
@@ -42,55 +46,56 @@ export default function ReviewSend({ lead, photo, onSent, compact = false }) {
     }
   }, [url, lead.first_name])
 
-  const text = reviewText(lead, !!photo)
-  // Sans partage de fichier (ordinateur) : le lien de la photo est ajouté au message.
-  const textWithLink = photo ? `${text}\n\nLa photo : ${url}` : text
+  const text = reviewText(lead, !!photo, { relance })
+  // Texte seul : lien de la page client en premier → aperçu WhatsApp = photo « après ».
+  const textOnly = reviewText(lead, !!photo, { relance, linkFirst: !!photo })
 
   async function shareWithPhoto() {
-    // Copie de secours : si l'appli n'affiche pas le texte, il suffit de le coller.
+    // Copie de secours : si l'appli n'affiche pas le texte sous la photo, il suffit de le coller.
     navigator.clipboard?.writeText(text).catch(() => {})
     try {
       await navigator.share({ files: [file], text })
+      setShared(true)
       onSent?.('partage')
-      setNote('Si le message n’apparaît pas sous la photo, collez-le : il est copié.')
+      setNote('Photo envoyée. Si le texte n’est pas parti avec, collez-le (il est copié) ou utilisez « Envoyer le texte ».')
     } catch (e) {
-      if (e?.name !== 'AbortError') setNote('Partage impossible : utilisez WhatsApp ou SMS ci-dessous.')
+      if (e?.name !== 'AbortError') setNote('Partage impossible : utilisez WhatsApp ci-dessous (la photo s’affiche en aperçu du lien).')
     }
   }
 
   return (
-    <div>
+    <div className={v2.reviewSend}>
       {photo && (
         <div className={v2.reviewPhoto}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={url} alt="Photo après" />
-          <span>{canShare ? 'La photo « après » part avec le message.' : 'Le lien de la photo « après » est ajouté au message.'}</span>
+          <span>{canShare ? 'La photo « après » part avec le message.' : 'La photo « après » s’affiche en aperçu du lien dans WhatsApp.'}</span>
         </div>
       )}
       {canShare && file ? (
         <>
           <button type="button" className={`${styles.actWa} ${styles.btnBlock}`} onClick={shareWithPhoto}>
-            <Icon name="camera" size={18} /> Envoyer avec la photo
+            <Icon name="camera" size={18} /> {shared ? 'Renvoyer avec la photo' : 'Envoyer avec la photo'}
           </button>
-          <p className={styles.hint}>Choisissez WhatsApp ou Messages, puis {lead.first_name || 'le client'}.</p>
+          {!shared && <p className={styles.hint}>Choisissez WhatsApp ou Messages, puis {lead.first_name || 'le client'}.</p>}
           {note && <p className={styles.hint}>{note}</p>}
-          {!compact && (
+          {(shared || !compact) && (
             <div className={v2.inlineLinks}>
-              <a className={styles.linkBtn} href={whatsappHref(lead, text)} target="_blank" rel="noopener noreferrer" onClick={() => onSent?.('whatsapp')}>
-                <Icon name="whatsapp" size={15} /> Texte seul (WhatsApp)
+              <a className={styles.linkBtn} href={whatsappHref(lead, textOnly)} target="_blank" rel="noopener noreferrer" onClick={() => onSent?.('whatsapp')}>
+                <Icon name="whatsapp" size={15} /> {shared ? 'Envoyer le texte' : 'Texte seul (WhatsApp)'}
               </a>
-              <a className={styles.linkBtn} href={smsHref(lead, text)} onClick={() => onSent?.('sms')}>
-                <Icon name="sms" size={15} /> Texte seul (SMS)
+              <a className={styles.linkBtn} href={smsHref(lead, textOnly)} onClick={() => onSent?.('sms')}>
+                <Icon name="sms" size={15} /> SMS
               </a>
             </div>
           )}
         </>
       ) : (
         <div className={styles.doneActions}>
-          <a className={styles.actWa} href={whatsappHref(lead, textWithLink)} target="_blank" rel="noopener noreferrer" onClick={() => onSent?.('whatsapp')}>
+          <a className={styles.actWa} href={whatsappHref(lead, textOnly)} target="_blank" rel="noopener noreferrer" onClick={() => onSent?.('whatsapp')}>
             <Icon name="whatsapp" size={18} /> WhatsApp
           </a>
-          <a className={styles.btnSecondary} href={smsHref(lead, textWithLink)} onClick={() => onSent?.('sms')}>
+          <a className={styles.btnSecondary} href={smsHref(lead, textOnly)} onClick={() => onSent?.('sms')}>
             <Icon name="sms" size={18} /> SMS
           </a>
         </div>

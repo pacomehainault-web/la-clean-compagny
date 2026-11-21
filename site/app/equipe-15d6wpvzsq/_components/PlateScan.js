@@ -24,7 +24,7 @@ export default function PlateScan({ partner, file: firstFile, manual: startManua
   const today = toDateInput(new Date().toISOString())
   const [file, setFile] = useState(firstFile || null)
   // Résultat de lecture, rattaché à la photo lue (la lecture est « en cours » tant qu'il ne correspond pas).
-  const [result, setResult] = useState({ file: null, ok: null })
+  const [result, setResult] = useState({ file: null, ok: null, reason: '' })
   const [plate, setPlate] = useState('')
   const [model, setModel] = useState('')
   const [prep, setPrep] = useState('parc')
@@ -41,7 +41,7 @@ export default function PlateScan({ partner, file: firstFile, manual: startManua
   const plateRef = useRef(null)
   const preview = useMemo(() => (file ? URL.createObjectURL(file) : ''), [file])
   const reading = !!file && result.file !== file
-  const readMsg = file && result.file === file ? (result.ok ? 'ok' : 'fail') : ''
+  const readMsg = file && result.file === file ? (result.ok ? 'ok' : result.reason === 'photo' ? 'photo' : 'fail') : ''
 
   useEffect(() => {
     warmUpPlateReader()
@@ -77,13 +77,13 @@ export default function PlateScan({ partner, file: firstFile, manual: startManua
     if (!file) return
     let alive = true
     readPlate(file)
-      .then(({ plate: p }) => {
+      .then(({ plate: p, reason }) => {
         if (!alive) return
-        setResult({ file, ok: !!p })
+        setResult({ file, ok: !!p, reason })
         if (p) changePlate(p)
         else plateRef.current?.focus()
       })
-      .catch(() => alive && setResult({ file, ok: false }))
+      .catch(() => alive && setResult({ file, ok: false, reason: '' }))
     return () => {
       alive = false
     }
@@ -208,6 +208,7 @@ export default function PlateScan({ partner, file: firstFile, manual: startManua
               />
             </label>
             {readMsg === 'ok' && <p className={styles.hint}>Plaque lue automatiquement : vérifiez-la d&apos;un coup d&apos;œil.</p>}
+            {readMsg === 'photo' && <p className={styles.textWarn}>Aucune plaque sur cette photo (trop sombre, floue ou vide). Reprenez-la de près, plaque au centre, ou tapez-la.</p>}
             {readMsg === 'fail' && <p className={styles.textWarn}>Plaque pas lue sur la photo : tapez-la (sur iPhone, « Scanner du texte » au-dessus du clavier marche aussi).</p>}
             {sameDay && <p className={styles.textWarn}>Attention : {sameDay.plate} est déjà enregistrée ce jour-là chez {partner}.</p>}
             {!sameDay && lastSeen && (
@@ -272,7 +273,7 @@ export default function PlateScan({ partner, file: firstFile, manual: startManua
               {file && (
                 <label className={styles.btnSecondary}>
                   <Icon name="camera" size={16} /> Reprendre
-                  <input type="file" accept="image/*" capture="environment" onChange={(e) => e.target.files?.[0] && (dropPreview(), setFile(e.target.files[0]))} hidden />
+                  <input type="file" accept="image/*" capture="environment" onChange={(e) => e.target.files?.[0] && (dropPreview(), setPlate(''), setFile(e.target.files[0]))} hidden />
                 </label>
               )}
               <button type="submit" className={styles.btnPrimary} disabled={busy || !plate}>
