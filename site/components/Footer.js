@@ -30,8 +30,8 @@ export default function Footer() {
               style={{ height: 46, width: 'auto' }}
             />
             <p className={styles.tagline}>
-              {SITE.slogan}. Detailing automobile haut de gamme à Angers et dans un rayon de{' '}
-              {CONTACT.radiusKm} km, pour tous les véhicules.
+              {SITE.slogan}. <Link href="/">Nettoyage voiture à Angers</Link> à domicile et detailing automobile
+              dans un rayon de {CONTACT.radiusKm} km, pour tous les véhicules.
             </p>
             <div className={styles.socials}>
               <a href={SOCIALS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
