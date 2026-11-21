@@ -79,7 +79,7 @@ export default async function ArticlePage({ params }) {
                 Nos équipes interviennent directement chez vous, à{' '}
                 <Link href="/">Angers et dans un rayon de 30 km</Link>.
               </p>
-              <Link href="/devis" className="btn btn-cta" style={{ marginTop: 20 }}>
+              <Link href="/reserver" className="btn btn-cta" style={{ marginTop: 20 }}>
                 Voir les tarifs et réserver
                 <IconArrowRight size={18} />
               </Link>

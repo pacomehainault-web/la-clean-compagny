@@ -15,13 +15,6 @@ const DEFAULT_TIER_ID = 'citadine'
 // de véhicules du configurateur de devis (taxonomie historique, incluant aussi
 // les gabarits professionnels). On fait correspondre chaque palier au type de
 // véhicule le plus proche pour préremplir le devis correctement.
-const TIER_TO_VEHICLE_ID = {
-  citadine: 'citadine',
-  'compacte-berline': 'berline',
-  'suv-break': 'suv',
-  'grand-suv': 'monospace',
-}
-
 // Moto : exclusivité Espace Particulier, insérée juste avant Prestige. Ce
 // sélecteur n'est utilisé que sur la page d'accueil grand public (jamais dans
 // l'espace Pro), donc aucune condition d'affichage supplémentaire n'est requise.
@@ -74,7 +67,7 @@ export default function PricingSelector() {
               <span className={styles.priceValue}>{MOTO_PRICING.fromPrice} €</span>
             </div>
             <p className={styles.tagline}>{MOTO_PRICING.description}</p>
-            <Link href="/devis?vehicule=moto" className="btn btn-cta btn-block">
+            <Link href="/reserver?prestation=Moto&gabarit=moto" className="btn btn-cta btn-block">
               Demander un devis moto
               <IconArrowRight size={16} />
             </Link>
@@ -109,7 +102,7 @@ export default function PricingSelector() {
                 </div>
                 <p className={styles.tagline}>{formula.tagline}</p>
                 <Link
-                  href={`/devis?formule=${formula.id}&vehicule=${TIER_TO_VEHICLE_ID[tierId]}`}
+                  href={`/reserver?prestation=${encodeURIComponent(formula.name)}&gabarit=${tierId}`}
                   className="btn btn-cta btn-block"
                 >
                   Choisir ma formule

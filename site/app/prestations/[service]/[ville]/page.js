@@ -140,7 +140,7 @@ export default async function ServiceCityPage({ params }) {
               ))}
             </ul>
             <div className={styles.formBandCtas}>
-              <Link href="/devis" className="btn btn-cta">
+              <Link href="/reserver" className="btn btn-cta">
                 Réserver en ligne
                 <IconArrowRight size={18} />
               </Link>
@@ -277,7 +277,7 @@ export default async function ServiceCityPage({ params }) {
                 flexWrap: "wrap",
               }}
             >
-              <Link href="/devis" className="btn btn-cta">
+              <Link href="/reserver" className="btn btn-cta">
                 Voir les tarifs et réserver
                 <IconArrowRight size={18} />
               </Link>

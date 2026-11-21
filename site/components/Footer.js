@@ -64,7 +64,7 @@ export default function Footer() {
           <nav className={styles.col} aria-label="Navigation">
             <div className={styles.colTitle}>Le site</div>
             <div className={styles.linkList}>
-              <Link href="/devis">Demander un devis</Link>
+              <Link href="/reserver">Réserver en ligne</Link>
               <Link href="/galerie">Galerie avant / après</Link>
               <Link href="/evenements">Événements</Link>
               <Link href="/notre-histoire">Notre histoire</Link>

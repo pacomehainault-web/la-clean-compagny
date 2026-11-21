@@ -123,7 +123,7 @@ export default function EvenementsPage() {
             </a>
           </div>
           <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <Link href="/devis" className="btn btn-cta">
+            <Link href="/reserver" className="btn btn-cta">
               Voir les tarifs et réserver
               <IconArrowRight size={18} />
             </Link>

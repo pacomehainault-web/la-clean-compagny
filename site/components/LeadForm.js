@@ -131,7 +131,7 @@ export default function LeadForm({ variant = 'hero', source = 'accueil', title, 
       <p className={styles.legal}>
         Vos coordonnées servent uniquement à vous recontacter.{' '}
         <Link href="/politique-de-confidentialite">Confidentialité</Link> · ou{' '}
-        <Link href="/devis">composez votre devis en ligne</Link>
+        <Link href="/reserver">réservez directement en ligne</Link>
       </p>
     </form>
   )
