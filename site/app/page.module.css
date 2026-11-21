@@ -450,46 +450,6 @@
   min-width: min(100%, 300px);
 }
 
-.bookCard {
-  background: var(--color-ink);
-  color: #fff;
-  border-radius: 22px;
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.bookTitle {
-  font-family: var(--font-heading), 'Archivo', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1.5rem;
-  line-height: 1.15;
-  margin: 0;
-}
-
-.bookSteps {
-  margin: 0;
-  padding-left: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  color: var(--color-on-ink-muted);
-  line-height: 1.45;
-}
-
-.bookBtn {
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.bookNote {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--color-on-ink-muted);
-}
-
 /* ---------- Les points à comparer ---------- */
 .sectionLead {
   margin-top: 14px;

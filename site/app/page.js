@@ -560,19 +560,7 @@ export default function HomePage() {
             <p className={styles.phoneNote}>Appel, SMS ou WhatsApp</p>
           </div>
           <div className={styles.finalForm}>
-            <div className={styles.bookCard}>
-              <p className={styles.bookTitle}>Réservez en ligne en 1 minute</p>
-              <ol className={styles.bookSteps}>
-                <li>Choisissez la prestation et la taille de votre véhicule</li>
-                <li>Choisissez le jour et l&apos;heure qui vous arrangent</li>
-                <li>Indiquez votre adresse : on vient chez vous</li>
-              </ol>
-              <Link href="/reserver" className={`btn btn-cta ${styles.bookBtn}`}>
-                Réserver mon créneau
-                <IconArrowRight size={18} />
-              </Link>
-              <p className={styles.bookNote}>Prix de départ affiché avant de valider · paiement après la prestation</p>
-            </div>
+            <LeadForm variant="dark" source="accueil-bas" title="Recevoir mon prix" subtitle="Laissez votre numéro, Enzo vous rappelle sous 24h ouvrées." withVehicle />
           </div>
         </div>
       </section>
