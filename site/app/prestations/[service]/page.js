@@ -109,7 +109,7 @@ export default async function ServiceDetailPage({ params }) {
               ))}
             </ul>
             <div className={styles.formBandCtas}>
-              <Link href="/devis" className="btn btn-cta">
+              <Link href="/reserver" className="btn btn-cta">
                 Réserver en ligne
                 <IconArrowRight size={18} />
               </Link>
@@ -140,7 +140,7 @@ export default async function ServiceDetailPage({ params }) {
                   </div>
                 )}
                 <span className={styles.sidebarPrice}>{service.priceLine}</span>
-                <Link href="/devis" className="btn btn-cta btn-block">
+                <Link href="/reserver" className="btn btn-cta btn-block">
                   Voir les tarifs et réserver
                   <IconArrowRight size={18} />
                 </Link>
@@ -285,7 +285,7 @@ export default async function ServiceDetailPage({ params }) {
             })}
           </div>
           <div style={{ marginTop: 28, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-            <Link href="/devis" className="btn btn-cta">
+            <Link href="/reserver" className="btn btn-cta">
               Voir les tarifs et réserver
               <IconArrowRight size={18} />
             </Link>

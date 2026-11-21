@@ -124,6 +124,9 @@ const nextConfig = {
       toWww('lacleancompagny.fr'),
       toWww('www.lacleancompagny.fr'),
       toWww('lacleancompagny.com'),
+      // Les réservations se font uniquement en ligne : l'ancien devis renvoie vers la réservation
+      // (sauf la demande des professionnels, ?pro=1, qui garde son formulaire).
+      { source: '/devis', missing: [{ type: 'query', key: 'pro' }], destination: '/reserver', permanent: false },
       // Adresse Vercel de production : sinon Google voit un doublon complet du site.
       // (Les aperçus de branches « la-clean-compagny-git-… » ne sont pas concernés.)
       // L'espace équipe, l'API, le suivi client et le service worker restent servis tels quels

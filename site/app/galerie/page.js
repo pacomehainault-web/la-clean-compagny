@@ -101,7 +101,7 @@ export default function GaleriePage() {
           <span className="eyebrow">Envie du même résultat ?</span>
           <h2 style={{ marginTop: 14 }}>Votre véhicule mérite le même soin</h2>
           <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <Link href="/devis" className="btn btn-cta">
+            <Link href="/reserver" className="btn btn-cta">
               Voir les tarifs et réserver
               <IconArrowRight size={18} />
             </Link>

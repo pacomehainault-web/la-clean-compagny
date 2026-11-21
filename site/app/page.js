@@ -152,7 +152,7 @@ const HOME_FAQ = [
 function CtaPair({ dark = false }) {
   return (
     <div className={styles.ctaPair}>
-      <Link href="/devis" className={`btn ${dark ? 'btn-cta' : styles.btnWhite}`}>
+      <Link href="/reserver" className={`btn ${dark ? 'btn-cta' : styles.btnWhite}`}>
         Réserver en ligne
         <IconArrowRight size={18} />
       </Link>
@@ -513,7 +513,7 @@ export default function HomePage() {
             ))}
           </ol>
           <div className={styles.ctaPair}>
-            <Link href="/devis" className="btn btn-cta">
+            <Link href="/reserver" className="btn btn-cta">
               Réserver en ligne
               <IconArrowRight size={18} />
             </Link>

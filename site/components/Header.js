@@ -106,7 +106,7 @@ export default function Header() {
               <IconPhone size={17} />
               {CONTACT.phoneDisplay}
             </a>
-            <Link href="/devis" className={`btn btn-cta btn-sm ${styles.headerCta}`}>
+            <Link href="/reserver" className={`btn btn-cta btn-sm ${styles.headerCta}`}>
               Voir les tarifs et réserver
             </Link>
             <button
@@ -167,7 +167,7 @@ export default function Header() {
             <IconPhone size={18} />
             {CONTACT.phoneDisplay}
           </a>
-          <Link href="/devis" className="btn btn-cta btn-block" onClick={() => setOpen(false)}>
+          <Link href="/reserver" className="btn btn-cta btn-block" onClick={() => setOpen(false)}>
             Voir les tarifs et réserver
           </Link>
           <div className={styles.drawerSocials}>

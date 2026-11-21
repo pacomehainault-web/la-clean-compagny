@@ -27,8 +27,8 @@ export function MobileStickyCTA() {
         <IconPhone size={16} />
         Appeler
       </a>
-      <Link href="/devis" className="btn btn-cta btn-sm">
-        Demander un devis
+      <Link href="/reserver" className="btn btn-cta btn-sm">
+        Réserver
       </Link>
     </div>
   )

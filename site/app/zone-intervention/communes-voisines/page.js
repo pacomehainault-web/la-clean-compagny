@@ -147,7 +147,7 @@ export default function CommunesVoisinesPage() {
           <span className="eyebrow">Prêt à réserver ?</span>
           <h2 style={{ marginTop: 14 }}>Votre devis en quelques minutes</h2>
           <div style={{ marginTop: 28, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <Link href="/devis" className="btn btn-cta">
+            <Link href="/reserver" className="btn btn-cta">
               Voir les tarifs et réserver
               <IconArrowRight size={18} />
             </Link>
