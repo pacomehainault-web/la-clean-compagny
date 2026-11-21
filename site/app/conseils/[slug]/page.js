@@ -6,7 +6,7 @@ import JsonLd from '@/components/JsonLd'
 import { IconArrowRight } from '@/components/Icons'
 import { ARTICLES, getArticle } from '@/lib/data/articles'
 import { buildMetadata } from '@/lib/seo'
-import { articleSchema, breadcrumbSchema } from '@/lib/schema'
+import { articleSchema, breadcrumbSchema, faqPageSchema } from '@/lib/schema'
 import styles from './page.module.css'
 
 export function generateStaticParams() {
@@ -39,6 +39,7 @@ export default async function ArticlePage({ params }) {
   return (
     <>
       <JsonLd data={articleSchema(article)} />
+      {article.quickAnswers?.length > 0 && <JsonLd data={faqPageSchema(article.quickAnswers)} />}
       <JsonLd
         data={breadcrumbSchema([
           { name: 'Accueil', path: '/' },
@@ -69,6 +70,17 @@ export default async function ArticlePage({ params }) {
             </div>
 
             <div className={styles.prose}>
+              {article.quickAnswers?.length > 0 && (
+                <div className={styles.quickAnswers}>
+                  <span className={styles.quickLabel}>La réponse rapide</span>
+                  {article.quickAnswers.map((qa) => (
+                    <div key={qa.question} className={styles.quickItem}>
+                      <h2 className={styles.quickQuestion}>{qa.question}</h2>
+                      <p>{qa.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
               <TableOfContents blocks={article.content} />
               <ContentBlocks blocks={article.content} />
             </div>

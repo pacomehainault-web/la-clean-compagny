@@ -102,6 +102,15 @@ export const ARTICLES = [
     date: '2026-10-09',
     readTime: '6 min',
     metaDescription: `Prix d'un nettoyage de voiture à Angers en ${CURRENT_YEAR} : de 45 € à 179 € selon la prestation. Grille tarifaire complète et facteurs de prix.`,
+    updatedDate: '2026-11-21',
+    // Réponses directes en tête d'article (requêtes longues vues dans Search Console)
+    quickAnswers: [
+      {
+        question: 'Combien coûte une entreprise de nettoyage de voiture à Angers ?',
+        answer:
+          "Comptez dès 45 € pour un lavage extérieur, dès 109 € pour un nettoyage intérieur et dès 179 € pour une remise en état complète, intérieur et extérieur. Le tarif final dépend du gabarit et de l'état du véhicule. La Clean Compagny se déplace à domicile, à Angers et dans un rayon de 30 km.",
+      },
+    ],
     content: [
       { type: 'p', text: `À Angers, le prix d'un nettoyage de voiture varie de 45 € pour un simple lavage extérieur à 179 € pour une remise en état complète, intérieur et extérieur. Le tarif exact dépend du gabarit de votre véhicule, de son état, et des prestations choisies — voici le détail complet, avec nos tarifs ${CURRENT_YEAR}.` },
       { type: 'h2', text: 'La grille tarifaire complète' },
@@ -130,13 +139,22 @@ export const ARTICLES = [
   },
   {
     slug: 'enlever-tache-siege-tissu-voiture',
-    title: 'Comment enlever une tache sur un siège de voiture en tissu ?',
+    title: 'Comment nettoyer et détacher un siège de voiture en tissu ?',
     excerpt:
       "Café renversé, tache de gras, trace suspecte... Les bons gestes pour traiter une tache sur un siège tissu sans l'aggraver, et quand mieux vaut appeler un pro.",
     date: '2026-10-09',
     readTime: '5 min',
     metaDescription:
-      'Comment enlever une tache sur un siège de voiture en tissu ? Méthode étape par étape, astuces maison et quand faire appel à un professionnel, à Angers.',
+      'Comment nettoyer et détacher un siège de voiture en tissu ? Méthode étape par étape, astuces maison et quand faire appel à un professionnel, à Angers.',
+    updatedDate: '2026-11-21',
+    // Réponses directes en tête d'article (requêtes longues vues dans Search Console)
+    quickAnswers: [
+      {
+        question: 'Comment nettoyer les sièges de voiture en tissu ?',
+        answer:
+          "Aspirez à fond, puis tamponnez la tache sans frotter avec un chiffon microfibre et de l'eau tiède légèrement savonneuse. Rincez à l'eau claire, épongez, et laissez sécher vitres ouvertes. Pour une tache ancienne ou incrustée, seule une injection-extraction professionnelle va chercher la saleté au cœur de la mousse.",
+      },
+    ],
     content: [
       { type: 'p', text: "Face à une tache fraîche sur un siège tissu, le réflexe à avoir est toujours le même : agir vite, sans frotter. Plus une tache sèche et s'incruste dans les fibres, plus elle devient difficile à retirer complètement — y compris pour un professionnel." },
       { type: 'h2', text: 'Le bon geste, étape par étape' },
@@ -164,6 +182,15 @@ export const ARTICLES = [
     readTime: '4 min',
     metaDescription:
       'Comment enlever les poils de chien dans une voiture ? Astuces efficaces (gants humides, brosse, aspirateur) et conseils pour un nettoyage en profondeur à Angers.',
+    updatedDate: '2026-11-21',
+    // Réponses directes en tête d'article (requêtes longues vues dans Search Console)
+    quickAnswers: [
+      {
+        question: 'Comment enlever les poils de chien dans une voiture ?',
+        answer:
+          "Passez d'abord un gant en caoutchouc humide ou une brosse à poils pour décrocher les poils pris dans les fibres, toujours dans le même sens. Aspirez ensuite avec un embout brosse. Si les poils sont incrustés dans la moquette ou les sièges depuis longtemps, un nettoyage intérieur professionnel les retire en profondeur.",
+      },
+    ],
     content: [
       { type: 'p', text: "Les poils de chien ont la particularité de s'enrouler autour des fibres textiles, ce qui les rend bien plus difficiles à retirer qu'une simple poussière. Un aspirateur classique ne suffit souvent pas à lui seul : voici une méthode plus efficace." },
       { type: 'h2', text: 'La méthode la plus efficace' },
@@ -191,6 +218,20 @@ export const ARTICLES = [
     readTime: '5 min',
     metaDescription:
       'Comment enlever une mauvaise odeur dans une voiture (tabac, humidité, animal) ? Les bons gestes et la solution qui traite la source : la désinfection à l’ozone.',
+    updatedDate: '2026-11-21',
+    // Réponses directes en tête d'article (requêtes longues vues dans Search Console)
+    quickAnswers: [
+      {
+        question: "Comment enlever l'odeur d'humidité dans une voiture ?",
+        answer:
+          "Trouvez d'abord l'origine (joint de pare-brise, toit ouvrant, tapis détrempé), faites sécher tapis et moquette à fond, puis traitez l'habitacle à l'ozone pour éliminer les moisissures responsables de l'odeur. Tant que la fuite n'est pas réparée, l'odeur revient.",
+      },
+      {
+        question: "Comment enlever l'odeur de cigarette dans une voiture ?",
+        answer:
+          "Videz et lavez le cendrier, nettoyez en profondeur les sièges, la moquette et le ciel de toit, changez le filtre d'habitacle, puis faites une désinfection à l'ozone, qui neutralise les molécules de tabac au lieu de les masquer. Un désodorisant seul ne suffit jamais.",
+      },
+    ],
     content: [
       { type: 'p', text: "Une mauvaise odeur dans l'habitacle a presque toujours une source précise — tissus imprégnés, humidité stagnante, circuit de ventilation — qu'un désodorisant classique ne fait que masquer temporairement. Pour s'en débarrasser durablement, il faut d'abord comprendre d'où elle vient." },
       { type: 'h2', text: 'Identifier la source avant d’agir' },
