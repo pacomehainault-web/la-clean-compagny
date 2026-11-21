@@ -39,3 +39,36 @@
   font-weight: 700;
   margin-bottom: 8px;
 }
+
+/* Bloc « réponse rapide » en tête d'article : réponse directe à la question
+   longue que les gens tapent sur Google (et reprise par les AI Overviews). */
+.quickAnswers {
+  margin: 0 0 32px;
+  padding: 22px 24px;
+  border-left: 4px solid var(--color-brand-blue);
+  border-radius: var(--radius-md);
+  background: var(--color-brand-blue-soft);
+}
+
+.quickLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-blue);
+  margin-bottom: 10px;
+}
+
+.prose .quickQuestion {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.quickItem + .quickItem {
+  margin-top: 18px;
+}
+
+.prose .quickItem p {
+  margin-bottom: 0;
+}
