@@ -222,7 +222,7 @@ export default function HomePage() {
         <div className="container">
           <div className={styles.sectionHead}>
             <span className="eyebrow">Nos prestations</span>
-            <h2>Ce qu&apos;on fait pour votre voiture, à Angers et alentour</h2>
+            <h2>Nettoyage automobile à domicile à Angers et alentour</h2>
           </div>
           <div className={styles.serviceGrid}>
             {MAIN_SERVICES.map((s) => (
