@@ -116,7 +116,7 @@ export default function LeadForm({ variant = 'hero', source = 'accueil', title, 
 
       <label className={styles.consent}>
         <input type="checkbox" name="relance" />
-        <span>J&apos;accepte de recevoir un rappel d&apos;entretien et une demande d&apos;avis après la prestation.</span>
+        <span>J&apos;accepte d&apos;être relancé par SMS si je n&apos;ai pas encore réservé, puis de recevoir une demande d&apos;avis et un rappel d&apos;entretien. Désinscription à tout moment (STOP).</span>
       </label>
 
       {error && (

@@ -25,8 +25,8 @@ export default function CookieConsent() {
   return (
     <div className={styles.wrap} role="dialog" aria-label="Gestion des cookies">
       <p className={styles.text}>
-        Cookies de mesure d&apos;audience : acceptez-les ou refusez-les, le site fonctionne
-        dans tous les cas.{' '}
+        Cookies de mesure d&apos;audience et de nos publicités (Google, Meta) : acceptez-les
+        ou refusez-les, le site fonctionne dans tous les cas.{' '}
         <Link href="/politique-de-confidentialite">En savoir plus</Link>.
       </p>
       <div className={styles.actions}>

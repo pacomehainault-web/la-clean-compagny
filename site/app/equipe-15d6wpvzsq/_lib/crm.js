@@ -4,6 +4,9 @@
 
 import { CONTACT, SITE } from '@/lib/constants'
 import { defaultMinutes, recallDays, WORK_START, WORK_END } from '@/lib/catalog'
+import { leadChannel, channelLabel } from '@/lib/attribution'
+
+export { leadChannel, channelLabel }
 
 // Adresse secrète de l'espace équipe (aussi dans next.config.mjs et les alertes ntfy).
 export const BASE_PATH = '/equipe-15d6wpvzsq'
@@ -92,6 +95,15 @@ export function sourceGroup(source) {
   if (!source) return 'Autre'
   if (source.startsWith('accueil') || source.startsWith('prestation-') || source.startsWith('devis')) return 'Site internet'
   return sourceLabel(source)
+}
+
+// Origine détaillée d'une demande (canal + campagne), pour la fiche client.
+export function originText(lead) {
+  const ch = channelLabel(leadChannel(lead))
+  const last = lead?.attribution?.last
+  if (!last) return ch
+  const bits = [last.campaign && `campagne « ${last.campaign} »`, !last.campaign && last.ref, last.landing && last.landing !== '/' && `arrivé sur ${last.landing}`].filter(Boolean)
+  return bits.length ? `${ch} · ${bits.join(' · ')}` : ch
 }
 
 // ---------- Téléphone & liens ----------
@@ -637,7 +649,9 @@ export const EXPENSE_CATEGORIES = [
   { id: 'produits', label: 'Produits' },
   { id: 'carburant', label: 'Carburant' },
   { id: 'materiel', label: 'Matériel' },
-  { id: 'pub', label: 'Pub / marketing' },
+  { id: 'pub_meta', label: 'Pub Meta (Insta / Facebook)' },
+  { id: 'pub_google', label: 'Pub Google Ads' },
+  { id: 'pub', label: 'Pub / marketing (autre)' },
   { id: 'assurance', label: 'Assurance' },
   { id: 'urssaf', label: 'URSSAF / impôts' },
   { id: 'telephone', label: 'Téléphone / abonnements' },

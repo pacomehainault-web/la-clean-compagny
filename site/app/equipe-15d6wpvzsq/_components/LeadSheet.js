@@ -18,6 +18,7 @@ import {
   formatPhone,
   formatDate,
   sourceLabel,
+  originText,
   toLocalInput,
   fromLocalInput,
   toDateInput,
@@ -53,6 +54,7 @@ const KIND_LABEL = {
   avis: '⭐ Avis',
   prestation: '🧽 Prestation',
   creation: '➕ Création',
+  sms_auto: '🤖 SMS auto',
 }
 
 // Fiche complète d'un prospect / client (panneau latéral).
@@ -1016,6 +1018,8 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
                 <p>
                   {sourceLabel(lead.source)}
                   {lead.consent_relance ? ' · accepte les relances' : ''}
+                  <br />
+                  Origine : {originText(lead)}
                 </p>
                 <em>{formatDate(lead.created_at, { dateStyle: 'short', timeStyle: 'short' })}</em>
               </li>

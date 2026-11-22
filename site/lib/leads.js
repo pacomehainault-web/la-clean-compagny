@@ -1,5 +1,7 @@
 import { LEADS_DB } from './constants'
 import { storedReferral } from './booking'
+import { attributionForLead } from './attribution'
+import { trackLead } from './track'
 
 // Envoi d'un prospect depuis les formulaires du site : enregistré dans la
 // base Supabase (table `leads`), lue par le dashboard. Pas d'email : tout se
@@ -23,6 +25,7 @@ export function normalizeLead(raw) {
     source: clean(raw.source, 120) || 'site',
     consent_relance: Boolean(raw.consentRelance),
     ref_code: clean(raw.refCode ?? storedReferral(), 20),
+    attribution: raw.attribution ?? attributionForLead(),
   }
 }
 
@@ -53,10 +56,8 @@ export async function submitLead(raw) {
     console.error('[Prospect]', err)
     throw new Error("La demande n'a pas pu être envoyée.")
   }
-  // Mesure de conversion (Google Analytics, seulement si l'utilisateur a accepté).
-  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', 'generate_lead', { form_source: lead.source })
-  }
+  // Mesure de conversion (Google Analytics et pixel Meta, seulement si l'utilisateur a accepté).
+  trackLead(lead.source)
 }
 
 // Enregistre seulement le prospect dans la base (sans email) : utilisé par le
