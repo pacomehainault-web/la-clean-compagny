@@ -24,11 +24,13 @@ export default function MentionsLegalesPage() {
               individuelle représentée par <strong>{SITE.gerant}</strong>, gérant.
             </p>
             <ul>
-              <li>SIREN : {SITE.siren}</li>
+              <li>Entreprise individuelle : {SITE.gerant} EI</li>
+              <li>SIRET : {SITE.siret}</li>
+              <li>N° de TVA intracommunautaire : {SITE.vatNumber}</li>
               <li>Zone d&apos;intervention : {CONTACT.city} et {CONTACT.radiusKm} km alentour</li>
               <li>Téléphone : {CONTACT.phoneDisplay}</li>
               <li>Email : {CONTACT.email}</li>
-              <li>{SITE.vatNote}</li>
+              <li>{SITE.vatNote} sur l&apos;ensemble des tarifs affichés</li>
             </ul>
 
             <h2>Directeur de la publication</h2>

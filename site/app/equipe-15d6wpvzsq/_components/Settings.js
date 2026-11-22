@@ -5,16 +5,25 @@ import styles from '../admin.module.css'
 import { Icon } from './Icon'
 import SmsPanel from './SmsPanel'
 import PushPanel from './PushPanel'
+import { CONTACT } from '@/lib/constants'
 
 const FIELDS = [
   ['name', 'Nom commercial'],
   ['owner', 'Gérant'],
+  ['legal_name', 'Raison sociale (ex. Enzo Soldet EI)'],
   ['siret', 'SIRET'],
+  ['vat_number', 'N° de TVA intracommunautaire'],
   ['phone', 'Téléphone'],
   ['email', 'Email'],
   ['website', 'Site'],
-  ['vat_note', 'Mention TVA'],
-  ['payment_terms', 'Conditions de paiement'],
+  ['payment_terms', 'Conditions de règlement (ex. immédiat)'],
+  ['rm', 'Mention bas de page (ex. Enregistré au RM de Maine-et-Loire)'],
+]
+const BANK = [
+  ['account_holder', 'Nom associé au compte'],
+  ['iban', 'IBAN'],
+  ['bic', 'BIC'],
+  ['bank', 'Nom de la banque'],
 ]
 
 const LINKS = [
@@ -22,6 +31,7 @@ const LINKS = [
   ['Fiche Google', 'https://business.google.com'],
   ['Search Console', 'https://search.google.com/search-console?resource_id=sc-domain%3Alacleancompagny.com'],
   ['Lien d’avis Google', 'https://g.page/r/CSFtfbCI8GR-EBM/review'],
+  ['Lien d’avis avec photos (mobile)', CONTACT.googleReviewPhotoUrl],
 ]
 
 // Réglages : infos de l'entreprise (devis/factures), objectif, alertes et automatismes.
@@ -117,8 +127,8 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
             <span className={styles.autoOn}>
               <Icon name="check" size={16} />
               <span>
-                <strong>Relevé Google chaque matin</strong>
-                <em>Stats de la fiche, positions dans Google, nouveaux avis avec réponse proposée.</em>
+                <strong>Relevé Google 5 fois par jour</strong>
+                <em>Stats de la fiche et positions chaque matin ; nouveaux avis relevés toutes les 3 h environ, avec notification et réponse déjà rédigée au prénom du client.</em>
               </span>
             </span>
           </li>
@@ -144,9 +154,26 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
           <input value={biz.address || ''} onChange={(e) => set('address', e.target.value)} placeholder="N°, rue, code postal, ville" />
         </label>
         <label className={styles.field}>
-          IBAN (affiché sur les factures, facultatif)
-          <input value={biz.iban || ''} onChange={(e) => set('iban', e.target.value)} autoComplete="off" />
+          TVA facturée
+          <select
+            value={biz.vat_rate === null || biz.vat_rate === undefined || biz.vat_rate === '' ? 'none' : String(biz.vat_rate)}
+            onChange={(e) => set('vat_rate', e.target.value === 'none' ? null : Number(e.target.value))}
+          >
+            <option value="20">20 % (prix des RDV saisis HT, TTC calculé)</option>
+            <option value="10">10 %</option>
+            <option value="none">Pas de TVA (micro-entreprise, art. 293 B)</option>
+          </select>
         </label>
+        <h3 className={styles.subHead}>Virement (bas des factures)</h3>
+        <div className={styles.grid2}>
+          {BANK.map(([k, label]) => (
+            <label className={styles.field} key={k}>
+              {label}
+              <input value={biz[k] || ''} onChange={(e) => set(k, e.target.value)} autoComplete="off" />
+            </label>
+          ))}
+        </div>
+        <p className={styles.hint}>Les factures déjà validées gardent les coordonnées du jour de leur validation.</p>
         <label className={styles.field}>
           Objectif de chiffre d&apos;affaires par mois (€)
           <input

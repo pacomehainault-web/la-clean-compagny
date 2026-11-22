@@ -1,0 +1,353 @@
+/* Devis & factures : dossiers, aperçu du mail, lignes détaillées, totaux. */
+
+.folders {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.folders::-webkit-scrollbar {
+  display: none;
+}
+.folder {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line2);
+  background: var(--paper);
+  border-radius: var(--r-item);
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.folder em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate);
+  background: var(--mist);
+  border-radius: 99px;
+  padding: 1px 7px;
+}
+.folderOn {
+  background: var(--night);
+  border-color: var(--night);
+  color: #fff;
+}
+.folderOn em {
+  background: var(--night3);
+  color: #fff;
+}
+.folderHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 14px;
+  font-size: 14px;
+  color: var(--slate);
+}
+.folderHead strong {
+  font-size: 18px;
+  color: var(--ink);
+}
+.tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--cobalt-soft);
+  color: var(--cobalt);
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+.tagDraft {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* Aperçu du mail, façon Gmail */
+.mail {
+  border: 1px solid var(--line);
+  border-radius: var(--r-block);
+  background: var(--paper);
+  overflow: hidden;
+}
+.mailHead {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--mist);
+  font-size: 13px;
+  color: var(--slate);
+  display: grid;
+  gap: 3px;
+}
+.mailHead b {
+  color: var(--ink);
+}
+.mailSubject {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.mailBody {
+  padding: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.mailBody p {
+  margin: 0 0 10px;
+}
+.attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 14px 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--mist);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.attach i {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: #d93025;
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+
+.sendGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.locked {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: var(--r-item);
+  background: var(--mint-soft);
+  color: var(--mint);
+  font-size: 14px;
+  font-weight: 600;
+}
+.draftBox {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--r-item);
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Lignes : prestation + détail + quantité + PU HT */
+.dline {
+  display: grid;
+  grid-template-columns: 1fr 70px 110px 32px;
+  gap: 6px 8px;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.dline input,
+.dline textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  background: var(--mist);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+}
+.dline input {
+  height: 44px;
+}
+.dline textarea {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  resize: vertical;
+  line-height: 1.4;
+}
+.dline .full {
+  grid-column: 1 / -1;
+}
+.dline small {
+  grid-column: 1 / -1;
+  text-align: right;
+  font-size: 13px;
+  color: var(--slate);
+}
+.dline small b {
+  color: var(--ink);
+}
+.dline input:focus,
+.dline textarea:focus {
+  border-color: var(--cobalt);
+  background: #fff;
+}
+.dline input:disabled,
+.dline textarea:disabled {
+  opacity: 0.75;
+}
+
+.totals {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: var(--r-block);
+  background: var(--mist);
+  font-size: 14px;
+}
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.totals span {
+  color: var(--slate);
+}
+.totals .ttc {
+  border-top: 2px solid var(--ink);
+  padding-top: 10px;
+  margin-top: 4px;
+  font-size: 15px;
+}
+.totals .ttc strong {
+  font-size: 24px;
+  font-weight: 770;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+@media (max-width: 520px) {
+  .dline {
+    grid-template-columns: 1fr 64px 96px 30px;
+  }
+}
+
+/* Onglet Audit */
+.axes {
+  display: grid;
+  gap: 16px;
+}
+.axis p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--slate);
+  line-height: 1.45;
+}
+.axisHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+.axisHead em {
+  font-style: normal;
+  color: var(--slate);
+  font-weight: 500;
+}
+.bar {
+  position: relative;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 99px;
+  background: var(--mist);
+  overflow: hidden;
+}
+.bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 99px;
+}
+.barBefore {
+  background: var(--line2);
+}
+.barGood {
+  background: var(--mint);
+}
+.barMid {
+  background: var(--cobalt);
+}
+.barLow {
+  background: var(--amber);
+}
+.actions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.actions li {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.actions li:last-child {
+  border-bottom: 0;
+}
+.actions strong {
+  font-size: 15px;
+}
+.actions p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--slate);
+  line-height: 1.45;
+}
+.actions em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cobalt);
+}
+.actionDone strong {
+  text-decoration: line-through;
+  color: var(--slate);
+}
+.actionDone em {
+  color: var(--mint);
+}
+.check {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 2px solid var(--line2);
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  cursor: pointer;
+}
+.actionDone .check {
+  background: var(--mint);
+  border-color: var(--mint);
+}
+.check:disabled {
+  cursor: default;
+}

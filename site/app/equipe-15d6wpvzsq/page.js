@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './admin.module.css'
 import { getSupabase } from '@/lib/supabaseClient'
-import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, docTotal, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime, defaultMinutes, stockCategory, setTravelBuffer, setReferralGoal } from './_lib/crm'
+import { BASE_PATH, CLIENT_STATUSES, STATUS_LABEL, addDays, clientFromLead, toCsv, toDateInput, taskGroup, formatDayLabel, formatTime, defaultMinutes, stockCategory, setTravelBuffer, setReferralGoal, setVatRate, docLinesFromLead, isNewReview } from './_lib/crm'
+import { docAmounts, folderOf, displayNumber, DOC_LABEL, frDate } from '@/lib/invoice'
 import Overview from './_components/Overview'
 import Pipeline from './_components/Pipeline'
 import Planning from './_components/Planning'
@@ -23,6 +24,7 @@ import Fidelite from './_components/Fidelite'
 import Partners from './_components/Partners'
 import Stock, { lowStock } from './_components/Stock'
 import Content from './_components/Content'
+import Audit from './_components/Audit'
 import { useForecast } from './_lib/geo'
 import { Icon } from './_components/Icon'
 import { pushState, syncPush } from './_lib/push'
@@ -49,6 +51,7 @@ const VIEWS = [
   { id: 'clients', label: 'Clients', icon: 'star' },
   { id: 'avis', label: 'Avis Google', icon: 'message' },
   { id: 'stats', label: 'Statistiques', icon: 'chart' },
+  { id: 'audit', label: 'Audit SEO / IA', short: 'Audit', icon: 'search' },
   { id: 'reglages', label: 'Réglages', icon: 'settings' },
 ]
 const MOBILE_MAIN = ['accueil', 'planning', 'prospects']
@@ -97,7 +100,15 @@ export default function TeamDashboard() {
   const [toast, setToast] = useState('')
   const [lastSync, setLastSync] = useState(null)
 
-  const [view, setView] = useState('accueil')
+  // Ouverture depuis une notification (ex. « Nouvel avis » → ?vue=avis).
+  const [view, setView] = useState(() => {
+    if (typeof window === 'undefined') return 'accueil'
+    const v = new URLSearchParams(window.location.search).get('vue')
+    return v && VIEWS.some((x) => x.id === v) ? v : 'accueil'
+  })
+  useEffect(() => {
+    if (window.location.search.includes('vue=')) window.history.replaceState(null, '', window.location.pathname)
+  }, [])
   const [statsTab, setStatsTab] = useState('activite')
   const [moreOpen, setMoreOpen] = useState(false)
   const [openId, setOpenId] = useState(null)
@@ -480,21 +491,30 @@ export default function TeamDashboard() {
         setError('Numéro de document indisponible, réessayez.')
         return null
       }
+      const biz = settings?.business || {}
       const today = toDateInput(new Date().toISOString())
-      const lines =
-        base?.lines ||
-        (lead?.service ? [{ label: lead.service, qty: 1, unit_price: Number(lead.quoted_price) || 0 }] : [{ label: '', qty: 1, unit_price: 0 }])
+      const lines = base?.lines || docLinesFromLead(lead)
+      const client = base?.client || clientFromLead(lead)
+      const vat_rate = base && 'vat_rate' in base ? base.vat_rate : biz.vat_rate ?? null
+      const discount_pct = Number(base?.discount_pct) || 0
+      const a = docAmounts({ lines, vat_rate, discount_pct })
       const row = {
         kind,
         number,
         lead_id: lead?.id || base?.lead_id || null,
-        client: base?.client || clientFromLead(lead),
+        client,
         lines,
-        total: docTotal(lines),
+        vat_rate,
+        discount_pct,
+        total: a.ttc,
+        total_ht: a.ht,
         issued_at: today,
+        delivery_on: base?.delivery_on || (lead?.appointment_at ? toDateInput(lead.appointment_at) : today),
+        payment_terms: base?.payment_terms || biz.payment_terms || 'immédiat',
         due_at: kind === 'devis' ? toDateInput(addDays(new Date(), 30).toISOString()) : today,
         notes: base?.notes || null,
         source_id: base?.id || null,
+        folder: folderOf(client),
       }
       const { data, error: err } = await supabase.from('documents').insert(row).select().single()
       if (err) {
@@ -502,25 +522,36 @@ export default function TeamDashboard() {
         return null
       }
       setDocs((prev) => [data, ...prev])
-      flash(`${kind === 'devis' ? 'Devis' : 'Facture'} ${number} créé${kind === 'facture' ? 'e' : ''}`)
+      flash(kind === 'devis' ? `Devis ${number} créé` : `${DOC_LABEL[kind]} créé${kind === 'facture' ? 'e' : ''} (brouillon)`)
       return data
     },
-    [supabase]
+    [supabase, settings]
   )
 
   const updateDoc = useCallback(
     async (doc, changes, { silent = false } = {}) => {
       setDocs((prev) => prev.map((d) => (d.id === doc.id ? { ...d, ...changes } : d)))
-      const { error: err } = await supabase.from('documents').update(changes).eq('id', doc.id)
+      const { data: saved, error: err } = await supabase.from('documents').update(changes).eq('id', doc.id).select().single()
       if (err) {
-        setError("Le document n'a pas été enregistré.")
+        setError(
+          String(err.message || '').includes('facture_validee')
+            ? 'Une facture validée ne se modifie plus : faites un avoir pour l’annuler.'
+            : "Le document n'a pas été enregistré."
+        )
         load()
         return false
+      }
+      // La base attribue le numéro définitif à la validation : on récupère la version enregistrée.
+      setDocs((prev) => prev.map((d) => (d.id === doc.id ? saved : d)))
+      // Avoir validé : la facture d'origine passe en « Annulée ».
+      if (doc.kind === 'avoir' && doc.status === 'brouillon' && changes.status && changes.status !== 'brouillon' && doc.source_id) {
+        await supabase.from('documents').update({ status: 'annule' }).eq('id', doc.source_id)
+        setDocs((prev) => prev.map((d) => (d.id === doc.source_id ? { ...d, status: 'annule' } : d)))
       }
       // Le devis fait avancer la fiche du prospect.
       const lead = doc.lead_id ? leads.find((l) => l.id === doc.lead_id) : null
       if (lead && changes.status && doc.kind === 'devis') {
-        const total = changes.total ?? doc.total
+        const total = changes.total_ht ?? doc.total_ht ?? changes.total ?? doc.total
         if (changes.status === 'envoye' && ['nouveau', 'contacte'].includes(lead.status))
           await updateLead(lead, { status: 'devis_envoye', quoted_price: total }, { silent: true })
         if (changes.status === 'accepte' && ['nouveau', 'contacte', 'devis_envoye'].includes(lead.status))
@@ -528,9 +559,9 @@ export default function TeamDashboard() {
         if (changes.status === 'refuse' && !CLIENT_STATUSES.includes(lead.status))
           await updateLead(lead, { status: 'perdu', lost_reason: 'Devis refusé' }, { silent: true })
       }
-      if (lead && changes.status) await logActivity(lead.id, 'note', `${doc.kind === 'devis' ? 'Devis' : 'Facture'} ${doc.number} : ${changes.status}`)
-      if (!silent) flash('Enregistré')
-      return true
+      if (lead && changes.status) await logActivity(lead.id, 'note', `${DOC_LABEL[doc.kind]} ${displayNumber(saved)} : ${changes.status}`)
+      if (!silent) flash(saved.number !== doc.number ? `${DOC_LABEL[doc.kind]} n° ${saved.number} validée` : 'Enregistré')
+      return saved
     },
     [supabase, load, leads, updateLead, logActivity]
   )
@@ -557,6 +588,20 @@ export default function TeamDashboard() {
       if (facture) setOpenDocId(facture.id)
     },
     [updateDoc, createDoc, leads]
+  )
+
+  // Annuler une facture validée : avoir du même montant (à valider ensuite).
+  const createAvoir = useCallback(
+    async (facture) => {
+      const lead = facture.lead_id ? leads.find((l) => l.id === facture.lead_id) : null
+      const avoir = await createDoc('avoir', lead, {
+        ...facture,
+        notes: `Avoir sur la facture n° ${facture.number} du ${frDate(facture.issued_at)}.`,
+        id: facture.id,
+      })
+      if (avoir) setOpenDocId(avoir.id)
+    },
+    [createDoc, leads]
   )
 
   const syncGoogle = useCallback(async () => {
@@ -629,7 +674,7 @@ export default function TeamDashboard() {
   // Devis ou facture d'un garage à partir des voitures de la période (la facture marque les voitures comme facturées).
   const makeGarageDoc = useCallback(
     async (kind, partner, list, lines, notes) => {
-      const doc = await createDoc(kind, null, { lines, client: { name: partner }, notes })
+      const doc = await createDoc(kind, null, { lines, client: { company: partner, name: '' }, notes })
       if (!doc) return
       if (kind === 'facture') {
         const ids = list.map((c) => c.id)
@@ -658,7 +703,7 @@ export default function TeamDashboard() {
   )
 
   const completeRdv = useCallback(
-    async (lead, { amount, payment_method, discount = 0, invoice = true, plate = null }) => {
+    async (lead, { amount, payment_method, discount = 0, invoice = true, plate = null, unit_ht = null, discount_pct = 0 }) => {
       const done_at = toDateInput(lead.appointment_at || new Date().toISOString())
       const service = lead.service || 'Prestation'
       const { data: row, error: err } = await supabase
@@ -685,7 +730,7 @@ export default function TeamDashboard() {
       if (lead.partner) {
         const { data: car } = await supabase
           .from('garage_cars')
-          .insert({ partner: lead.partner, plate: plate || lead.plate || 'SANS PLAQUE', model: lead.vehicle || null, prep: 'autre', price: Number(amount) || 0, done_on: done_at, notes: service, author })
+          .insert({ partner: lead.partner, plate: plate || lead.plate || 'SANS PLAQUE', model: lead.vehicle || null, prep: 'autre', price: Number(unit_ht ?? amount) || 0, done_on: done_at, notes: service, author })
           .select()
           .single()
         if (car) setCars((prev) => [car, ...prev])
@@ -698,13 +743,19 @@ export default function TeamDashboard() {
       // Facture automatique (les garages partenaires ont leur facture mensuelle groupée).
       let invoiceNumber = null
       if (invoice && amount > 0 && !lead.partner) {
-        const lines = [{ label: `${service}${lead.vehicle ? ` – ${lead.vehicle}` : ''}`, qty: 1, unit_price: Number(amount) + Number(discount || 0) }]
-        if (discount) lines.push({ label: 'Remise fidélité', qty: 1, unit_price: -Number(discount) })
-        const doc = await createDoc('facture', { ...lead, ...leadChanges }, { lines, client: clientFromLead(lead), notes: null })
+        const full = { ...lead, ...leadChanges, plate: plate || lead.plate }
+        const lines = docLinesFromLead(full, unit_ht ?? Number(lead.quoted_price) ?? 0)
+        const doc = await createDoc('facture', full, {
+          lines,
+          client: clientFromLead(full),
+          discount_pct: discount_pct || 0,
+          delivery_on: done_at,
+          notes: discount_pct ? `Remise fidélité de ${discount_pct} % incluse.` : null,
+        })
         if (doc) {
-          invoiceNumber = doc.number
           const paid = payment_method !== 'a_encaisser'
-          await updateDoc(doc, paid ? { status: 'paye', paid_at: done_at } : { status: 'envoye' }, { silent: true })
+          const saved = await updateDoc(doc, paid ? { status: 'paye', paid_at: done_at } : { status: 'envoye' }, { silent: true })
+          invoiceNumber = saved?.number || null
         }
       }
 
@@ -962,12 +1013,14 @@ export default function TeamDashboard() {
   // ---------- Dashboard ----------
   setTravelBuffer(settings?.business?.travel_buffer_min ?? 30)
   setReferralGoal(settings?.business?.referral_goal ?? 10)
+  setVatRate(settings?.business?.vat_rate ?? null)
   const visibleLeads = hideTests ? leads.filter((l) => l.source !== 'test') : leads
   const visiting = leads.find((l) => l.id === visitingId) || null
   const lowCount = lowStock(products).length
   const openLead = leads.find((l) => l.id === openId) || null
   const newCount = visibleLeads.filter((l) => l.status === 'nouveau').length
   const unreplied = reviews.filter((r) => !r.replied).length
+  const newReviews = reviews.filter((r) => isNewReview(r))
   const tasksDue = tasks.filter((t) => ['late', 'today'].includes(taskGroup(t))).length
   const openQuick = (opts = {}) => setQuick(opts)
   const shared = { leads: visibleLeads, jobs, onOpen: setOpenId, updateLead, logActivity, onReview: (l) => setReviewingId(l.id) }
@@ -1042,6 +1095,18 @@ export default function TeamDashboard() {
               </button>
             </div>
           )}
+          {view === 'accueil' && newReviews.length > 0 && (
+            <button type="button" className={styles.reviewBanner} onClick={() => goTo('avis')}>
+              <Icon name="star" size={20} />
+              <span>
+                <strong>
+                  {newReviews.length > 1 ? `${newReviews.length} nouveaux avis Google` : `Nouvel avis Google de ${newReviews[0].author}${newReviews[0].rating ? ` (${newReviews[0].rating}★)` : ''}`}
+                </strong>
+                <span>La réponse est déjà rédigée avec le prénom du client.</span>
+              </span>
+              <em>Répondre →</em>
+            </button>
+          )}
           {view === 'accueil' && (
             <Overview
               {...shared}
@@ -1105,7 +1170,11 @@ export default function TeamDashboard() {
               onUpdate={updateDoc}
               onDelete={deleteDoc}
               onConvert={convertDoc}
+              onAvoir={createAvoir}
               onPaid={markPaid}
+              settings={settings}
+              supabase={supabase}
+              flash={flash}
               onOpenLead={(id) => {
                 setOpenDocId(null)
                 setOpenId(id)
@@ -1159,6 +1228,7 @@ export default function TeamDashboard() {
           {view === 'clients' && <Clients {...shared} />}
           {view === 'avis' && <Reviews {...shared} reviews={reviews} stats={stats} onUpdateReview={updateReview} flash={flash} onSaveStats={saveStats} />}
           {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} expenses={expenses} stats={stats} views={views} sync={syncInfo} onSync={syncGoogle} syncing={syncing} initialTab={statsTab} />}
+          {view === 'audit' && <Audit settings={settings} onSaveSettings={saveSettings} />}
           {view === 'reglages' && settings && (
             <Settings
               supabase={supabase}

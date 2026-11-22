@@ -605,3 +605,19 @@
   border-radius: 99px;
   background: var(--color-blue-dark);
 }
+
+.lineDetails {
+  display: block;
+  white-space: pre-line;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.reviewSteps {
+  text-align: left;
+  margin: 10px 0 14px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}

@@ -4,9 +4,10 @@ import { useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
 import Duel from './Duel'
-import { formatDate, templates, whatsappHref, daysBetween } from '../_lib/crm'
+import { formatDate, templates, whatsappHref, daysBetween, replyDraft, isNewReview } from '../_lib/crm'
+import { CONTACT } from '@/lib/constants'
 
-const REVIEW_URL = 'https://g.page/r/CSFtfbCI8GR-EBM/review'
+const REVIEW_URL = CONTACT.googleReviewPhotoUrl
 const GBP_URL = 'https://business.google.com/reviews'
 
 // Avis Google : avis relevés chaque matin + demandes d'avis aux clients.
@@ -148,11 +149,15 @@ export default function Reviews({ reviews, leads, stats, onUpdateReview, onOpen,
 }
 
 function ReviewCard({ review, onUpdate, flash }) {
-  const [draft, setDraft] = useState(review.reply_draft || '')
+  const [draft, setDraft] = useState(review.reply_draft || replyDraft(review))
+  const fresh = isNewReview(review)
   return (
-    <article className={styles.review}>
+    <article className={`${styles.review} ${fresh ? styles.reviewNew : ''}`}>
       <header>
-        <strong>{review.author}</strong>
+        <strong>
+          {fresh && <span className={styles.newBadge}>Nouveau</span>}
+          {review.author}
+        </strong>
         <span className={styles.stars} aria-label={`${review.rating} étoiles sur 5`}>
           {'★'.repeat(review.rating || 0)}
           <i>{'★'.repeat(5 - (review.rating || 0))}</i>
@@ -174,20 +179,20 @@ function ReviewCard({ review, onUpdate, flash }) {
             placeholder="Réponse à publier…"
             aria-label="Réponse proposée"
           />
+          <p className={styles.hint}>Réponse déjà rédigée au prénom du client : relisez, puis copiez-la sur Google.</p>
           <div className={styles.quickRow}>
-            <button
-              type="button"
+            <a
               className={styles.btnSecondary}
+              href={GBP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => {
                 navigator.clipboard?.writeText(draft)
                 if (draft !== review.reply_draft) onUpdate(review, { reply_draft: draft }, { silent: true })
-                flash('Réponse copiée : collez-la sur Google')
+                flash('Réponse copiée : collez-la sous l’avis sur Google')
               }}
             >
-              <Icon name="copy" size={16} /> Copier
-            </button>
-            <a className={styles.btnSecondary} href={GBP_URL} target="_blank" rel="noopener noreferrer">
-              <Icon name="globe" size={16} /> Répondre sur Google
+              <Icon name="copy" size={16} /> Copier et répondre sur Google
             </a>
             <button type="button" className={styles.btnPrimary} onClick={() => onUpdate(review, { replied: true, reply_text: draft || null })}>
               <Icon name="check" size={16} /> C&apos;est fait

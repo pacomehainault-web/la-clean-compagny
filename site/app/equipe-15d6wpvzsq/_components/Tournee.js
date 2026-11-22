@@ -5,6 +5,7 @@ import styles from '../admin.module.css'
 import v2 from '../v2.module.css'
 import { Icon } from './Icon'
 import { sameDay, formatTime, durationH, euros, roadKm, driveMinutes, routeHref, wazeHref, isOutdoor, CLIENT_STATUSES, formatDuration, telHref } from '../_lib/crm'
+import { leadTtc } from '../_lib/crm'
 import { ensureCoords, geocode, slotRain, dayWeather, weatherEmoji } from '../_lib/geo'
 
 // Tournée du jour : ordre des clients, trajets estimés, itinéraire complet, km.
@@ -43,7 +44,7 @@ export default function Tournee({ leads, day, fc, settings, onOpen, onGo, onVisi
   const back = prev && base && stops.length ? roadKm(prev, base) : null
   const totalKm = legs.reduce((t, l) => t + (l.km || 0), 0) + (back || 0)
   const work = stops.reduce((t, l) => t + durationH(l) * 60, 0)
-  const value = stops.reduce((t, l) => t + Number(l.quoted_price || 0), 0)
+  const value = stops.reduce((t, l) => t + Number(leadTtc(l) || 0), 0)
   const remaining = stops.filter((s) => !CLIENT_STATUSES.includes(s.status) && s.track_stage !== 'termine')
   const route = routeHref(remaining)
   const w = dayWeather(fc, day)
