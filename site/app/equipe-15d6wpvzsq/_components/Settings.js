@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
+import SmsPanel from './SmsPanel'
 import PushPanel from './PushPanel'
 
 const FIELDS = [
@@ -123,6 +124,8 @@ export default function Settings({ supabase, flash, settings, onSave, onTestAler
           </li>
         </ul>
       </section>
+
+      <SmsPanel supabase={supabase} flash={flash} settings={settings} onSave={onSave} />
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>

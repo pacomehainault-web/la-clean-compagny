@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import styles from './BookingWizard.module.css'
 import { CATALOG, QUICK_SIZES, priceFor } from '@/lib/catalog'
 import { fetchBusy, bookSlot, freeSlots, BOOKING_ERRORS, storedReferral, rememberReferral } from '@/lib/booking'
+import { attributionForLead } from '@/lib/attribution'
+import { trackBooking } from '@/lib/track'
 import { CONTACT } from '@/lib/constants'
 import AddressAutocomplete from './AddressAutocomplete'
 
@@ -37,7 +39,7 @@ export default function BookingWizard() {
   const [busy, setBusy] = useState(null)
   const [day, setDay] = useState(null)
   const [slot, setSlot] = useState(null)
-  const [form, setForm] = useState(() => ({ name: '', phone: '', email: '', address: '', city: '', vehicle: '', notes: '', ref: (params.get('parrain') || storedReferral() || '').toUpperCase().slice(0, 12) }))
+  const [form, setForm] = useState(() => ({ name: '', phone: '', email: '', address: '', city: '', vehicle: '', notes: '', consent: false, ref: (params.get('parrain') || storedReferral() || '').toUpperCase().slice(0, 12) }))
   const [state, setState] = useState('idle')
   const [error, setError] = useState('')
 
@@ -103,8 +105,10 @@ export default function BookingWizard() {
         p_price: price,
         p_notes: form.notes.trim() || null,
         p_ref_code: form.ref.trim() || null,
+        p_attribution: attributionForLead(),
+        p_consent: Boolean(form.consent),
       })
-      if (typeof window !== 'undefined' && typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { form_source: 'reservation-en-ligne' })
+      trackBooking({ service, price })
       setState('done')
       router.push(`/suivi/${token}?nouveau=1`)
     } catch (err) {
@@ -270,6 +274,10 @@ export default function BookingWizard() {
                 <label className={styles.full}>
                   Précisions (facultatif)
                   <textarea rows={3} value={form.notes} onChange={(e) => set('notes', e.target.value)} placeholder="Poils d'animaux, taches, code portail, prise électrique…" maxLength={1000} />
+                </label>
+                <label className={`${styles.full} ${styles.check}`}>
+                  <input type="checkbox" checked={Boolean(form.consent)} onChange={(e) => set('consent', e.target.checked)} />
+                  <span>J&apos;accepte de recevoir par SMS une demande d&apos;avis après la prestation et un rappel d&apos;entretien. Désinscription à tout moment (STOP).</span>
                 </label>
               </div>
             </>

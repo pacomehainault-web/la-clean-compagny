@@ -1158,7 +1158,7 @@ export default function TeamDashboard() {
           )}
           {view === 'clients' && <Clients {...shared} />}
           {view === 'avis' && <Reviews {...shared} reviews={reviews} stats={stats} onUpdateReview={updateReview} flash={flash} onSaveStats={saveStats} />}
-          {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} stats={stats} views={views} sync={syncInfo} onSync={syncGoogle} syncing={syncing} initialTab={statsTab} />}
+          {view === 'stats' && <Stats key={statsTab} leads={visibleLeads} jobs={jobs} expenses={expenses} stats={stats} views={views} sync={syncInfo} onSync={syncGoogle} syncing={syncing} initialTab={statsTab} />}
           {view === 'reglages' && settings && (
             <Settings
               supabase={supabase}

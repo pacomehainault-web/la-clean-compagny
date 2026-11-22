@@ -7,6 +7,8 @@ import Footer from '@/components/Footer'
 import { WhatsAppFloat, MobileStickyCTA } from '@/components/FloatingCTAs'
 import CookieConsent from '@/components/CookieConsent'
 import Analytics from '@/components/Analytics'
+import MetaPixel from '@/components/MetaPixel'
+import AttributionTracker from '@/components/AttributionTracker'
 import JsonLd from '@/components/JsonLd'
 import CustomCursor from '@/components/CustomCursor'
 import ScrollRevealInit from '@/components/ScrollRevealInit'
@@ -72,6 +74,8 @@ export default function RootLayout({ children }) {
           <MobileStickyCTA />
           <CookieConsent />
           <Analytics />
+          <MetaPixel />
+          <AttributionTracker />
           <ViewTracker />
         </HideOnAdmin>
       </body>

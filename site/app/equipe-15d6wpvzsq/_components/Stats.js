@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import styles from '../admin.module.css'
-import { CLIENT_STATUSES, computeKpis, countBy, euros, monthlySeries, sourceGroup, statSeries, latestStat, addDays, startOfDay, toDateInput } from '../_lib/crm'
+import Ads from './Ads'
+import { CLIENT_STATUSES, computeKpis, countBy, euros, monthlySeries, sourceGroup, leadChannel, channelLabel, statSeries, latestStat, addDays, startOfDay, toDateInput } from '../_lib/crm'
 
 function Bars({ rows, valueKey, format = (v) => v, tone = 'blue' }) {
   const max = Math.max(1, ...rows.map((r) => r[valueKey]))
@@ -45,7 +46,7 @@ function Activity({ leads, jobs }) {
   const real = leads.filter((l) => l.source !== 'test')
   const won = real.filter((l) => ['reserve', ...CLIENT_STATUSES].includes(l.status))
   const lost = real.filter((l) => l.status === 'perdu')
-  const bySource = countBy(real, (l) => sourceGroup(l.source))
+  const bySource = countBy(real, (l) => channelLabel(leadChannel(l)))
   const byService = countBy(real, (l) => l.service)
   const byCity = countBy(real, (l) => l.city && l.city.trim())
   const lostReasons = countBy(lost, (l) => l.lost_reason)
@@ -404,13 +405,14 @@ function Google({ stats, sync, onSync, syncing }) {
   )
 }
 
-export default function Stats({ leads, jobs, stats, views, sync, onSync, syncing, initialTab = 'activite' }) {
+export default function Stats({ leads, jobs, expenses, stats, views, sync, onSync, syncing, initialTab = 'activite' }) {
   const [tab, setTab] = useState(initialTab)
   return (
     <div className={styles.stack}>
       <div className={styles.segment} role="tablist" aria-label="Statistiques">
         {[
           ['activite', 'Activité'],
+          ['pubs', 'Pubs & clients'],
           ['google', 'Google'],
           ['site', 'Site'],
         ].map(([id, label]) => (
@@ -420,6 +422,7 @@ export default function Stats({ leads, jobs, stats, views, sync, onSync, syncing
         ))}
       </div>
       {tab === 'activite' && <Activity leads={leads} jobs={jobs} />}
+      {tab === 'pubs' && <Ads leads={leads} jobs={jobs} expenses={expenses} />}
       {tab === 'google' && <Google stats={stats} sync={sync} onSync={onSync} syncing={syncing} />}
       {tab === 'site' && <Site views={views} leads={leads} />}
     </div>

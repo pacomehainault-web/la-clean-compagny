@@ -75,6 +75,24 @@ export default function PrivacyPage() {
               le bandeau affiché lors de votre première visite. Vous pouvez à tout moment modifier
               votre choix en réinitialisant les données de ce site dans votre navigateur.
             </p>
+            <p>
+              Avec ce même consentement, le site peut aussi utiliser le pixel Meta (Facebook et
+              Instagram) pour mesurer les demandes et réservations issues de nos publicités sur
+              ces réseaux. Sans votre accord, aucun de ces outils n&apos;est chargé.
+            </p>
+
+            <h2>Origine de votre demande et messages</h2>
+            <p>
+              Lorsque vous arrivez sur le site depuis une publicité, un moteur de recherche ou un
+              réseau social, l&apos;origine de la visite (nom de la campagne, site d&apos;origine)
+              est gardée 30 jours dans votre navigateur et jointe à votre demande uniquement si
+              vous remplissez un formulaire, pour savoir quel canal nous a fait connaître. Nous
+              pouvons vous envoyer par SMS une confirmation de votre demande et un rappel la
+              veille de votre rendez-vous. Les relances, demandes d&apos;avis et rappels
+              d&apos;entretien ne sont envoyés que si vous avez coché la case prévue à cet effet ;
+              vous pouvez vous désinscrire à tout moment en répondant STOP. Les SMS sont envoyés
+              par notre prestataire Brevo.
+            </p>
 
             <h2>Vos droits</h2>
             <p>
