@@ -25,6 +25,10 @@ import {
   toDateInput,
   addDays,
 } from '../_lib/crm'
+import { ttc, priceLabel, eurosAuto, getVatRate } from '../_lib/crm'
+import { htOf } from '@/lib/invoice'
+
+const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100
 
 export function Sheet({ title, sub, onClose, wide = false, children }) {
   return (
@@ -64,10 +68,12 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, photos =
   const biz = settings?.business || {}
   const loy = loyalty(visits, biz.loyalty_every)
   const pct = Number(biz.loyalty_discount) || 20
-  const base = Number(lead.quoted_price) || 0
+  // Le prix du RDV est HT ; le client paie TTC.
+  const baseHt = Number(lead.quoted_price) || 0
+  const base = Number(ttc(baseHt)) || 0
   const [applyLoyalty, setApplyLoyalty] = useState(loy.rewardNow && base > 0)
-  const discount = applyLoyalty ? Math.round((base * pct) / 100) : 0
-  const [amount, setAmount] = useState(base ? String(base - discount) : '')
+  const discount = applyLoyalty ? r2((base * pct) / 100) : 0
+  const [amount, setAmount] = useState(base ? String(r2(base - discount)) : '')
   const [method, setMethod] = useState('cb')
   const [invoice, setInvoice] = useState(true)
   const [plate, setPlate] = useState(lead.plate || '')
@@ -93,14 +99,21 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, photos =
   function toggleLoyalty() {
     const next = !applyLoyalty
     setApplyLoyalty(next)
-    if (base) setAmount(String(base - (next ? Math.round((base * pct) / 100) : 0)))
+    if (base) setAmount(String(r2(base - (next ? r2((base * pct) / 100) : 0))))
   }
 
   async function submit(e) {
     e.preventDefault()
     setBusy(true)
+    const amt = Number(amount) || 0
+    const appliedPct = applyLoyalty ? pct : 0
+    // Facture : prix HT de la ligne (celui du RDV si le montant n'a pas été changé) + remise fidélité en %.
+    const untouched = base && Math.abs(amt - r2(base - discount)) < 0.01
+    const unitHt = untouched ? baseHt : r2((htOf(amt, getVatRate()) || 0) / (1 - appliedPct / 100))
     const res = await onComplete(lead, {
-      amount: Number(amount) || 0,
+      amount: amt,
+      unit_ht: unitHt,
+      discount_pct: appliedPct,
       payment_method: method,
       discount,
       invoice,
@@ -134,6 +147,7 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, photos =
             <ReviewSend
               lead={after}
               photo={afterPhoto}
+              photos={photos}
               onSent={(ch) => {
                 onAskedReview?.(after)
                 logActivity?.(after.id, ch === 'partage' ? 'whatsapp' : ch, afterPhoto ? 'Demande d’avis envoyée avec la photo après' : 'Récap + demande d’avis envoyés')
@@ -231,7 +245,7 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, photos =
                   <label className={styles.toggle}>
                     <input type="checkbox" checked={applyLoyalty} onChange={toggleLoyalty} />
                     <span>
-                      {visits + 1}e passage : fidélité -{pct} %{base ? ` (−${euros(Math.round((base * pct) / 100))})` : ''}
+                      {visits + 1}e passage : fidélité -{pct} %{base ? ` (−${eurosAuto(r2((base * pct) / 100))} TTC)` : ''}
                     </span>
                   </label>
                 ) : (
@@ -242,8 +256,9 @@ export function CompleteRdv({ lead, visits = 0, settings, subscription, photos =
               </div>
             )}
             {lead.ref_code && visits === 0 && <p className={styles.hint}>🎁 Client parrainé (code {lead.ref_code}) : cette prestation compte pour son parrain.</p>}
+            {baseHt > 0 && <p className={styles.hint}>Prix du RDV : {priceLabel(baseHt)}</p>}
             <label className={styles.field}>
-              Montant encaissé (€)
+              Montant encaissé TTC (€)
               <input type="number" min="0" step="0.01" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} required autoFocus />
             </label>
             <div className={styles.slotLabel}>Paiement</div>
@@ -454,7 +469,7 @@ export function AskReview({ lead, photos = [], supabase, onPhotos, onClose, onSe
             <input type="file" accept="image/*" hidden disabled={uploading} onChange={(e) => add(e.target.files?.[0])} />
           </label>
         )}
-        <ReviewSend lead={lead} photo={photo} onSent={onSent} />
+        <ReviewSend lead={lead} photo={photo} photos={photos} onSent={onSent} />
       </section>
     </Sheet>
   )

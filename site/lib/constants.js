@@ -11,9 +11,12 @@ export const SITE = {
   // OG, Twitter), par robots.js et sitemap.js. Ne jamais coder un domaine en dur
   // ailleurs dans le projet — passer par SITE.url ou absoluteUrl().
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.lacleancompagny.com',
-  siren: '953 772 282 00018',
+  siren: '953 772 282',
+  siret: '953 772 282 00018',
   gerant: 'Enzo Soldet',
-  vatNote: 'TVA non applicable, art. 293 B du CGI',
+  // Enzo facture la TVA (20 %) : les prix affichés sur le site sont TTC.
+  vatNumber: 'FR91953772282',
+  vatNote: 'Prix TTC, TVA 20 % incluse',
 }
 
 export const CONTACT = {
@@ -42,6 +45,11 @@ export const CONTACT = {
   // Google : c'est la forme d'URL que Google utilise lui-même pour une fiche,
   // utile dans `sameAs` pour relier sans ambiguïté le site à la fiche.
   googleMapsCidUrl: 'https://maps.google.com/?cid=9107668816317213985',
+  // Lien d'avis qui garde le bouton « Ajouter des photos » sur téléphone : le lien
+  // court ci-dessus (writereview) le fait souvent disparaître sur mobile. Ouvre le
+  // formulaire d'avis de la fiche via son CID.
+  googleReviewPhotoUrl:
+    'https://www.google.com/search?q=La+Clean+Compagny&ludocid=9107668816317213985&ibp=gwp;0,7#lkt=LocalPoiReviews&lpg=cid:CgIgAQ%3D%3D',
 }
 
 export const SOCIALS = {

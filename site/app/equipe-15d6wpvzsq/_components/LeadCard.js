@@ -2,7 +2,7 @@
 
 import styles from '../admin.module.css'
 import { Icon } from './Icon'
-import { STATUS_LABEL, sourceLabel, timeAgo, formatPhone, telHref, whatsappHref, templates, formatDayLabel, formatTime, euros } from '../_lib/crm'
+import { STATUS_LABEL, sourceLabel, timeAgo, formatPhone, telHref, whatsappHref, templates, formatDayLabel, formatTime, priceLabel } from '../_lib/crm'
 
 // Carte compacte d'un prospect / client, avec les actions en un geste.
 // `reason` (optionnel) : pourquoi il apparaît dans « À faire ».
@@ -36,7 +36,7 @@ export default function LeadCard({ lead, onOpen, updateLead, logActivity, reason
             {lead.appointment_at && lead.status === 'reserve'
               ? `RDV ${formatDayLabel(lead.appointment_at).toLowerCase()} à ${formatTime(lead.appointment_at)}`
               : `${timeAgo(lead.created_at).replace(/^./, (c) => c.toUpperCase())}, ${sourceLabel(lead.source).toLowerCase()}`}
-            {lead.quoted_price ? `, ${euros(lead.quoted_price)}` : ''}
+            {lead.quoted_price ? `, ${priceLabel(lead.quoted_price)}` : ''}
           </span>
         </span>
       </button>

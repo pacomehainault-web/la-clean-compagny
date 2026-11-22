@@ -99,7 +99,7 @@ export default function Footer() {
 
         <div className={styles.bottom}>
           <span>
-            © {year} {SITE.legalName} — SIREN {SITE.siren} — {SITE.vatNote}
+            © {year} {SITE.legalName} — SIRET {SITE.siret} — TVA {SITE.vatNumber}
           </span>
           <div className={styles.bottomLinks}>
             <Link href="/mentions-legales">Mentions légales</Link>

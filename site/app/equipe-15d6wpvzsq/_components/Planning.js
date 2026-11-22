@@ -28,6 +28,7 @@ import {
   WORK_START,
   WORK_END,
 } from '../_lib/crm'
+import { priceLabel, leadTtc } from '../_lib/crm'
 
 const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
@@ -50,7 +51,7 @@ function RdvCard({ l, onOpen, logActivity, onComplete, onMove, onGo, onVisit, fc
         <strong>{l.first_name}</strong>
         <span>{[l.service, l.vehicle].filter(Boolean).join(' · ')}</span>
         {large && (l.address || l.city) && <span>{[l.address, l.city].filter(Boolean).join(', ')}</span>}
-        {l.quoted_price ? <span>{euros(l.quoted_price)}</span> : null}
+        {l.quoted_price ? <span>{priceLabel(l.quoted_price)}</span> : null}
         {rain && rain.prob >= 40 && <span className={v2.rainChip}>🌧️ pluie {rain.prob} %</span>}
         {l.track_stage === 'en_route' && <span className={v2.liveChip}>En route</span>}
         {l.track_stage === 'sur_place' && <span className={v2.liveChip}>Sur place</span>}
@@ -140,7 +141,7 @@ export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete
 
   // ----- Vue jour -----
   const dayItems = booked.filter((l) => sameDay(l.appointment_at, day))
-  const dayValue = dayItems.reduce((s, l) => s + Number(l.quoted_price || 0), 0)
+  const dayValue = dayItems.reduce((s, l) => s + Number(leadTtc(l) || 0), 0)
   const dayMinutes = dayItems.reduce((s, l) => s + durationH(l) * 60, 0)
   const free = freeStarts(leads, day, 60).filter((d) => d.getMinutes() === 0)
   const hours = Array.from({ length: WORK_END - WORK_START }, (_, i) => WORK_START + i)
@@ -149,7 +150,7 @@ export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
   const weekEnd = addDays(weekStart, 7)
   const inWeek = booked.filter((l) => new Date(l.appointment_at) >= weekStart && new Date(l.appointment_at) < weekEnd)
-  const weekValue = inWeek.reduce((s, l) => s + Number(l.quoted_price || 0), 0)
+  const weekValue = inWeek.reduce((s, l) => s + Number(leadTtc(l) || 0), 0)
   const freeDays = days.filter((d) => d >= today && d.getDay() !== 0 && !inWeek.some((l) => sameDay(l.appointment_at, d)))
   const weekLabel = `${weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${addDays(weekStart, 6).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`
 
@@ -197,7 +198,7 @@ export default function Planning({ leads, onOpen, logActivity, onAdd, onComplete
             <span className={styles.weekMeta}>
               {dayItems.length} RDV
               {dayMinutes ? ` · ${formatDuration(Math.round(dayMinutes))} de travail` : ''}
-              {dayValue ? ` · ${euros(dayValue)}` : ''}
+              {dayValue ? ` · ${euros(dayValue)} TTC` : ''}
             </span>
           </header>
           <div className={styles.dayList}>

@@ -1432,3 +1432,39 @@
 .lsBottom {
   height: 24px;
 }
+
+/* Demande d'avis : vignettes avant / après + envoi par mail */
+.reviewPhoto .reviewThumbs {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+.reviewThumbs img {
+  width: 48px;
+  height: 48px;
+}
+.reviewMail {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin: 8px 0 10px;
+}
+.reviewMail input {
+  min-width: 0;
+  height: 46px;
+  border: 1px solid var(--line2);
+  border-radius: 10px;
+  background: var(--mist);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 15px;
+}
+.reviewMail p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+@media (max-width: 480px) {
+  .reviewMail {
+    grid-template-columns: 1fr;
+  }
+}

@@ -26,7 +26,8 @@ export default function CGVPage() {
             <p>
               Les présentes conditions générales de vente régissent les prestations de detailing
               et de nettoyage automobile proposées par {SITE.legalName}{' '}({SITE.gerant}),
-              micro-entreprise immatriculée sous le SIREN {SITE.siren}, {SITE.vatNote}.
+              entreprise individuelle immatriculée sous le SIRET {SITE.siret}, n° de TVA intracommunautaire{' '}
+              {SITE.vatNumber}. Les prix indiqués sont TTC (TVA 20 % incluse).
             </p>
 
             <h2>Article 2 — Prestations</h2>

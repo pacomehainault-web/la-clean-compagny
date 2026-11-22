@@ -38,6 +38,7 @@ import {
   formatTime,
   formatDayLabel,
 } from '../_lib/crm'
+import { priceLabel, getVatRate, eurosAuto, ttc } from '../_lib/crm'
 import v2 from '../v2.module.css'
 import { photoUrl, uploadPhoto } from '../_lib/media'
 import ReviewSend, { lastAfterPhoto } from './ReviewSend'
@@ -214,7 +215,7 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
   const ref = referralInfo(lead, allLeads, allJobs, goal)
   const parrain = lead.ref_code ? allLeads.find((l) => l.referral_code === lead.ref_code.toUpperCase()) : null
   const sub = [lead.vehicle, formatPhone(lead.phone)].filter(Boolean).join(' · ')
-  const openJobForm = () => setJobForm({ done_at: new Date().toISOString().slice(0, 10), service: form.service, amount: form.quoted_price, notes: '' })
+  const openJobForm = () => setJobForm({ done_at: new Date().toISOString().slice(0, 10), service: form.service, amount: form.quoted_price === '' ? '' : ttc(form.quoted_price), notes: '' })
 
   // Envoi rapide d'un modèle (bouton de l'étape « À faire »).
   const quickSend = (id, channel = 'whatsapp') => {
@@ -352,7 +353,7 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
                 <input type="file" accept="image/*" hidden disabled={uploading} onChange={(e) => addAfterPhoto(e.target.files?.[0])} />
               </label>
             )}
-            <ReviewSend lead={lead} photo={afterPhoto} relance={relance} compact onSent={(ch) => reviewSent(ch, relance)} />
+            <ReviewSend lead={lead} photo={afterPhoto} photos={photos} relance={relance} compact onSent={(ch) => reviewSent(ch, relance)} />
             <button type="button" className={styles.linkBtn} onClick={() => setStatus('avis_recu')}>
               ✓ Il a laissé son avis
             </button>
@@ -580,7 +581,7 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
                   <dt>Prestation</dt>
                   <dd>
                     {lead.service || '—'}
-                    {lead.quoted_price != null ? ` · ${euros(lead.quoted_price)}` : ''}
+                    {lead.quoted_price != null ? ` · ${priceLabel(lead.quoted_price)}` : ''}
                   </dd>
                 </div>
                 <div>
@@ -811,7 +812,7 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
             </label>
             {isReview && afterPhoto ? (
               <>
-                <ReviewSend lead={lead} photo={afterPhoto} relance={tplId === 'relance-avis'} onSent={(ch) => reviewSent(ch, tplId === 'relance-avis')} />
+                <ReviewSend lead={lead} photo={afterPhoto} photos={photos} relance={tplId === 'relance-avis'} onSent={(ch) => reviewSent(ch, tplId === 'relance-avis')} />
                 <p className={styles.hint}>Le message est déjà rédigé (lien de l&apos;avis + sa page avec les photos).</p>
               </>
             ) : (
@@ -919,8 +920,8 @@ export default function LeadSheet({ lead, jobs, allJobs = [], docs = [], allLead
               </label>
               <div className={styles.grid2}>
                 <label className={styles.field}>
-                  Prix proposé (€)
-                  <input type="number" min="0" step="1" inputMode="decimal" value={form.quoted_price} onChange={(e) => set('quoted_price', e.target.value)} />
+                  Prix HT (€){form.quoted_price !== '' && getVatRate() ? <em className={styles.fieldHint}> = {eurosAuto(ttc(form.quoted_price))} TTC</em> : null}
+                  <input type="number" min="0" step="0.01" inputMode="decimal" value={form.quoted_price} onChange={(e) => set('quoted_price', e.target.value)} />
                 </label>
                 <label className={styles.field}>
                   Plaque

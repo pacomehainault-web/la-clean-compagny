@@ -38,10 +38,6 @@ function periodRange(kind, custom) {
   }
 }
 
-function lineLabel(c) {
-  return [formatDate(c.done_on, { day: '2-digit', month: '2-digit' }), c.plate, c.model, PREP_LABEL[c.prep] || c.prep].filter(Boolean).join(' · ')
-}
-
 // Garages partenaires : chaque voiture scannée le jour même, vue jour par jour, devis/facture en un clic.
 export default function Partners({ leads, docs, cars, settings, onSaveSettings, onAddCar, onUpdateCar, onDeleteCar, onMakeDoc, onOpenDoc, flash }) {
   const partners = partnerList(settings, leads)
@@ -96,7 +92,12 @@ export default function Partners({ leads, docs, cars, settings, onSaveSettings, 
   function makeDoc(kind) {
     const list = [...todo].sort((a, b) => (a.done_on === b.done_on ? (a.created_at > b.created_at ? 1 : -1) : a.done_on > b.done_on ? 1 : -1))
     if (!list.length) return
-    const lines = list.map((c) => ({ label: lineLabel(c), qty: 1, unit_price: Number(c.price) || 0 }))
+    const lines = list.map((c) => ({
+      label: [PREP_LABEL[c.prep] || c.prep || 'Préparation', c.model].filter(Boolean).join(' '),
+      details: [c.plate && `Immatriculation ${c.plate}`, formatDate(c.done_on, { day: '2-digit', month: '2-digit', year: 'numeric' })].filter(Boolean).join(' · '),
+      qty: 1,
+      unit_price: Number(c.price) || 0,
+    }))
     const notes = `${list.length} véhicule${list.length > 1 ? 's' : ''} préparé${list.length > 1 ? 's' : ''} ${label} (${list.filter((c) => c.prep === 'parc').length} préparation parc, ${list.filter((c) => c.prep === 'vendue').length} préparation vendue)`
     onMakeDoc(kind, current, list, lines, notes)
   }
@@ -276,7 +277,7 @@ export default function Partners({ leads, docs, cars, settings, onSaveSettings, 
         <div className={styles.grid2}>
           {PREPS.filter((p) => p.id !== 'autre').map((p) => (
             <label className={styles.field} key={p.id}>
-              {p.label} (€)
+              {p.label} (€ HT)
               <input type="number" min="0" step="0.01" inputMode="decimal" value={rateForm[p.id] ?? ''} onChange={(e) => setRateForm({ ...rateForm, [p.id]: e.target.value })} placeholder="Ex. 45" />
             </label>
           ))}
@@ -360,7 +361,7 @@ export default function Partners({ leads, docs, cars, settings, onSaveSettings, 
               </div>
               <div className={styles.grid2}>
                 <label className={styles.field}>
-                  Tarif (€)
+                  Tarif (€ HT)
                   <input type="number" min="0" step="0.01" inputMode="decimal" value={editing.price} onChange={(e) => setEditing({ ...editing, price: e.target.value })} />
                 </label>
                 <label className={styles.field}>

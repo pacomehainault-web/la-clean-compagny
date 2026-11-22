@@ -7,6 +7,7 @@ import styles from './tracking.module.css'
 import { getTracking, acceptQuote, icsFile } from '@/lib/booking'
 import { photoUrl } from '@/lib/photos'
 import { CONTACT, SITE, whatsappLink } from '@/lib/constants'
+import { docAmounts, lineHt, eur } from '@/lib/invoice'
 
 const STEPS = [
   { id: 'confirme', label: 'Confirmé' },
@@ -288,22 +289,8 @@ export default function Tracking({ token }) {
             <h2>Devis {quote.number}</h2>
             <span className={`${styles.pill} ${quote.status === 'accepte' || accepted ? styles.pillOk : ''}`}>{quote.status === 'accepte' || accepted ? 'Accepté' : 'En attente'}</span>
           </div>
-          <ul className={styles.lines}>
-            {(quote.lines || []).map((l, i) => (
-              <li key={i}>
-                <span>
-                  {l.label}
-                  {Number(l.qty) > 1 ? ` × ${l.qty}` : ''}
-                </span>
-                <strong>{euros(Number(l.qty || 0) * Number(l.unit_price || 0))}</strong>
-              </li>
-            ))}
-            <li className={styles.total}>
-              <span>Total</span>
-              <strong>{euros(quote.total)}</strong>
-            </li>
-          </ul>
-          {biz.vat_note && <p className={styles.small}>{biz.vat_note}</p>}
+          <DocLines doc={quote} />
+          {quote.vat_rate == null && biz.vat_note && <p className={styles.small}>{biz.vat_note}</p>}
           {quote.status === 'envoye' && !accepted && (
             <button type="button" className={`btn btn-cta btn-block ${styles.mt}`} onClick={accept} disabled={accepting}>
               {accepting ? 'Validation…' : 'J’accepte ce devis'}
@@ -387,7 +374,7 @@ export default function Tracking({ token }) {
 
       {/* Avant / après */}
       {(pairs.length > 0 || extraAfters.length > 0) && (
-        <section className={`${styles.card} ${styles.noPrint}`}>
+        <section id="photos" className={`${styles.card} ${styles.noPrint}`}>
           <h2>Avant / après</h2>
           <div className={styles.baList}>
             {pairs.map((p, i) => (
@@ -404,7 +391,8 @@ export default function Tracking({ token }) {
               ))}
             </div>
           )}
-          <p className={styles.small}>Touchez une photo pour l&apos;ouvrir en grand et l&apos;enregistrer.</p>
+          <SavePhotos photos={[...befores, ...afters]} name={t.first_name} />
+          <p className={styles.small}>Ou touchez une photo pour l&apos;ouvrir en grand et l&apos;enregistrer.</p>
         </section>
       )}
 
@@ -416,7 +404,14 @@ export default function Tracking({ token }) {
           </p>
           <h2>Votre avis compte énormément</h2>
           <p className={styles.muted}>30 secondes sur Google aident une petite entreprise locale à se faire connaître. Merci !</p>
-          <a className="btn btn-cta btn-block" href={CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer">
+          {photos.length > 0 && (
+            <ol className={styles.reviewSteps}>
+              <li>Enregistrez vos photos avant / après (bouton plus haut)</li>
+              <li>Touchez « Laisser un avis Google », mettez vos étoiles et quelques mots</li>
+              <li>Touchez « Ajouter des photos » et choisissez-les ✨</li>
+            </ol>
+          )}
+          <a className="btn btn-cta btn-block" href={CONTACT.googleReviewPhotoUrl || CONTACT.googleReviewUrl} target="_blank" rel="noopener noreferrer">
             Laisser un avis Google
           </a>
         </section>
@@ -446,22 +441,9 @@ export default function Tracking({ token }) {
               <span>Émise le {new Date(invoice.issued_at).toLocaleDateString('fr-FR')}</span>
             </div>
           </div>
-          <ul className={styles.lines}>
-            {(invoice.lines || []).map((l, i) => (
-              <li key={i}>
-                <span>
-                  {l.label}
-                  {Number(l.qty) > 1 ? ` × ${l.qty}` : ''}
-                </span>
-                <strong>{euros(Number(l.qty || 0) * Number(l.unit_price || 0))}</strong>
-              </li>
-            ))}
-            <li className={styles.total}>
-              <span>Total</span>
-              <strong>{euros(invoice.total)}</strong>
-            </li>
-          </ul>
-          {biz.vat_note && <p className={styles.small}>{biz.vat_note}</p>}
+          <DocLines doc={invoice} />
+          {invoice.vat_rate == null && biz.vat_note && <p className={styles.small}>{biz.vat_note}</p>}
+          {invoice.vat_rate != null && biz.vat_number && <p className={styles.small}>N° TVA : {biz.vat_number}</p>}
           <div className={`${styles.actions} ${styles.noPrint}`}>
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => window.print()}>
               Télécharger (PDF)
@@ -533,5 +515,100 @@ export default function Tracking({ token }) {
         <p>Nettoyage automobile à domicile autour d&apos;{CONTACT.city}</p>
       </footer>
     </main>
+  )
+}
+
+// Lignes d'un devis / d'une facture : HT, remise, TVA et TTC (ou total sans TVA pour les anciens documents).
+function DocLines({ doc }) {
+  const a = docAmounts(doc)
+  const vat = a.rate !== null
+  return (
+    <ul className={styles.lines}>
+      {(doc.lines || []).map((l, i) => (
+        <li key={i}>
+          <span>
+            {l.label}
+            {Number(l.qty) > 1 ? ` × ${l.qty}` : ''}
+            {l.details ? <small className={styles.lineDetails}>{l.details}</small> : null}
+          </span>
+          <strong>
+            {eur(lineHt(l))}
+            {vat ? ' HT' : ''}
+          </strong>
+        </li>
+      ))}
+      {a.pct > 0 && (
+        <li>
+          <span>Remise ({String(a.pct).replace('.', ',')} %)</span>
+          <strong>{eur(-a.remise)}</strong>
+        </li>
+      )}
+      {vat && (
+        <>
+          <li>
+            <span>Total HT</span>
+            <strong>{eur(a.ht)}</strong>
+          </li>
+          <li>
+            <span>TVA {String(a.rate).replace('.', ',')} %</span>
+            <strong>{eur(a.tva)}</strong>
+          </li>
+        </>
+      )}
+      <li className={styles.total}>
+        <span>{vat ? 'Total TTC' : 'Total'}</span>
+        <strong>{eur(doc.total ?? a.ttc)}</strong>
+      </li>
+    </ul>
+  )
+}
+
+// « Enregistrer mes photos » : sur téléphone, le menu de partage propose « Enregistrer les images » ;
+// sinon chaque photo est téléchargée. Les fichiers sont préparés à l'avance (le partage doit partir du geste).
+function SavePhotos({ photos, name }) {
+  const key = photos.map((p) => p.path).join('|')
+  const [ready, setReady] = useState({ key: '', files: [] })
+  const files = ready.key === key ? ready.files : []
+
+  useEffect(() => {
+    let alive = true
+    if (!key) return
+    Promise.all(
+      key.split('|').map((path, i) =>
+        fetch(photoUrl(path))
+          .then((r) => (r.ok ? r.blob() : Promise.reject(new Error('photo'))))
+          .then((b) => new File([b], `la-clean-compagny-photo-${i + 1}.jpg`, { type: b.type || 'image/jpeg' }))
+      )
+    )
+      .then((fs) => alive && setReady({ key, files: fs }))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [key])
+
+  if (!photos.length) return null
+
+  function save() {
+    if (files.length && navigator.canShare?.({ files })) {
+      navigator.share({ files, title: `Photos ${name || ''} – La Clean Compagny`.trim() }).catch(() => {})
+      return
+    }
+    const list = files.length ? files.map((f) => ({ url: URL.createObjectURL(f), name: f.name })) : photos.map((p, i) => ({ url: photoUrl(p.path), name: `photo-${i + 1}.jpg` }))
+    for (const f of list) {
+      const a = document.createElement('a')
+      a.href = f.url
+      a.download = f.name
+      a.target = '_blank'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    }
+  }
+
+  return (
+    <button type="button" className={`btn btn-ghost btn-block ${styles.mt}`} onClick={save}>
+      📸 Enregistrer mes {photos.length} photo{photos.length > 1 ? 's' : ''}
+    </button>
   )
 }

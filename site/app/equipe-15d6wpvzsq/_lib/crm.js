@@ -5,11 +5,38 @@
 import { CONTACT, SITE } from '@/lib/constants'
 import { defaultMinutes, recallDays, WORK_START, WORK_END } from '@/lib/catalog'
 import { leadChannel, channelLabel } from '@/lib/attribution'
+import { ttcOf } from '@/lib/invoice'
 
 export { leadChannel, channelLabel }
 
 // Adresse secrète de l'espace équipe (aussi dans next.config.mjs et les alertes ntfy).
 export const BASE_PATH = '/equipe-15d6wpvzsq'
+
+// ---------- TVA : les prix des RDV sont saisis HT, le client paie TTC ----------
+let VAT = 20
+export function setVatRate(rate) {
+  VAT = rate === null || rate === undefined || rate === '' ? 0 : Number(rate) || 0
+}
+export function getVatRate() {
+  return VAT
+}
+// Prix TTC d'un montant HT (taux de l'entreprise).
+export function ttc(ht) {
+  return ttcOf(ht, VAT)
+}
+// Prix TTC du RDV (quoted_price est en HT).
+export function leadTtc(lead) {
+  return lead?.quoted_price === null || lead?.quoted_price === undefined || lead?.quoted_price === '' ? null : ttc(lead.quoted_price)
+}
+// « 180 € HT · 216 € TTC »
+export function priceLabel(ht) {
+  if (ht === null || ht === undefined || ht === '') return ''
+  if (!VAT) return eurosAuto(ht)
+  return `${eurosAuto(ht)} HT · ${eurosAuto(ttc(ht))} TTC`
+}
+export function eurosAuto(n) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(Number(n) || 0)
+}
 
 export const STATUSES = [
   { id: 'nouveau', label: 'Nouveau', short: 'Nouveau' },
@@ -225,7 +252,7 @@ export function templates(lead) {
   const rdv = lead.appointment_at
     ? `${formatDayLabel(lead.appointment_at).toLowerCase()} à ${formatTime(lead.appointment_at)}`
     : '[date et heure]'
-  const prix = lead.quoted_price ? euros(lead.quoted_price) : '[prix]'
+  const prix = lead.quoted_price ? `${eurosAuto(leadTtc(lead))}${VAT ? ' TTC' : ''}` : '[prix]'
   const service = lead.service ? lead.service.toLowerCase() : 'nettoyage'
   const suivi = trackUrl(lead)
   const eta = lead.eta_at ? formatTime(lead.eta_at) : ''
@@ -268,12 +295,12 @@ export function templates(lead) {
     {
       id: 'avis',
       label: 'Demande d’avis',
-      text: `Bonjour ${prenom}, merci pour votre confiance !${suivi ? ` Vos photos avant/après et votre facture sont ici : ${suivi}\n\n` : ' '}Si le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewUrl}${sign}`,
+      text: `Bonjour ${prenom}, merci pour votre confiance !${suivi ? ` Vos photos avant/après et votre facture sont ici : ${suivi}\n\n` : ' '}Si le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${CONTACT.googleReviewPhotoUrl}${sign}`,
     },
     {
       id: 'relance-avis',
       label: 'Relance avis',
-      text: `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄 Si vous avez 30 secondes pour l'avis, voici le lien : ${CONTACT.googleReviewUrl} Merci beaucoup !${sign}`,
+      text: `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄 Si vous avez 30 secondes pour l'avis, voici le lien : ${CONTACT.googleReviewPhotoUrl} Merci beaucoup !${sign}`,
     },
     {
       id: 'entretien',
@@ -410,7 +437,7 @@ export function computeKpis(leads, jobs, now = new Date()) {
     reviewsReceived: real.filter((l) => l.status === 'avis_recu').length,
     pipelineValue: real
       .filter((l) => ['devis_envoye', 'reserve'].includes(l.status))
-      .reduce((s, l) => s + Number(l.quoted_price || 0), 0),
+      .reduce((s, l) => s + Number(leadTtc(l) || 0), 0),
   }
 }
 
@@ -487,12 +514,27 @@ export function euros2(n) {
 export function clientFromLead(lead) {
   if (!lead) return {}
   return {
+    company: lead.partner || '',
     name: lead.first_name || '',
     phone: lead.phone || '',
     email: lead.email || '',
     address: [lead.address, lead.city].filter(Boolean).join(', '),
     vehicle: lead.vehicle || '',
+    plate: lead.plate || '',
   }
+}
+
+// Ligne de facture d'un RDV : prestation + détail véhicule / plaque / date (prix HT).
+export function docLinesFromLead(lead, unitHt = null) {
+  if (!lead) return [{ label: '', details: '', qty: 1, unit_price: 0 }]
+  const details = [
+    lead.vehicle ? `Véhicule concerné ${lead.vehicle}` : '',
+    lead.plate ? `Immatriculation ${lead.plate}` : '',
+    lead.appointment_at ? `Prestation du ${formatDate(lead.appointment_at, { dateStyle: 'short' })}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
+  return [{ label: lead.service || 'Prestation', details, qty: 1, unit_price: unitHt ?? (Number(lead.quoted_price) || 0) }]
 }
 
 export function isOverdue(doc, now = new Date()) {
@@ -738,7 +780,7 @@ export function monthForecast(leads, jobs, now = new Date()) {
   const done = jobs.filter((j) => new Date(j.done_at) >= monthStart && new Date(j.done_at) < monthEnd).reduce((s, j) => s + Number(j.amount || 0), 0)
   const planned = leads
     .filter((l) => l.status === 'reserve' && l.appointment_at && new Date(l.appointment_at) >= startOfDay(now) && new Date(l.appointment_at) < monthEnd)
-    .reduce((s, l) => s + Number(l.quoted_price || 0), 0)
+    .reduce((s, l) => s + Number(leadTtc(l) || 0), 0)
   return { done, planned, total: done + planned }
 }
 
@@ -780,7 +822,8 @@ export function reviewText(lead, withPhoto, { relance = false, linkFirst = false
   const prenom = lead.first_name || ''
   const suivi = trackUrl(lead)
   const sign = '\nEnzo – La Clean Compagny'
-  const avis = CONTACT.googleReviewUrl
+  // Lien qui garde « Ajouter des photos » sur téléphone (le lien court le fait souvent disparaître).
+  const avis = CONTACT.googleReviewPhotoUrl || CONTACT.googleReviewUrl
   if (linkFirst && suivi) {
     const head = relance
       ? `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄`
@@ -788,7 +831,7 @@ export function reviewText(lead, withPhoto, { relance = false, linkFirst = false
     return `${head}\n\n📸 Votre voiture une fois terminée (photos avant/après${relance ? '' : ' et facture'}) : ${suivi}\n\nSi le résultat vous a plu, un petit avis Google nous aiderait énormément (30 secondes) : ${avis}\nVous pouvez y ajouter la photo ✨${sign}`
   }
   const photo = withPhoto
-    ? `\n\n📸 Voici votre voiture une fois terminée ! Si vous pouvez, ajoutez cette photo à votre avis : enregistrez-la, puis touchez « Ajouter des photos » en écrivant l'avis.`
+    ? `\n\n📸 Voici votre voiture avant / après ! Si vous pouvez, ajoutez une photo à votre avis : enregistrez-la, puis touchez « Ajouter des photos » en écrivant l'avis.`
     : ''
   if (relance) {
     return `Bonjour ${prenom}, j'espère que${vehiclePart(lead)} est toujours aussi propre 😄${photo}\n\nSi vous avez 30 secondes pour l'avis, voici le lien : ${avis}\nMerci beaucoup !${sign}`
@@ -820,4 +863,34 @@ export function arrivedText(lead) {
 // Bientôt fini.
 export function almostDoneText(lead, endIso) {
   return `Bonjour ${lead.first_name || ''}, j'ai bientôt terminé${endIso ? ` (vers ${formatTime(endIso)})` : ''} ✨ Je vous préviens dès que c'est prêt.${SIGN}`
+}
+
+// ---------- Avis Google : réponse prête au prénom du client ----------
+// Même texte que celui préparé par la base à l'arrivée de l'avis (private.review_reply_draft).
+export function replyDraft(review) {
+  const first = String(review?.author || '').trim().split(/\s+/)[0] || ''
+  const name = first && !/^client/i.test(first) ? first.charAt(0).toUpperCase() + first.slice(1).toLowerCase() : ''
+  const hi = name ? `Bonjour ${name}` : 'Bonjour'
+  const sign = ' Enzo – La Clean Compagny'
+  const rating = Number(review?.rating) || 5
+  if (rating >= 4) {
+    const v = [
+      `${hi}, merci beaucoup pour votre avis ! Ravi que le résultat vous plaise. C'était un plaisir de m'occuper de votre voiture, à très bientôt pour le prochain nettoyage ✨`,
+      `${hi}, merci pour votre confiance et pour ce super retour ! Content que votre voiture ait retrouvé son éclat. Au plaisir de vous revoir pour un prochain nettoyage à domicile 🚗`,
+      `${hi}, un grand merci pour ces quelques mots ! Votre satisfaction est la meilleure récompense. N'hésitez pas à me recontacter quand votre voiture aura besoin d'un coup de propre 😉`,
+    ]
+    const k = [...String(review?.id || '')].reduce((t, c) => (t + c.charCodeAt(0)) % 3, 0)
+    return v[k] + sign
+  }
+  if (rating === 3)
+    return `${hi}, merci pour votre avis. Je suis désolé que tout n'ait pas été parfait : pouvez-vous me dire ce qui vous a manqué ? Je tiens à ce que chaque client soit pleinement satisfait.${sign}`
+  return `${hi}, merci d'avoir pris le temps de laisser un avis. Je suis sincèrement désolé que la prestation ne vous ait pas satisfait. Contactez-moi directement au ${CONTACT.phoneDisplay} pour qu'on trouve une solution ensemble.${sign}`
+}
+
+// Avis arrivé récemment et sans réponse (bandeau « Nouvel avis » de l'accueil).
+export function isNewReview(review, now = new Date()) {
+  if (review?.replied) return false
+  const fetched = review?.fetched_at ? new Date(review.fetched_at) : null
+  const dated = review?.review_date ? new Date(`${review.review_date}T12:00:00`) : null
+  return Boolean(fetched && now - fetched < 3 * 86400000 && (!dated || now - dated < 14 * 86400000))
 }

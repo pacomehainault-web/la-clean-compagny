@@ -38,3 +38,21 @@ export async function sendLeadEmail({ subject, text, replyTo }) {
     text,
   })
 }
+
+// Email envoyé au nom d'Enzo depuis sa boîte Gmail (factures, devis, demandes d'avis).
+// Copie cachée à Enzo : le mail arrive aussi dans sa boîte de réception.
+export async function sendAsEnzo({ to, subject, text, html, attachments = [], copyToEnzo = true }) {
+  const t = getTransporter()
+  if (!t) throw new Error('gmail_non_configure')
+  const me = process.env.GMAIL_USER
+  return t.sendMail({
+    from: `"Enzo - La Clean Compagny" <${me}>`,
+    to,
+    bcc: copyToEnzo ? me : undefined,
+    replyTo: me,
+    subject,
+    text,
+    html,
+    attachments,
+  })
+}

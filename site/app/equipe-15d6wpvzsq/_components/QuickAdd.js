@@ -24,8 +24,15 @@ import {
   smsHref,
   gcalHref,
   toDateInput,
-  euros,
 } from '../_lib/crm'
+import { priceLabel, getVatRate, eurosAuto, ttc } from '../_lib/crm'
+import { htOf } from '@/lib/invoice'
+
+// Les prix du site sont TTC : le RDV garde le prix HT.
+function catalogHt(service, size) {
+  const p = priceFor(service, size)
+  return p === null || p === undefined ? null : htOf(p, getVatRate())
+}
 
 const MODES = [
   { id: 'rdv', label: 'RDV', icon: 'calendar' },
@@ -118,7 +125,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
     setService(s)
     if (!slotTouched) setSlot((v) => ({ ...v, minutes: defaultMinutes(s) }))
     if (!priceTouched) {
-      const p = priceFor(s, size)
+      const p = catalogHt(s, size)
       setPrice(p ?? '')
     }
   }
@@ -126,7 +133,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
   function chooseSize(s) {
     setSize(s)
     if (!priceTouched) {
-      const p = priceFor(service, s)
+      const p = catalogHt(service, s)
       if (p) setPrice(p)
     }
   }
@@ -155,7 +162,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
       setPrice(p.price)
       setPriceTouched(true)
     } else if (!priceTouched && svc) {
-      const pr = priceFor(svc, sz)
+      const pr = catalogHt(svc, sz)
       if (pr) setPrice(pr)
     }
     if (p.vehicle) {
@@ -235,7 +242,7 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
           <p>
             {done.first_name} · {new Date(done.appointment_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à{' '}
             {new Date(done.appointment_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-            {done.quoted_price ? ` · ${euros(done.quoted_price)}` : ''}
+            {done.quoted_price ? ` · ${priceLabel(done.quoted_price)}` : ''}
           </p>
         </div>
         <div className={styles.doneActions}>
@@ -356,11 +363,11 @@ function RdvForm({ leads, settings, initial, onCreate, onClose, onOpenLead }) {
         </div>
         <div className={styles.grid2}>
           <label className={styles.field}>
-            Prix (€)
+            Prix HT (€){price !== '' && getVatRate() ? <em className={styles.fieldHint}> = {eurosAuto(ttc(price))} TTC</em> : null}
             <input
               type="number"
               min="0"
-              step="1"
+              step="0.01"
               inputMode="decimal"
               value={price}
               onChange={(e) => {

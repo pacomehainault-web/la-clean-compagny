@@ -212,3 +212,37 @@
     padding: 18mm 16mm;
   }
 }
+
+.toolBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.toolbar a.btn {
+  background: #2f52d0;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+.toolbar a.btnGhost {
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+.frame {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  height: calc(100dvh - 110px);
+  min-height: 600px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}

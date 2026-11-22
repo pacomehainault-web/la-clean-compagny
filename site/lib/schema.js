@@ -58,6 +58,17 @@ export function localBusinessSchema() {
       ...CITIES.map((city) => ({ '@type': 'City', name: city.name })),
     ],
     sameAs: [...Object.values(SOCIALS), CONTACT.googleBusinessUrl, CONTACT.googleMapsCidUrl],
+    vatID: SITE.vatNumber,
+    taxID: SITE.siret,
+    // Sur rendez-vous, du lundi au samedi (mêmes horaires que la réservation en ligne).
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        opens: '08:00',
+        closes: '19:00',
+      },
+    ],
   }
 }
 
